@@ -15,6 +15,7 @@
 #include "stb_vorbis.c"
 
 #include "AudioConvert.h"
+#include "utils/util.hpp"
 
 #include <cstdio>
 
@@ -38,7 +39,7 @@ AudioFormat AudioConverter::detectFormat(const std::string& filePath)
     std::string ext = path.extension().string();
     
     // Convert to lowercase
-    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+    ext = String_ToLower(ext);
     
     if (ext == ".mp3")
         return AUDIO_FORMAT_MP3;

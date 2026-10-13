@@ -11,6 +11,8 @@ option(VORTIGAUNT_AUTORIG "Enable the GoldSrc Auto-Rig tool" OFF)
 set(VORTIGAUNT_CORE_HEADERS
     core/converters/Gr2Converter.h
     core/converters/FbxGlbConverter.h
+    core/converters/WeaponModelConverter.h
+    core/mdl/StudioModel.h
     core/WadMaker.h
     
     core/QCFile.h
@@ -85,6 +87,8 @@ set(VORTIGAUNT_CORE
     
     core/QCFile.cpp
     core/converters/FbxGlbConverter.cpp
+    core/converters/WeaponModelConverter.cpp
+    core/mdl/StudioModel.cpp
     core/converters/AudioConvert.cpp
     core/SpriteLoader.cpp
     core/extractors/xfs/XfsExtractor.cpp

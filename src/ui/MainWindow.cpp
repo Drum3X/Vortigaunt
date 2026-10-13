@@ -9,6 +9,7 @@
 #include <QPushButton>
 #include <QComboBox>
 #include <QCheckBox>
+#include <QDoubleSpinBox>
 #include <QPlainTextEdit>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -61,6 +62,7 @@
 #include "core/extractors/pak/PakExtractor.h"
 #include "core/converters/Gr2Converter.h"
 #include "core/converters/FbxGlbConverter.h"
+#include "core/converters/WeaponModelConverter.h"
 #include "core/VortigauntLog.h"
 
 #ifdef ENABLE_GRANNY2
@@ -160,8 +162,8 @@ MainWindow::MainWindow(QWidget* parent)
 #endif
     resize(minimumWidth(), minimumHeight());
     setAcceptDrops(true);
-    setMinimumWidth(800);
-    setMinimumHeight(600);
+    setMinimumWidth(1024);
+    setMinimumHeight(768);
 
     // Menu bar with Tools entries
     m_toolsMenu = menuBar()->addMenu(tr("Tools"));
@@ -371,7 +373,8 @@ MainWindow::MainWindow(QWidget* parent)
     m_operationCombo = new QComboBox();
     m_operationCombo->addItem(tr("Convert LTB"));
     m_operationCombo->addItem(tr("Convert GR2"));
-    m_operationCombo->addItem(tr("Convert FBX/GLB"));
+    m_operationCombo->addItem(tr("Convert FBX/GLB/OBJ"));
+    m_operationCombo->addItem(tr("Convert V model to P/W model"));
 #ifdef METIN2_SCRIPT_EFFECT
     m_operationCombo->addItem(tr("Convert MSE Effect (Metin2 Effect Script)"));
 #endif
@@ -467,6 +470,80 @@ MainWindow::MainWindow(QWidget* parent)
     m_writeQCCheck->setToolTip(tr("Generate QC file for studiomdl compilation"));
     m_writeQCCheck->setVisible(false); // Hidden by default, shown only for GR2
     runLayout->addWidget(m_writeQCCheck);
+
+    // Shown with Write QC; there is nothing to compile without a QC
+    m_compileModelCheck = new QCheckBox(tr("Compile model"));
+    m_compileModelCheck->setToolTip(tr("Run studiomdl on the QC to produce the .mdl. Set the location of studiomdl in Settings."));
+    m_compileModelCheck->setVisible(false);
+    m_compileModelCheck->setEnabled(m_writeQCCheck->isChecked());
+    runLayout->addWidget(m_compileModelCheck);
+    connect(m_writeQCCheck, &QCheckBox::toggled, m_compileModelCheck, &QCheckBox::setEnabled);
+
+    // V model -> P/W model: size and mirroring of the result
+    m_weaponScaleLabel = new QLabel(tr("Scale:"));
+    m_weaponScaleSpin = new QDoubleSpinBox();
+    m_weaponScaleSpin->setRange(0.0, 20.0);
+    m_weaponScaleSpin->setDecimals(2);
+    m_weaponScaleSpin->setSingleStep(0.05);
+    m_weaponScaleSpin->setValue(0.0);
+    m_weaponScaleSpin->setSpecialValueText(tr("Auto"));
+    m_weaponScaleSpin->setToolTip(tr("Size of the P/W model relative to the V model. Auto works it out from the size of the V model's hands; "
+                                     "the log shows the value it used, which is a good starting point for setting it by hand."));
+    m_weaponMirrorLabel = new QLabel(tr("Mirror:"));
+    m_weaponMirrorCombo = new QComboBox();
+    m_weaponMirrorCombo->addItem(tr("Auto"), -1);
+    m_weaponMirrorCombo->addItem(tr("Yes"), 1);
+    m_weaponMirrorCombo->addItem(tr("No"), 0);
+    m_weaponMirrorCombo->setToolTip(tr("V models are usually built left handed and flipped by the engine, so the P/W model has to be the mirror image. "
+                                       "Auto mirrors when the weapon stands on the left of the view."));
+    m_gameDirLabel = new QLabel(tr("Game:"));
+    m_gameDirCombo = new QComboBox();
+    m_gameDirCombo->addItem(tr("Counter-Strike"), static_cast<int>(GameDir::cstrike));
+    m_gameDirCombo->addItem(tr("Half-Life"), static_cast<int>(GameDir::valve));
+    m_gameDirCombo->addItem(tr("Sven Co-op"), static_cast<int>(GameDir::svencoop));
+    m_gameDirCombo->setToolTip(tr("The game the P model is for. Each has its own player skeleton and hand size, "
+                                     "and holds a weapon a little differently."));
+
+    m_weaponTypeLabel = new QLabel(tr("Weapon:"));
+    m_weaponTypeCombo = new QComboBox();
+    m_weaponTypeCombo->addItem(tr("Auto"), static_cast<int>(WeaponType::Auto));
+    m_weaponTypeCombo->addItem(tr("Gun"), static_cast<int>(WeaponType::Gun));
+    m_weaponTypeCombo->addItem(tr("Knife / melee"), static_cast<int>(WeaponType::Knife));
+    m_weaponTypeCombo->addItem(tr("Grenade"), static_cast<int>(WeaponType::Grenade));
+    m_weaponTypeCombo->addItem(tr("Pack (C4, mine)"), static_cast<int>(WeaponType::Pack));
+    m_weaponTypeCombo->addItem(tr("Dual (one in each hand)"), static_cast<int>(WeaponType::Dual));
+    m_weaponTypeCombo->addItem(tr("Like a reference p_ model"), static_cast<int>(WeaponType::Reference));
+    m_weaponTypeCombo->setToolTip(tr("How the player holds the weapon. P models of one kind all sit in the hand the same way: "
+                                     "a gun points along the hand, a knife stands up out of the fist, a grenade lies in the palm. "
+                                     "For anything else, pick a p_ model that is held the way this one should be."));
+    m_weaponReferenceEdit = new QLineEdit();
+    m_weaponReferenceEdit->setPlaceholderText(tr("Reference p_ model (.mdl)"));
+    m_weaponReferenceEdit->setMinimumWidth(80);
+    m_weaponReferenceBrowse = new QPushButton(tr("..."));
+    m_weaponReferenceBrowse->setMaximumWidth(32);
+    connect(m_weaponReferenceBrowse, &QPushButton::clicked, this, [this]() {
+        const QString file = QFileDialog::getOpenFileName(this, tr("Select a reference p_ model"), m_weaponReferenceEdit->text(),
+                                                          tr("GoldSrc model (*.mdl);;All files (*.*)"));
+        if (!file.isEmpty())
+            m_weaponReferenceEdit->setText(file);
+    });
+    connect(m_weaponTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int) { updateWeaponModelControls(); });
+
+    m_weaponUpsideDownCheck = new QCheckBox(tr("Upside down"));
+    m_weaponUpsideDownCheck->setToolTip(tr("Turns the weapon end for end in the hand. For a grenade or knife that came out the wrong way up."));
+
+    auto* weaponLayout = new QHBoxLayout();
+    for (QWidget* w : { static_cast<QWidget*>(m_gameDirLabel), static_cast<QWidget*>(m_gameDirCombo),
+                        static_cast<QWidget*>(m_weaponTypeLabel), static_cast<QWidget*>(m_weaponTypeCombo),
+                        static_cast<QWidget*>(m_weaponReferenceEdit), static_cast<QWidget*>(m_weaponReferenceBrowse),
+                        static_cast<QWidget*>(m_weaponUpsideDownCheck),
+                        static_cast<QWidget*>(m_weaponScaleLabel), static_cast<QWidget*>(m_weaponScaleSpin),
+                        static_cast<QWidget*>(m_weaponMirrorLabel), static_cast<QWidget*>(m_weaponMirrorCombo) })
+    {
+        w->setVisible(false);
+        weaponLayout->addWidget(w, w == m_weaponReferenceEdit ? 1 : 0);
+    }
+    weaponLayout->addStretch();
     
     runLayout->addStretch();
     
@@ -512,6 +589,7 @@ MainWindow::MainWindow(QWidget* parent)
     mainLayout->addWidget(outputGroup);
     mainLayout->addWidget(optionsGroup);
     mainLayout->addWidget(m_gr2AnimGroup);
+    mainLayout->addLayout(weaponLayout);
     mainLayout->addLayout(runLayout);
     mainLayout->addWidget(logGroup, 1);
 
@@ -567,6 +645,7 @@ MainWindow::MainWindow(QWidget* parent)
         bool isGr2 = currentText.contains("GR2", Qt::CaseInsensitive);
         bool isLtb = currentText.contains("LTB", Qt::CaseInsensitive);
         bool isFbxGlb = currentText.contains("FBX", Qt::CaseInsensitive);
+        bool isWeaponModel = currentText.contains("P/W", Qt::CaseInsensitive);
         bool isArchiveFile = currentText.contains("REZ", Qt::CaseInsensitive) ||
 			currentText.contains("PAK", Qt::CaseInsensitive) ||
 			currentText.contains("VPK", Qt::CaseInsensitive);
@@ -579,7 +658,9 @@ MainWindow::MainWindow(QWidget* parent)
         m_gr2AnimGroup->setVisible(isGr2);
         m_mirrorUVYCheck->setVisible(isGr2); // Show Mirror UV Y checkbox only for GR2
         m_invertAlphaCheck->setVisible(isGr2); // Show Invert Alpha checkbox only for GR2
-        m_writeQCCheck->setVisible(isGr2 || isLtb || isFbxGlb); // Show Write QC checkbox  for GR2, Ltb & FBX/GLB
+        m_writeQCCheck->setVisible(isGr2 || isLtb || isFbxGlb || isWeaponModel); // Show Write QC checkbox  for GR2, Ltb & FBX/GLB
+        m_compileModelCheck->setVisible(isGr2 || isLtb || isFbxGlb || isWeaponModel);
+        updateWeaponModelControls();
 
 
         m_ignoreMeshesCheck->setVisible(isLtb);
@@ -622,7 +703,10 @@ MainWindow::MainWindow(QWidget* parent)
     
     m_mirrorUVYCheck->setVisible(initialGr2);
     m_invertAlphaCheck->setVisible(initialGr2);
-    m_writeQCCheck->setVisible(initialGr2 || initialLtb || initialText.contains("FBX", Qt::CaseInsensitive));
+    m_writeQCCheck->setVisible(initialGr2 || initialLtb || initialText.contains("FBX", Qt::CaseInsensitive) ||
+                               initialText.contains("P/W", Qt::CaseInsensitive));
+    m_compileModelCheck->setVisible(m_writeQCCheck->isVisibleTo(this));
+    updateWeaponModelControls();
     m_unityBmpCheck->setVisible(initialText.contains("Unity", Qt::CaseInsensitive));
     
     if (m_outputFormatLabel) m_outputFormatLabel->setVisible(isModelOp);
@@ -822,7 +906,8 @@ void MainWindow::updateOperationComboForFile(const QString& filePath)
 #ifdef ENABLE_GRANNY2
     m_operationCombo->addItem(tr("Convert GR2 "));
 #endif
-    m_operationCombo->addItem(tr("Convert FBX/GLB"));
+    m_operationCombo->addItem(tr("Convert FBX/GLB/OBJ"));
+    m_operationCombo->addItem(tr("Convert V model to P/W model"));
     m_operationCombo->addItem(tr("Extract REZ File"));
     m_operationCombo->addItem(tr("Extract PAK File (Counter Strike Online)"));
     m_operationCombo->addItem(tr("Extract XFS File (Xenesis)"));
@@ -853,7 +938,11 @@ void MainWindow::updateOperationComboForFile(const QString& filePath)
             selectIndex = i;
             break;
         }
-        else if ((ext == "fbx" || ext == "glb" || ext == "gltf") && itemText.contains("fbx")) {
+        else if ((ext == "fbx" || ext == "glb" || ext == "gltf" || ext == "obj") && itemText.contains("fbx")) {
+            selectIndex = i;
+            break;
+        }
+        else if (ext == "mdl" && itemText.contains("p/w")) {
             selectIndex = i;
             break;
         }
@@ -899,7 +988,7 @@ void MainWindow::onBrowseInput()
     }
     else
     {
-        QString baseExtensions = "*.ltb *.gr2 *.fbx *.glb *.gltf *.rez *.pak *.mse *.xfs *.unity3d *.bundle *.assets *.vpk *.gma";
+        QString baseExtensions = "*.ltb *.gr2 *.fbx *.glb *.gltf *.obj *.mdl *.rez *.pak *.mse *.xfs *.unity3d *.bundle *.assets *.vpk *.gma";
         filterStr = tr("Supported files (%1);;All files (*.*)").arg(baseExtensions);
     }
 
@@ -1043,8 +1132,33 @@ void MainWindow::onRun()
 
     const bool fbxGlbWriteQC = !m_writeQCCheck || m_writeQCCheck->isChecked();
 
+    // Better to hear about a missing compiler now than after the conversion.
+    if (m_compileModelCheck->isVisibleTo(this) && m_compileModelCheck->isEnabled() && m_compileModelCheck->isChecked() &&
+        !QFileInfo(SettingsDialog::getStudioMdlPath()).isFile())
+    {
+        QMessageBox::warning(this, tr("studiomdl not set"),
+                             tr("\"Compile model\" needs studiomdl. Set its location in Settings, or untick \"Compile model\"."));
+        return;
+    }
+
+    WeaponModelOptions weaponOptions;
+    weaponOptions.writeQC = fbxGlbWriteQC;
+    weaponOptions.scale = static_cast<float>(m_weaponScaleSpin->value());
+    weaponOptions.mirror = m_weaponMirrorCombo->currentData().toInt();
+    weaponOptions.hold = static_cast<WeaponType>(m_weaponTypeCombo->currentData().toInt());
+    weaponOptions.gameDir = static_cast<GameDir>(m_gameDirCombo->currentData().toInt());
+    weaponOptions.upsideDown = m_weaponUpsideDownCheck->isChecked();
+    weaponOptions.referenceModel = m_weaponReferenceEdit->text().trimmed().toStdString();
+    if (modeText.contains("P/W", Qt::CaseInsensitive) && weaponOptions.hold == WeaponType::Reference &&
+        weaponOptions.referenceModel.empty())
+    {
+        QMessageBox::warning(this, tr("Reference model required"),
+                             tr("Select the p_ model this weapon should be held like, or choose another weapon type."));
+        return;
+    }
+
     // Start background task
-    runInBackground([this, modeText, selectedFiles, inputPath, outputDir, ltbEncSettings, unityTexturesToBmp, fbxGlbWriteQC]() mutable {
+    runInBackground([this, modeText, selectedFiles, inputPath, outputDir, ltbEncSettings, unityTexturesToBmp, fbxGlbWriteQC, weaponOptions]() mutable {
         
 
 
@@ -1066,7 +1180,7 @@ void MainWindow::onRun()
         // so i did this
         if ((modeText.contains("Multi Process Mode", Qt::CaseInsensitive) || selectedFiles.size() > 1) && !modeText.contains("Unity", Qt::CaseInsensitive))
         {
-            QStringList ltbList, gr2List, rezList, pakList, xfsList, vpkList, fbxGlbList;
+            QStringList ltbList, gr2List, rezList, pakList, xfsList, vpkList, fbxGlbList, mdlList;
             
             for (const QString& f : selectedFiles) {
                 QString ext = QFileInfo(f).suffix().toLower();
@@ -1074,7 +1188,8 @@ void MainWindow::onRun()
                 else if (ext == "pak") pakList << f;
                 else if (ext == "gr2") gr2List << f;
                 else if (ext == "ltb") ltbList << f;
-                else if (ext == "fbx" || ext == "glb" || ext == "gltf") fbxGlbList << f;
+                else if (ext == "fbx" || ext == "glb" || ext == "gltf" || ext == "obj") fbxGlbList << f;
+                else if (ext == "mdl") mdlList << f;
                 else if (ext == "xfs") xfsList << f;
                 else if (ext == "vpk" || ext == "gma") vpkList << f; // VPK and GMA share the same pipeline
             }
@@ -1092,6 +1207,9 @@ void MainWindow::onRun()
             for (const QString& model : fbxGlbList) {
                 convertFbxGlb(model, outputDir, fbxGlbWriteQC);
             }
+            for (const QString& model : mdlList) {
+                convertViewModel(model, outputDir, weaponOptions);
+            }
             if (!rezList.isEmpty()) extractArchiveRez(rezList, outputDir);
             if (!pakList.isEmpty()) extractArchivePak(pakList, outputDir);
             if (!xfsList.isEmpty()) extractArchiveXfs(xfsList, outputDir);
@@ -1108,6 +1226,10 @@ void MainWindow::onRun()
         else if (modeText.contains("FBX", Qt::CaseInsensitive))
         {
             convertFbxGlb(inputPath, outputDir, fbxGlbWriteQC);
+        }
+        else if (modeText.contains("P/W", Qt::CaseInsensitive))
+        {
+            convertViewModel(inputPath, outputDir, weaponOptions);
         }
         else if (modeText.contains("Extract REZ", Qt::CaseInsensitive))
         {
@@ -1319,7 +1441,7 @@ void MainWindow::convertFbxGlb(const QString& inputPath, const QString& outputDi
 
     if (files.empty())
     {
-        VortigauntLog::Vortigaunt_Printf(QStringLiteral("No .fbx / .glb / .gltf files found in '%1'.").arg(inputPath));
+        VortigauntLog::Vortigaunt_Printf(QStringLiteral("No .fbx / .glb / .gltf / .obj files found in '%1'.").arg(inputPath));
         return;
     }
 
@@ -1333,13 +1455,102 @@ void MainWindow::convertFbxGlb(const QString& inputPath, const QString& outputDi
         const QString inFile = QString::fromStdWString(p.wstring());
         if (!FbxGlbConverter::IsSupportedFile(inFile.toStdString()))
         {
-            VortigauntLog::Vortigaunt_Printf(QStringLiteral("^3Skipped:^7 %1 is not an FBX, GLB or glTF file.").arg(inFile));
+            VortigauntLog::Vortigaunt_Printf(QStringLiteral("^3Skipped:^7 %1 is not an FBX, GLB, glTF or OBJ file.").arg(inFile));
             continue;
         }
 
         const FbxGlbConvertReport report = converter.Convert(inFile.toStdString(), outputDir.toStdString(), options);
         if (report.ok)
             converted++;
+        if (!report.qcPath.empty())
+            compileModelIfWanted(QString::fromStdString(report.qcPath));
+    }
+
+    if (files.size() > 1)
+    {
+        VortigauntLog::Vortigaunt_Printf(QStringLiteral("^2%1 of %2 models converted.").arg(converted).arg(files.size()));
+    }
+}
+
+void MainWindow::compileModelIfWanted(const QString& qcPath)
+{
+    if (!m_compileModelCheck || !m_compileModelCheck->isChecked() || !m_writeQCCheck->isChecked())
+        return;
+
+    VortigauntLog::Vortigaunt_Printf(QStringLiteral("  Compiling %1 ...").arg(QFileInfo(qcPath).fileName()));
+    const QCCompileResult result = QCFile::Compile(SettingsDialog::getStudioMdlPath().toStdString(), qcPath.toStdString());
+    if (result.Ok)
+    {
+        VortigauntLog::Vortigaunt_Printf(QStringLiteral("  ^2Compiled:^7 %1").arg(QString::fromStdString(result.ModelPath)));
+    }
+    else
+    {
+        VortigauntLog::Vortigaunt_Printf(QStringLiteral("  ^1Compile failed:^7 %1").arg(QString::fromStdString(result.Error)));
+    }
+}
+
+void MainWindow::updateWeaponModelControls()
+{
+    if (!m_weaponTypeCombo || !m_operationCombo)
+        return;
+
+    const bool weaponMode = m_operationCombo->currentText().contains("P/W", Qt::CaseInsensitive);
+    const bool needsReference = weaponMode &&
+        static_cast<WeaponType>(m_weaponTypeCombo->currentData().toInt()) == WeaponType::Reference;
+
+    m_gameDirLabel->setVisible(weaponMode);
+    m_gameDirCombo->setVisible(weaponMode);
+    m_weaponTypeLabel->setVisible(weaponMode);
+    m_weaponTypeCombo->setVisible(weaponMode);
+    m_weaponReferenceEdit->setVisible(needsReference);
+    m_weaponReferenceBrowse->setVisible(needsReference);
+    m_weaponUpsideDownCheck->setVisible(weaponMode);
+    m_weaponScaleLabel->setVisible(weaponMode);
+    m_weaponScaleSpin->setVisible(weaponMode);
+    m_weaponMirrorLabel->setVisible(weaponMode);
+    m_weaponMirrorCombo->setVisible(weaponMode);
+}
+
+void MainWindow::convertViewModel(const QString& inputPath, const QString& outputDir, const WeaponModelOptions& options)
+{
+    // A single v_ model, or every v_*.mdl under a folder.
+    std::vector<std::filesystem::path> files;
+    const std::filesystem::path start(inputPath.toStdWString());
+    std::error_code ec;
+    if (std::filesystem::is_regular_file(start, ec))
+    {
+        files.push_back(start);
+    }
+    else if (std::filesystem::is_directory(start, ec))
+    {
+        for (const auto& entry : std::filesystem::recursive_directory_iterator(start, ec))
+        {
+            if (!entry.is_regular_file(ec))
+                continue;
+            if (WeaponModelConverter::IsViewModelFile(QString::fromStdWString(entry.path().wstring()).toStdString()))
+                files.push_back(entry.path());
+        }
+    }
+
+    if (files.empty())
+    {
+        VortigauntLog::Vortigaunt_Printf(QStringLiteral("No v_*.mdl files found in '%1'.").arg(inputPath));
+        return;
+    }
+
+    WeaponModelConverter converter;
+    int converted = 0;
+    for (const auto& p : files)
+    {
+        // The converter writes its own account of the model to the log.
+        const QString inFile = QString::fromStdWString(p.wstring());
+        const WeaponModelResult report = converter.Convert(inFile.toStdString(), outputDir.toStdString(), options);
+        if (report.ok)
+            converted++;
+        if (!report.pQcPath.empty())
+            compileModelIfWanted(QString::fromStdString(report.pQcPath));
+        if (!report.wQcPath.empty())
+            compileModelIfWanted(QString::fromStdString(report.wQcPath));
     }
 
     if (files.size() > 1)
@@ -1461,6 +1672,7 @@ void MainWindow::convertLtb(const QString& inputPath, const QString& outputDir, 
                     if (qcWriter.Write(String_UTF16toUTF8(qcPath.generic_u16string())))
                     {
                         VortigauntLog::Vortigaunt_Printf(QStringLiteral("  QC file created: %1").arg(QString::fromStdWString(qcPath.generic_wstring())));
+                        compileModelIfWanted(QString::fromStdWString(qcPath.wstring()));
                     }
                     else
                     {
@@ -2280,6 +2492,7 @@ void MainWindow::convertGr2(const QString& inputPath, const QString& outputDir)
                 if (qcWriter.Write(String_UTF16toUTF8(qcPath.generic_u16string())))
                 {
                     VortigauntLog::Vortigaunt_Printf(QStringLiteral("  QC file created: %1").arg(QString::fromStdWString(qcPath.generic_wstring())));
+                    compileModelIfWanted(QString::fromStdWString(qcPath.wstring()));
                 }
                 else
                 {

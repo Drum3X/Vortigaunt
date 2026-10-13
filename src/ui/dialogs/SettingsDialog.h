@@ -16,6 +16,8 @@ public:
     explicit SettingsDialog(QWidget* parent = nullptr);
 
     static QString getModelViewerPath();
+    static QString getStudioMdlPath();
+    static void setStudioMdlPath(const QString& path);
     static bool getDeveloperMode();
     static bool getMirrorUVY();
 	static bool getDiscordRpcMode();
@@ -41,6 +43,7 @@ public:
 
 private slots:
     void onBrowseModelViewer();
+    void onBrowseStudioMdl();
     void onBrowseExtractPath();
     void onSave();
 #ifdef Q_OS_WIN
@@ -60,6 +63,8 @@ private:
 #endif
 
     QLineEdit* m_modelViewerEdit;
+    QLineEdit* m_studioMdlEdit;
+    QPushButton* m_browseStudioMdlButton;
     QLineEdit* m_extractPathEdit;
     QCheckBox* m_developerModeCheck;
 	QCheckBox* m_discordRpcCheck;

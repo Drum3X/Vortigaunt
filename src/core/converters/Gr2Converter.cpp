@@ -1921,7 +1921,7 @@ void Gr2Converter::renameTexturesToMatchSmd(const std::string& outputDir, const 
         {
             std::string baseName = String_UTF16toUTF8(path.stem().generic_u16string());
             // Convert to lowercase for case-insensitive matching
-            std::transform(baseName.begin(), baseName.end(), baseName.begin(), [](unsigned char c){ return std::tolower(c); });
+            baseName = String_ToLower(baseName);
             exportedTextureMap[baseName] = path;
             Vortigaunt_Printf("DEBUG:   Exported texture: '" + baseName + "' -> " + String_UTF16toUTF8(path.generic_u16string()));
         }
@@ -1938,7 +1938,7 @@ void Gr2Converter::renameTexturesToMatchSmd(const std::string& outputDir, const 
             if (mesh)
             {
                 std::string meshName = mesh->mName.C_Str();
-                std::transform(meshName.begin(), meshName.end(), meshName.begin(), [](unsigned char c){ return std::tolower(c); });
+                meshName = String_ToLower(meshName);
                 meshNameToMaterialIndex[meshName] = mesh->mMaterialIndex;
                 Vortigaunt_Printf("DEBUG:     Mesh '" + std::string(mesh->mName.C_Str()) + "' -> material index " + std::to_string(mesh->mMaterialIndex));
             }
@@ -1961,7 +1961,7 @@ void Gr2Converter::renameTexturesToMatchSmd(const std::string& outputDir, const 
             if (mesh)
             {
                 std::string meshName = mesh->mName.C_Str();
-                std::transform(meshName.begin(), meshName.end(), meshName.begin(), [](unsigned char c){ return std::tolower(c); });
+                meshName = String_ToLower(meshName);
                 meshNameToOrder[meshName] = meshOrder++;
             }
         }
@@ -1976,7 +1976,7 @@ void Gr2Converter::renameTexturesToMatchSmd(const std::string& outputDir, const 
         {
             smdBaseName = smdBaseName.substr(0, dotPos);
         }
-        std::transform(smdBaseName.begin(), smdBaseName.end(), smdBaseName.begin(), [](unsigned char c){ return std::tolower(c); });
+        smdBaseName = String_ToLower(smdBaseName);
         
         Vortigaunt_Printf("DEBUG:   Processing SMD texture name: '" + smdTexName + "' (base: '" + smdBaseName + "')");
         

@@ -4,6 +4,7 @@
 #include "utils/FileIO.h"
 #include "utils/ImageUtils.h"
 #include "libimagequant.h"
+#include "utils/util.hpp"
 
 
 #ifdef QT_CORE_LIB
@@ -45,7 +46,7 @@ std::string WadArchive::getFileExtension(const std::string& path) const
         return "";
     
     std::string ext = path.substr(dotPos + 1);
-    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+    ext = String_ToLower(ext);
     return ext;
 }
 

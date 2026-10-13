@@ -1,6 +1,7 @@
 #include "GmaExtractor.h"
 #include "GmaFile.h"
 #include "core/VortigauntLog.h"
+#include "utils/util.hpp"
 
 #include <filesystem>
 #include <fstream>
@@ -69,7 +70,7 @@ bool GmaExtractor::ExtractSingle(const std::string& gmaPath, const std::string& 
     }
 
     std::string ext = fs::path(gmaPath).extension().string();
-    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+    ext = String_ToLower(ext);
     if (ext != ".gma")
     {
         VortigauntLog::LogF("Error: Input is not a .gma file: %s", gmaPath.c_str());
@@ -190,7 +191,7 @@ size_t GmaExtractor::ExtractMultiple(const std::vector<std::string>& gmaPaths,
         VortigauntLog::LogF("--- Extracting: %s ---", gmaFsPath.filename().string().c_str());
 
         std::string ext = gmaFsPath.extension().string();
-        std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+        ext = String_ToLower(ext);
         if (ext != ".gma")
         {
             VortigauntLog::LogF("  Skipped (not a .gma file)");

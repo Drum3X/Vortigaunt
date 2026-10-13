@@ -16,6 +16,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #endif
 #include "../../ThirdParty/assimp/contrib/stb/stb_image.h"
+#include "utils/util.hpp"
 
 namespace ImageUtils {
 
@@ -26,7 +27,7 @@ QImage loadImage(const std::string& filePath) {
 
     std::filesystem::path p = FileIO::toPath(filePath);
     std::string ext = p.extension().string();
-    std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+    ext = String_ToLower(ext);
 
     if (ext == ".dds") {
         return DDS::loadDdsToQImage(QString::fromStdString(filePath));

@@ -67,7 +67,7 @@ bool PakExtractor::ExtractSingle(const std::string& pakPath, const std::string& 
     }
 
     auto ext = pakFsPath.extension().string();
-    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+    ext = String_ToLower(ext);
     if (ext != ".pak")
     {
         VortigauntLog::LogF("^2Error: Input is not a .pak file: %s", pakPath.c_str());
@@ -256,7 +256,7 @@ size_t PakExtractor::ExtractMultiple(const std::vector<std::string>& pakPaths, c
         VortigauntLog::LogF("--- Extracting: %s ---", pakFsPath.filename().string().c_str());
 
         auto ext = pakFsPath.extension().string();
-        std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+        ext = String_ToLower(ext);
         if (ext != ".pak")
         {
             VortigauntLog::LogF("  ^3Skipped (not a .pak file)");

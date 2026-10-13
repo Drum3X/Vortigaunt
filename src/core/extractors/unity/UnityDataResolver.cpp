@@ -1,5 +1,6 @@
 #include "UnityDataResolver.h"
 #include "utils/BinaryUtils.h"
+#include "utils/util.hpp"
 #include <fstream>
 #include <algorithm>
 #include <filesystem>
@@ -16,14 +17,14 @@ bool UnityDataResolver::LoadDirectory(const std::string& directory, const std::v
     std::vector<std::string> lowerExts;
     for (const auto& ext : extensions) {
         std::string le = ext;
-        std::transform(le.begin(), le.end(), le.begin(), ::tolower);
+        le = String_ToLower(le);
         lowerExts.push_back(le);
     }
 
     for (const auto& entry : std::filesystem::recursive_directory_iterator(dirPath)) {
         if (!entry.is_regular_file()) continue;
         std::string ext = entry.path().extension().string();
-        std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+        ext = String_ToLower(ext);
         if (std::find(lowerExts.begin(), lowerExts.end(), ext) == lowerExts.end())
             continue;
 

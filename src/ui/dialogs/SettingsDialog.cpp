@@ -27,6 +27,7 @@
 static const QString SETTINGS_ORG = "Vortigaunt";
 static const QString SETTINGS_APP = "VortigauntTool";
 static const QString KEY_MODEL_VIEWER = "GoldSrc/ModelViewerPath";
+static const QString KEY_STUDIOMDL = "GoldSrc/StudioMdlPath";
 static const QString KEY_DEVELOPER_MODE = "General/DeveloperMode";
 static const QString KEY_MIRROR_UV_Y = "GR2/MirrorUVY";
 static const QString KEY_DISCORD_RPC = "General/DiscordRPC";
@@ -59,6 +60,16 @@ void SettingsDialog::setupUI()
     modelLayout->addWidget(m_modelViewerEdit, 1);
     modelLayout->addWidget(m_browseModelViewerButton);
     viewersLayout->addLayout(modelLayout);
+
+    // Model compiler
+    auto* compilerLayout = new QHBoxLayout();
+    compilerLayout->addWidget(new QLabel(tr("Model Compiler:")));
+    m_studioMdlEdit = new QLineEdit();
+    m_studioMdlEdit->setPlaceholderText(tr("Path your Model Compiler..."));
+    m_browseStudioMdlButton = new QPushButton(tr("Browse..."));
+    compilerLayout->addWidget(m_studioMdlEdit, 1);
+    compilerLayout->addWidget(m_browseStudioMdlButton);
+    viewersLayout->addLayout(compilerLayout);
 
     viewersGroup->setLayout(viewersLayout);
 
@@ -135,6 +146,7 @@ void SettingsDialog::setupUI()
 
     // Connections
     connect(m_browseModelViewerButton, &QPushButton::clicked, this, &SettingsDialog::onBrowseModelViewer);
+    connect(m_browseStudioMdlButton, &QPushButton::clicked, this, &SettingsDialog::onBrowseStudioMdl);
     connect(m_browseExtractPathButton, &QPushButton::clicked, this, &SettingsDialog::onBrowseExtractPath);
     connect(saveButton, &QPushButton::clicked, this, &SettingsDialog::onSave);
     connect(cancelButton, &QPushButton::clicked, this, &QDialog::reject);
@@ -149,6 +161,7 @@ void SettingsDialog::setupUI()
 void SettingsDialog::loadSettings()
 {
     m_modelViewerEdit->setText(getModelViewerPath());
+    m_studioMdlEdit->setText(getStudioMdlPath());
     m_extractPathEdit->setText(getDefaultExtractPath());
     m_developerModeCheck->setChecked(getDeveloperMode());
 	m_discordRpcCheck->setChecked(getDiscordRpcMode());
@@ -172,6 +185,19 @@ void SettingsDialog::onBrowseModelViewer()
         m_modelViewerEdit->setText(path);
 }
 
+void SettingsDialog::onBrowseStudioMdl()
+{
+    QString path = QFileDialog::getOpenFileName(
+        this,
+        tr("Select studiomdl Executable"),
+        m_studioMdlEdit->text(),
+        tr("Executables (*.exe);;All files (*.*)")
+    );
+
+    if (!path.isEmpty())
+        m_studioMdlEdit->setText(path);
+}
+
 void SettingsDialog::onBrowseExtractPath()
 {
     QString path = QFileDialog::getExistingDirectory(
@@ -187,6 +213,7 @@ void SettingsDialog::onBrowseExtractPath()
 void SettingsDialog::onSave()
 {
     setModelViewerPath(m_modelViewerEdit->text().trimmed());
+    setStudioMdlPath(m_studioMdlEdit->text().trimmed());
     setDefaultExtractPath(m_extractPathEdit->text().trimmed());
     setDeveloperMode(m_developerModeCheck->isChecked());
 	setDiscordRpcMode(m_discordRpcCheck->isChecked());
@@ -210,6 +237,18 @@ void SettingsDialog::setModelViewerPath(const QString& path)
 {
     QSettings settings(SETTINGS_ORG, SETTINGS_APP);
     settings.setValue(KEY_MODEL_VIEWER, path);
+}
+
+QString SettingsDialog::getStudioMdlPath()
+{
+    QSettings settings(SETTINGS_ORG, SETTINGS_APP);
+    return settings.value(KEY_STUDIOMDL, "").toString();
+}
+
+void SettingsDialog::setStudioMdlPath(const QString& path)
+{
+    QSettings settings(SETTINGS_ORG, SETTINGS_APP);
+    settings.setValue(KEY_STUDIOMDL, path);
 }
 
 QString SettingsDialog::getDefaultExtractPath()

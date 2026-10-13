@@ -511,6 +511,12 @@ void LoLModelDownloadDialog::setupUI()
     m_writeQCCheckbox = new QCheckBox(tr("Write QC"));
     m_writeQCCheckbox->setChecked(true);
     buttonLayout->addWidget(m_writeQCCheckbox);
+
+    m_compileModelCheckbox = new QCheckBox(tr("Compile model"));
+    m_compileModelCheckbox->setToolTip(tr("Run model compiler. Set the location of the model compiler in Settings."));
+    m_compileModelCheckbox->setEnabled(m_writeQCCheckbox->isChecked());
+    buttonLayout->addWidget(m_compileModelCheckbox);
+    connect(m_writeQCCheckbox, &QCheckBox::toggled, m_compileModelCheckbox, &QCheckBox::setEnabled);
     
     m_viewCharacterButton = new QPushButton(tr("View Character"));
     m_viewCharacterButton->setStyleSheet("QPushButton { padding: 10px 20px; font-weight: bold; background-color: #2196F3; color: white; } QPushButton:hover { background-color: #1976D2; } QPushButton:disabled { background-color: #666; }");
@@ -1985,7 +1991,17 @@ void LoLModelDownloadDialog::onDownloadClicked()
             
             QString qcPath = QDir(modelDir).filePath(skinSafeName + ".qc");
             if (qcWriter.Write(qcPath.toStdString())) {
-                logToDialog(tr("  QC file created: %1").arg(QFileInfo(qcPath).fileName()));
+                logToDialog(tr("QC file created: %1").arg(QFileInfo(qcPath).fileName()));
+                if (m_compileModelCheckbox->isChecked())
+                {
+                    logToDialog(tr("Compiling % 1 ...").arg(QFileInfo(qcPath).fileName()));
+                    QApplication::processEvents();
+                    const QCCompileResult compiled = QCFile::Compile(SettingsDialog::getStudioMdlPath().toStdString(), qcPath.toStdString());
+                    if (compiled.Ok)
+                        logToDialog(tr("^2Compiled:^7 %1").arg(QString::fromStdString(compiled.ModelPath)));
+                    else
+                        logToDialog(tr("^1Compile failed:^7 %1").arg(QString::fromStdString(compiled.Error)));
+                }
             } else {
                 logToDialog(tr("  ^1Failed to create QC file:^7 %1").arg(QString::fromStdString(qcWriter.GetError())));
             }

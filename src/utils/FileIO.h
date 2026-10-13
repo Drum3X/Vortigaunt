@@ -40,6 +40,12 @@ inline std::filesystem::path toPath(std::string_view utf8sv)
     return toPath(std::string(utf8sv));
 }
 
+inline std::string fromPath(const std::filesystem::path& path)
+{
+    const std::u8string utf8 = path.u8string();
+    return std::string(utf8.begin(), utf8.end());
+}
+
 inline std::ifstream openRead(const std::string& utf8Path, std::ios::openmode mode = std::ios::in)
 {
     return std::ifstream(toPath(utf8Path), mode);

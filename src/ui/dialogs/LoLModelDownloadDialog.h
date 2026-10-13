@@ -128,6 +128,7 @@ private:
     QPushButton*        m_cancelButton;
     QCheckBox*          m_singleSmdCheckbox;
     QCheckBox*          m_writeQCCheckbox;
+    QCheckBox*          m_compileModelCheckbox = nullptr;
     QLineEdit*          m_outputPathEdit;
     QPushButton*        m_browseOutputButton;
     QPlainTextEdit*          m_logEdit;

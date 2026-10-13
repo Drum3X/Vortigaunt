@@ -795,7 +795,7 @@ int main(int argc,char** argv)
 				continue;
 			
 			std::string ext = entry.path().extension().string();
-			std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+			ext = String_ToLower(ext);
 			
 			if (ext == ".bmp" || ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".tga")
 			{

@@ -14,6 +14,9 @@ class QLineEdit;
 class QPushButton;
 class QComboBox;
 class QCheckBox;
+class QDoubleSpinBox;
+class QLabel;
+struct WeaponModelOptions;
 class QPlainTextEdit;
 class QAction;
 class QListWidget;
@@ -107,6 +110,15 @@ private:
 
     void convertFbxGlb(const QString& inputPath, const QString& outputDir, bool writeQC);
 
+    void convertViewModel(const QString& inputPath, const QString& outputDir, const WeaponModelOptions& options);
+
+    // Compiles a QC that was just written, when "Compile model" is ticked.
+    void compileModelIfWanted(const QString& qcPath);
+
+    // Shows the V -> P/W options only in that mode, and the reference model
+    // field only when the weapon type asks for one.
+    void updateWeaponModelControls();
+
     // UI
     void updateOperationComboForFile(const QString& filePath);
 
@@ -129,6 +141,20 @@ private:
     QCheckBox*     m_mirrorUVYCheck;
     QCheckBox*     m_invertAlphaCheck;  // For inverting alpha in GR2 DDS textures
     QCheckBox*     m_writeQCCheck;      // For generating QC file when exporting GR2 to SMD
+    QCheckBox*     m_compileModelCheck = nullptr;  // run studiomdl on every QC that gets written
+
+    // V model -> P/W model
+    QLabel*         m_weaponScaleLabel = nullptr;
+    QDoubleSpinBox* m_weaponScaleSpin = nullptr;   // 0 = worked out from the hands
+    QLabel*         m_weaponMirrorLabel = nullptr;
+    QComboBox*      m_weaponMirrorCombo = nullptr; // auto / yes / no
+    QLabel*         m_gameDirLabel = nullptr;
+    QComboBox*      m_gameDirCombo = nullptr;
+    QLabel*         m_weaponTypeLabel = nullptr;
+    QComboBox*      m_weaponTypeCombo = nullptr;   // how the weapon is held: gun, knife, grenade, as a reference model
+    QLineEdit*      m_weaponReferenceEdit = nullptr;
+    QPushButton*    m_weaponReferenceBrowse = nullptr;
+    QCheckBox*      m_weaponUpsideDownCheck = nullptr;
     QCheckBox*     m_separateFoldersCheck;  // For multiple extraction
     QCheckBox*     m_unityBmpCheck;         // Unity mode: convert textures to 8-bit BMP (unchecked = 32-bit PNG)
     QPlainTextEdit* m_logEdit;

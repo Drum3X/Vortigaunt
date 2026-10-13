@@ -6,6 +6,7 @@
 #include "core/QCFile.h"
 #include "core/VortigauntLog.h"
 #include "utils/FileIO.h"
+#include "utils/util.hpp"
 
 #include <assimp/Importer.hpp>
 #include <assimp/config.h>
@@ -49,18 +50,6 @@ constexpr int kGoldSrcMaxBones = 128;
 constexpr int kGoldSrcMaxVertsPerBodyPart = 2048;
 constexpr size_t kGoldSrcBoneNameLength = 32;     // mstudiobone_t::name
 constexpr size_t kGoldSrcTextureNameLength = 64;  // mstudiotexture_t::name
-
-std::string toUtf8(const fs::path& p)
-{
-    const std::u8string s = p.u8string();
-    return std::string(s.begin(), s.end());
-}
-
-std::string lower(std::string s)
-{
-    std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
-    return s;
-}
 
 aiMatrix3x3 orthonormalize(const aiMatrix3x3& a)
 {
@@ -144,7 +133,7 @@ std::string uniqueName(std::string base, size_t maxLength, std::set<std::string>
     }
     std::string candidate = base;
     int counter = 1;
-    while (taken.count(lower(candidate)))
+    while (taken.count(String_ToLower(candidate)))
     {
         const std::string suffix = "_" + std::to_string(counter++);
         std::string stem = base;
@@ -154,7 +143,7 @@ std::string uniqueName(std::string base, size_t maxLength, std::set<std::string>
         }
         candidate = stem + suffix;
     }
-    taken.insert(lower(candidate));
+    taken.insert(String_ToLower(candidate));
     return candidate;
 }
 
@@ -740,7 +729,7 @@ const char* const kImageExtensions[] = { "png", "jpg", "jpeg", "tga", "bmp", "dd
 
 bool isImageFile(const fs::path& p)
 {
-    std::string ext = lower(toUtf8(p.extension()));
+    std::string ext = String_ToLower(FileIO::fromPath(p.extension()));
     if (!ext.empty() && ext[0] == '.') ext = ext.substr(1);
     for (const char* e : kImageExtensions)
     {
@@ -757,7 +746,7 @@ std::vector<fs::path> nearbyImages(const fs::path& modelDir)
     for (const auto& entry : fs::directory_iterator(modelDir, ec))
     {
         if (!entry.is_directory(ec)) continue;
-        const std::string name = lower(toUtf8(entry.path().filename()));
+        const std::string name = String_ToLower(FileIO::fromPath(entry.path().filename()));
         if (name.find("tex") != std::string::npos || name.find("material") != std::string::npos ||
             name.find("map") != std::string::npos || name.find("image") != std::string::npos ||
             name.find(".fbm") != std::string::npos)
@@ -798,11 +787,11 @@ bool findTextureFile(const std::string& reference, const fs::path& modelDir,
         return true;
     }
 
-    const std::string wantedName = lower(toUtf8(asWritten.filename()));
-    const std::string wantedStem = lower(toUtf8(asWritten.stem()));
+    const std::string wantedName = String_ToLower(FileIO::fromPath(asWritten.filename()));
+    const std::string wantedStem = String_ToLower(FileIO::fromPath(asWritten.stem()));
     for (const fs::path& image : images)
     {
-        if (lower(toUtf8(image.filename())) == wantedName)
+        if (String_ToLower(FileIO::fromPath(image.filename())) == wantedName)
         {
             found = image;
             return true;
@@ -811,7 +800,7 @@ bool findTextureFile(const std::string& reference, const fs::path& modelDir,
     // The same picture saved in another format: a .psd reference, a .png on disk.
     for (const fs::path& image : images)
     {
-        if (!wantedStem.empty() && lower(toUtf8(image.stem())) == wantedStem)
+        if (!wantedStem.empty() && String_ToLower(FileIO::fromPath(image.stem())) == wantedStem)
         {
             found = image;
             return true;
@@ -855,7 +844,7 @@ bool guessTextureByName(const std::vector<std::string>& keys, const std::vector<
     int bestScore = 0;
     for (const fs::path& image : images)
     {
-        const std::vector<std::string> imageTokens = nameTokens(toUtf8(image.stem()));
+        const std::vector<std::string> imageTokens = nameTokens(FileIO::fromPath(image.stem()));
         if (imageTokens.empty()) continue;
 
         bool otherMap = false;
@@ -933,7 +922,7 @@ bool saveGoldSrcTexture(QImage image, const fs::path& path, int maxSize, bool& h
 
     image = image.convertToFormat(QImage::Format_RGB32).convertToFormat(QImage::Format_ARGB32);
 
-    return BMP::saveAsIndexed8(toUtf8(path), image.width(), image.height(),
+    return BMP::saveAsIndexed8(FileIO::fromPath(path), image.width(), image.height(),
                                reinterpret_cast<const uint32_t*>(image.constBits()));
 }
 
@@ -951,8 +940,8 @@ QImage decodeImageBytes(const uint8_t* data, size_t size)
 
 bool FbxGlbConverter::IsSupportedFile(const std::string& path)
 {
-    const std::string ext = lower(toUtf8(FileIO::toPath(path).extension()));
-    return ext == ".fbx" || ext == ".glb" || ext == ".gltf";
+    const std::string ext = String_ToLower(FileIO::fromPath(FileIO::toPath(path).extension()));
+    return ext == ".fbx" || ext == ".glb" || ext == ".gltf" || ext == ".obj";
 }
 
 FbxGlbConvertReport FbxGlbConverter::Convert(const std::string& inputPath,
@@ -971,15 +960,16 @@ FbxGlbConvertReport FbxGlbConverter::Convert(const std::string& inputPath,
     };
 
     const fs::path inputFile = FileIO::toPath(inputPath);
-    const std::string extension = lower(toUtf8(inputFile.extension()));
+    const std::string extension = String_ToLower(FileIO::fromPath(inputFile.extension()));
     const bool isGltf = (extension == ".glb" || extension == ".gltf");
-    if (!isGltf && extension != ".fbx")
+    const bool isObj = (extension == ".obj");
+    if (!isGltf && !isObj && extension != ".fbx")
     {
-        return fail("Not an FBX, GLB or glTF file: " + inputPath);
+        return fail("Not an FBX, GLB, glTF or OBJ file: " + inputPath);
     }
 
-    std::string modelName = sanitize(toUtf8(inputFile.stem()), "model");
-    VortigauntLog::LogF("^5Converting %s:^7 %s", isGltf ? "GLB" : "FBX", toUtf8(inputFile.filename()).c_str());
+    std::string modelName = sanitize(FileIO::fromPath(inputFile.stem()), "model");
+    VortigauntLog::LogF("^5Converting %s:^7 %s", isGltf ? "GLB" : (isObj ? "OBJ" : "FBX"), FileIO::fromPath(inputFile.filename()).c_str());
 
     Assimp::Importer importer;
 
@@ -1038,7 +1028,7 @@ FbxGlbConvertReport FbxGlbConverter::Convert(const std::string& inputPath,
                     if (scene->GetEmbeddedTexture(texturePath.C_Str())) break;
                     std::string file = texturePath.C_Str();
                     std::replace(file.begin(), file.end(), '\\', '/');
-                    const std::string stem = toUtf8(FileIO::toPath(file).stem());
+                    const std::string stem = FileIO::fromPath(FileIO::toPath(file).stem());
                     if (!stem.empty()) base = stem;
                     break;
                 }
@@ -1412,9 +1402,9 @@ FbxGlbConvertReport FbxGlbConverter::Convert(const std::string& inputPath,
     fs::create_directories(outFolder, ec);
     if (ec)
     {
-        return fail("Could not create the output folder: " + toUtf8(outFolder));
+        return fail("Could not create the output folder: " + FileIO::fromPath(outFolder));
     }
-    report.outputFolder = toUtf8(outFolder);
+    report.outputFolder = FileIO::fromPath(outFolder);
 
     // ref smd
     if (!report.animationOnly)
@@ -1426,7 +1416,7 @@ FbxGlbConvertReport FbxGlbConverter::Convert(const std::string& inputPath,
         SmdFile file(referencePath);
         if (!file.IsOpen())
         {
-            return fail("Could not write " + toUtf8(referencePath));
+            return fail("Could not write " + FileIO::fromPath(referencePath));
         }
 
         writeNodes(file, bones);
@@ -1515,10 +1505,10 @@ FbxGlbConvertReport FbxGlbConverter::Convert(const std::string& inputPath,
         file.Text("end\n");
         if (!file.Close())
         {
-            return fail("Writing " + toUtf8(referencePath) + " failed (disk full?).");
+            return fail("Writing " + FileIO::fromPath(referencePath) + " failed (disk full?).");
         }
 
-        report.referenceSmd = toUtf8(referencePath);
+        report.referenceSmd = FileIO::fromPath(referencePath);
         report.uniqueVertices = static_cast<int>(uniquePositions.size());
         for (int k = 0; k < 3; k++) report.size[k] = static_cast<float>(mx[k] - mn[k]);
     }
@@ -1598,7 +1588,7 @@ FbxGlbConvertReport FbxGlbConverter::Convert(const std::string& inputPath,
             SmdFile file(animPath);
             if (!file.IsOpen())
             {
-                warn("Could not write " + toUtf8(animPath));
+                warn("Could not write " + FileIO::fromPath(animPath));
                 continue;
             }
 
@@ -1644,7 +1634,7 @@ FbxGlbConvertReport FbxGlbConverter::Convert(const std::string& inputPath,
             file.Text("end\n");
             if (!file.Close())
             {
-                warn("Writing " + toUtf8(animPath) + " failed.");
+                warn("Writing " + FileIO::fromPath(animPath) + " failed.");
                 continue;
             }
 
@@ -1705,8 +1695,8 @@ FbxGlbConvertReport FbxGlbConverter::Convert(const std::string& inputPath,
                         fs::path file;
                         if (findTextureFile(texturePath.C_Str(), modelDir, images, file))
                         {
-                            image = ImageUtils::loadImage(toUtf8(file));
-                            origin = toUtf8(file.filename());
+                            image = ImageUtils::loadImage(FileIO::fromPath(file));
+                            origin = FileIO::fromPath(file.filename());
                         }
                         else
                         {
@@ -1751,16 +1741,16 @@ FbxGlbConvertReport FbxGlbConverter::Convert(const std::string& inputPath,
                     if (source->Get(AI_MATKEY_NAME, name) == AI_SUCCESS && name.length > 0) keys.push_back(name.C_Str());
                 }
                 for (const std::string& meshName : material.meshNames) keys.push_back(meshName);
-                if (materials.size() == 1) keys.push_back(toUtf8(inputFile.stem()));
+                if (materials.size() == 1) keys.push_back(FileIO::fromPath(inputFile.stem()));
 
                 fs::path file;
                 if (guessTextureByName(keys, images, file))
                 {
-                    image = ImageUtils::loadImage(toUtf8(file));
+                    image = ImageUtils::loadImage(FileIO::fromPath(file));
                     if (!image.isNull())
                     {
                         kind = Guessed;
-                        origin = toUtf8(file.filename());
+                        origin = FileIO::fromPath(file.filename());
                     }
                 }
             }
@@ -1828,9 +1818,9 @@ FbxGlbConvertReport FbxGlbConverter::Convert(const std::string& inputPath,
             qc.AddSequence(anim.name, anim.file, options.fps);
         }
         const fs::path qcPath = outFolder / FileIO::toPath(modelName + ".qc");
-        if (qc.Write(toUtf8(qcPath)))
+        if (qc.Write(FileIO::fromPath(qcPath)))
         {
-            report.qcPath = toUtf8(qcPath);
+            report.qcPath = FileIO::fromPath(qcPath);
         }
         else
         {

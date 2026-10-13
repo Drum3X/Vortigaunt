@@ -31,6 +31,7 @@
 #ifdef ENABLE_LITHTECH
 #include "core/converters/DtxConverter.h"
 #endif
+#include "utils/util.hpp"
 
 static const size_t LITHTECH_SPR_HEADER_SIZE = 20;  // 4 + 4 + 12 bytes
 
@@ -1299,7 +1300,7 @@ bool SpriteLoader::loadLithtechTextures(const std::string& baseDir)
         if (foundPath.empty() && !sprDir.empty())
         {
             std::string dtxFilenameLower = dtxFilename;
-            std::transform(dtxFilenameLower.begin(), dtxFilenameLower.end(), dtxFilenameLower.begin(), ::tolower);
+            dtxFilenameLower = String_ToLower(dtxFilenameLower);
             
             {
                 if (scannedFallbacks.find(sprDir.string()) == scannedFallbacks.end())
@@ -1310,7 +1311,7 @@ bool SpriteLoader::loadLithtechTextures(const std::string& baseDir)
                         for (const auto& entry : std::filesystem::recursive_directory_iterator(sprDir, std::filesystem::directory_options::skip_permission_denied)) {
                             if (entry.is_regular_file()) {
                                 std::string fname = entry.path().filename().string();
-                                std::transform(fname.begin(), fname.end(), fname.begin(), ::tolower);
+                                fname = String_ToLower(fname);
                                 if (fallbackCache.find(fname) == fallbackCache.end())
                                     fallbackCache[fname] = entry.path();
                             }

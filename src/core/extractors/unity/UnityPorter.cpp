@@ -5,6 +5,7 @@
 #include "UnityTextureDecoder.h"
 #include "UnityClassIds.h"
 #include "utils/BinaryUtils.h"
+#include "utils/util.hpp"
 #include <algorithm>
 #include <filesystem>
 #include <ankerl/unordered_dense.h>
@@ -30,13 +31,8 @@ static std::string CanonicalAbsPath(const std::string& pathStr) {
     }
 }
 
-static std::string ToLowerCopy(std::string s) {
-    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
-    return s;
-}
-
 static bool IsUiTexture(const std::string& name) {
-    std::string lower = ToLowerCopy(name);
+    std::string lower = String_ToLower(name);
 
     static const std::vector<std::string> uiKeywords = {
         "icon", "sprite", "font", "checkmark", "cursor", "ui_", "hud_",
@@ -67,7 +63,7 @@ static std::string SelectAlbedoTexture(const std::vector<std::string>& texNames)
     };
     for (const auto& keyword : albedoKeywords) {
         for (const auto& name : cleanNames) {
-            std::string lower = ToLowerCopy(name);
+            std::string lower = String_ToLower(name);
             if (lower.find(keyword) != std::string::npos) {
                 return name;
             }
@@ -78,7 +74,7 @@ static std::string SelectAlbedoTexture(const std::vector<std::string>& texNames)
         "normal", "n_opengl", "_n", "mask", "roughness", "metallic", "emission", "emissive", "_e", "height", "specular", "ao", "gloss"
     };
     for (const auto& name : cleanNames) {
-        std::string lower = ToLowerCopy(name);
+        std::string lower = String_ToLower(name);
         bool hasUtility = false;
         for (const auto& keyword : utilityKeywords) {
             if (lower.find(keyword) != std::string::npos) {
@@ -152,7 +148,7 @@ static bool HasValuableTextures(const std::vector<std::string>& texs) {
 
 static bool IsSerializedAssetFile(const std::string& filepath) {
     std::filesystem::path p(filepath);
-    std::string ext = ToLowerCopy(p.extension().string());
+    std::string ext = String_ToLower(p.extension().string());
 
     // Only allow real Unity serialized asset extensions or extensionless level/resources files
     if (ext != ".assets" && ext != ".sharedassets" && ext != ".globalgamemanagers" && !ext.empty()) {
@@ -224,7 +220,7 @@ int32_t UnityPorter::LookupClassId(int32_t currentKey, int32_t fileID, int64_t p
 std::string UnityPorter::MeshKey(const ObjectRef& ref) const {
     std::string key;
     if (ref.fileKey >= 0 && ref.fileKey < static_cast<int32_t>(m_summaries.size())) {
-        key = ToLowerCopy(m_summaries[ref.fileKey].absPath);
+        key = String_ToLower(m_summaries[ref.fileKey].absPath);
     }
     key += "|";
     key += std::to_string(ref.pathId);
@@ -233,7 +229,7 @@ std::string UnityPorter::MeshKey(const ObjectRef& ref) const {
 
 int32_t UnityPorter::SummarizeFile(const std::string& absPathStr) {
     std::string absPath = CanonicalAbsPath(absPathStr);
-    std::string pathLower = ToLowerCopy(absPath);
+    std::string pathLower = String_ToLower(absPath);
 
     auto itKey = m_summaryKeyByPath.find(pathLower);
     if (itKey != m_summaryKeyByPath.end()) {
@@ -289,13 +285,13 @@ int32_t UnityPorter::SummarizeFile(const std::string& absPathStr) {
     if (std::filesystem::is_directory(dir, ec)) {
         for (const auto& entry : std::filesystem::directory_iterator(dir, ec)) {
             if (!entry.is_regular_file()) continue;
-            siblingsByName.emplace(ToLowerCopy(entry.path().filename().string()), entry.path().string());
+            siblingsByName.emplace(String_ToLower(entry.path().filename().string()), entry.path().string());
         }
     }
     m_summaries[key].externalKeys.assign(externalNames.size(), -1);
     for (size_t i = 0; i < externalNames.size(); ++i) {
         if (externalNames[i].empty()) continue;
-        auto itSibling = siblingsByName.find(ToLowerCopy(externalNames[i]));
+        auto itSibling = siblingsByName.find(String_ToLower(externalNames[i]));
         if (itSibling == siblingsByName.end()) continue;
         int32_t externalKey = SummarizeFile(itSibling->second); // may grow m_summaries
         m_summaries[key].externalKeys[i] = externalKey;
@@ -633,7 +629,7 @@ void UnityPorter::WriteMeshTextureMap(const UnityAssetParser& parser,
 
     std::string mainKeyPrefix;
     if (mainKey >= 0 && mainKey < static_cast<int32_t>(m_summaries.size())) {
-        mainKeyPrefix = ToLowerCopy(m_summaries[mainKey].absPath) + "|";
+        mainKeyPrefix = String_ToLower(m_summaries[mainKey].absPath) + "|";
     }
     for (const auto& pair : m_meshTextures) {
         if (!mainKeyPrefix.empty() && pair.first.starts_with(mainKeyPrefix)) continue;
@@ -840,7 +836,7 @@ void UnityPorter::DumpDiagnostics(const UnityAssetParser& parser,
     }
     std::string mainKeyPrefix;
     if (mainKey >= 0 && mainKey < static_cast<int32_t>(m_summaries.size())) {
-        mainKeyPrefix = ToLowerCopy(m_summaries[mainKey].absPath) + "|";
+        mainKeyPrefix = String_ToLower(m_summaries[mainKey].absPath) + "|";
     }
     for (const auto& pair : m_meshTextures) {
         if (!mainKeyPrefix.empty() && pair.first.starts_with(mainKeyPrefix)) continue;
@@ -896,7 +892,7 @@ void UnityPorter::ProcessBundle(const std::string& bundlePath, const std::string
     {
         if (!entry.is_regular_file())
             continue;
-        std::string ext = ToLowerCopy(entry.path().extension().string());
+        std::string ext = String_ToLower(entry.path().extension().string());
         if (ext == ".assets" || IsSerializedAssetFile(entry.path().string()))
         {
             ProcessAssetFile(entry.path().string(), outputDir);
@@ -926,7 +922,7 @@ void UnityPorter::Process(const std::string& inputPathStr, const std::string& ou
             if (!entry.is_regular_file())
                 continue;
             std::string compPath = NormalizePath(entry.path().string());
-            std::string ext = ToLowerCopy(entry.path().extension().string());
+            std::string ext = String_ToLower(entry.path().extension().string());
             if (ext == ".unity3d" || ext == ".bundle")
             {
                 VortigauntLog::LogF("Processing bundle: %s\n", compPath.c_str());
@@ -942,7 +938,7 @@ void UnityPorter::Process(const std::string& inputPathStr, const std::string& ou
     else
     {
         std::filesystem::path p(inputPath);
-        std::string ext = ToLowerCopy(p.extension().string());
+        std::string ext = String_ToLower(p.extension().string());
         VortigauntLog::LogF("UnityPorter::Process file: extension = %s\n", ext.c_str());
 
         if (ext == ".assets" || IsSerializedAssetFile(inputPath))
@@ -966,7 +962,7 @@ void UnityPorter::ProcessAssetFile(const std::string& assetPathStr, const std::s
     VortigauntLog::LogF("UnityPorter::ProcessAssetFile started: %s\n", assetPath.c_str());
 
     // Prevent attempting to parse huge globalgamemanagers assets which can cause memory blow-up
-    if (ToLowerCopy(assetPath).find("globalgamemanagers") != std::string::npos) {
+    if (String_ToLower(assetPath).find("globalgamemanagers") != std::string::npos) {
         VortigauntLog::LogF("WARNING: Skipping parsing of globalgamemanagers asset to avoid excessive memory usage.\n");
         return;
     }
@@ -985,7 +981,7 @@ void UnityPorter::ProcessAssetFile(const std::string& assetPathStr, const std::s
         for (const auto& compEntry : std::filesystem::directory_iterator(assetDir)) {
             if (!compEntry.is_regular_file()) continue;
             std::string compPath = NormalizePath(compEntry.path().string());
-            std::string compExt = ToLowerCopy(compEntry.path().extension().string());
+            std::string compExt = String_ToLower(compEntry.path().extension().string());
             if (std::find(dataExtensions.begin(), dataExtensions.end(), compExt) != dataExtensions.end()) {
                 allFiles.push_back(compPath);
             }

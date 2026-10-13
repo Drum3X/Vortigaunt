@@ -6,6 +6,7 @@
 #include <streambuf>
 #include <algorithm>
 #include <cstring>
+#include "utils/util.hpp"
 
 namespace Utils {
 
@@ -171,7 +172,7 @@ inline std::string ReadNullTerminatedString(std::istream& in, size_t limit = 100
 inline std::string Normalise(const std::string& path) {
     std::string p = path;
     std::replace(p.begin(), p.end(), '\\', '/');
-    std::transform(p.begin(), p.end(), p.begin(), ::tolower);
+    p = String_ToLower(p);
     return p;
 }
 

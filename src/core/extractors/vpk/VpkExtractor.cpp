@@ -1,6 +1,7 @@
 #include "VpkExtractor.h"
 #include "VpkFile.h"
 #include "core/VortigauntLog.h"
+#include "utils/util.hpp"
 
 #include <filesystem>
 #include <fstream>
@@ -69,7 +70,7 @@ bool VpkExtractor::ExtractSingle(const std::string& vpkPath, const std::string& 
     }
 
     std::string ext = fs::path(vpkPath).extension().string();
-    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+    ext = String_ToLower(ext);
     if (ext != ".vpk")
     {
         VortigauntLog::LogF("Error: Input is not a .vpk file: %s", vpkPath.c_str());
@@ -179,7 +180,7 @@ size_t VpkExtractor::ExtractMultiple(const std::vector<std::string>& vpkPaths,
         VortigauntLog::LogF("--- Extracting: %s ---", vpkFsPath.filename().string().c_str());
 
         std::string ext = vpkFsPath.extension().string();
-        std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+        ext = String_ToLower(ext);
         if (ext != ".vpk")
         {
             VortigauntLog::LogF("  Skipped (not a .vpk file)");
