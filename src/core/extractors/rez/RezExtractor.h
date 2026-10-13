@@ -66,8 +66,12 @@ private:
 
     bool ParseDirectory(std::ifstream& in);
 
+    // Plain LithTech REZ (Combat Arms and the like): directory not encrypted, files stored as they are.
+    bool ParsePlainDirectory(std::ifstream& in);
+
 private:
     std::string m_rezFilePath;
     std::vector<RezEntry> m_entries;
+    bool m_plain = false;  // false: CrossFire (encrypted directory, LZMA files)
 };
 

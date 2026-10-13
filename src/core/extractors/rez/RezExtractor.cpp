@@ -14,6 +14,7 @@
 #include <cstdarg>
 #include <cstdio>
 #include "utils/fsutils.hpp"
+#include "utils/util.hpp"
 
 #include "LzmaDec.h"
 #include "Alloc.h"
@@ -22,6 +23,8 @@
 
 using std::uint32_t;
 using std::uint64_t;
+
+static void FixDtxHeader(const std::string& filename, std::vector<char>& data);
 
 // Static member definitions
 RezExtractor::ProgressFunc RezExtractor::s_progressFunc = nullptr;
@@ -246,6 +249,7 @@ static bool DecompressLZMA(const std::vector<char>& in, std::vector<char>& out)
 bool RezExtractor::Load(const std::string& rezFilePath)
 {
     m_entries.clear();
+    m_plain = false;
     m_rezFilePath = rezFilePath;
 
     std::ifstream in(FileIO::toPath(rezFilePath), std::ios::binary);
@@ -406,7 +410,8 @@ bool RezExtractor::ExtractAll(const std::string& outputDir) const
 
         // Try LZMA decompress first; if it fails, fall back to raw data
         std::vector<char> decompressed;
-        lzmaOk = DecompressLZMA(compressed, decompressed);
+        if (m_plain) FixDtxHeader(e.filename, compressed);
+        lzmaOk = !m_plain && DecompressLZMA(compressed, decompressed);
         const std::vector<char>& toWrite = lzmaOk ? decompressed : compressed;
         finalSize = toWrite.size();
 
@@ -576,7 +581,8 @@ bool RezExtractor::ExtractSelectedEntries(const std::vector<size_t>& indices, co
         compressed.resize(static_cast<size_t>(got));
 
         std::vector<char> decompressed;
-        lzmaOk = DecompressLZMA(compressed, decompressed);
+        if (m_plain) FixDtxHeader(e.filename, compressed);
+        lzmaOk = !m_plain && DecompressLZMA(compressed, decompressed);
         const std::vector<char>& toWrite = lzmaOk ? decompressed : compressed;
         finalSize = toWrite.size();
 
@@ -638,7 +644,8 @@ bool RezExtractor::ExtractEntryToMemory(const RezEntry& entry, std::vector<char>
 
     // Try LZMA decompress first
     std::vector<char> decompressed;
-    if (DecompressLZMA(compressed, decompressed))
+    if (m_plain) FixDtxHeader(entry.filename, compressed);
+    if (!m_plain && DecompressLZMA(compressed, decompressed))
     {
         outData = std::move(decompressed);
     }
@@ -675,8 +682,205 @@ bool RezExtractor::ExtractEntry(const RezEntry& entry, const std::string& output
 }
 
 
+// Plain LithTech REZ, header and directory layout after https://github.com/no-lith/RezExtract (MIT).
+// Returns false for anything that does not read as one from end to end, CrossFire's encrypted archives included.
+bool RezExtractor::ParsePlainDirectory(std::ifstream& in)
+{
+    in.clear();
+    in.seekg(0, std::ios::end);
+    const uint64_t fileSize = static_cast<uint64_t>(in.tellg());
+    in.seekg(0, std::ios::beg);
+
+    unsigned char header[208] = {};
+    in.read(reinterpret_cast<char*>(header), sizeof(header));
+    const size_t got = static_cast<size_t>(in.gcount());
+
+    auto u32 = [&](size_t at) {
+        uint32_t value = 0;
+        std::memcpy(&value, header + at, 4);
+        return value;
+    };
+    // line ends, or the characters that stand in for them in the obfuscated header
+    auto marker = [&](size_t at, char plain, char hidden) { return header[at] == plain || header[at] == hidden; };
+    if (got < 139 || !marker(0, '\r', '&') || !marker(1, '\n', '#') || !marker(62, '\r', '!') || !marker(63, '\n', '"') ||
+        !marker(124, '\r', '%') || !marker(125, '\n', '\''))
+    {
+        return false;
+    }
+
+    size_t at = 127;
+    if (header[126] == 0x2A)
+    {
+        // head, 32 bytes, tail, then the same again as a check
+        if (got < 207 || header[161] != (header[127] ^ 0x11) || header[194] != (header[160] ^ 0x11))
+        {
+            return false;
+        }
+        at = 195;
+        if (u32(at) != 1)
+        {
+            return false;
+        }
+    }
+    else if (header[126] == 0x1A)
+    {
+        if (u32(at) != 1)
+        {
+            // format 2 has seven more bytes before the version
+            at += 7;
+            if (got < at + 12 || u32(at) != 2)
+            {
+                return false;
+            }
+        }
+    }
+    else
+    {
+        return false;
+    }
+    const uint32_t rootPos = u32(at + 4);
+    const uint32_t rootSize = u32(at + 8);
+
+    std::vector<RezEntry> entries;
+    std::set<uint32_t> visited;
+    std::function<bool(const std::string&, uint32_t, uint32_t, int)> readDirectory;
+    readDirectory = [&](const std::string& prefix, uint32_t pos, uint32_t size, int depth) -> bool
+        {
+            if (size == 0)
+            {
+                return true;
+            }
+            if (depth > 64 || static_cast<uint64_t>(pos) + size > fileSize || !visited.insert(pos).second)
+            {
+                return false;
+            }
+            std::vector<char> block(size);
+            in.clear();
+            in.seekg(pos, std::ios::beg);
+            in.read(block.data(), static_cast<std::streamsize>(size));
+            if (static_cast<uint32_t>(in.gcount()) != size)
+            {
+                return false;
+            }
+
+            size_t offset = 0;
+            auto readName = [&](std::string& out) {
+                const void* end = std::memchr(block.data() + offset, 0, block.size() - offset);
+                if (!end)
+                {
+                    return false;
+                }
+                out.assign(static_cast<const char*>(block.data()) + offset, static_cast<const char*>(end));
+                offset += out.size() + 1;
+                for (unsigned char c : out)
+                {
+                    if (c < 0x20) return false;
+                }
+                return true;
+            };
+
+            while (offset < block.size())
+            {
+                if (offset + 16 > block.size())
+                {
+                    return false;
+                }
+                uint32_t entryType, entryPos, entrySize;
+                std::memcpy(&entryType, &block[offset + 0], 4);
+                std::memcpy(&entryPos, &block[offset + 4], 4);
+                std::memcpy(&entrySize, &block[offset + 8], 4);
+                offset += 16;
+                if (static_cast<uint64_t>(entryPos) + entrySize > fileSize)
+                {
+                    return false;
+                }
+
+                if (entryType == 1) // Directory
+                {
+                    std::string name;
+                    if (!readName(name) || name.empty() || !readDirectory(prefix + name + "/", entryPos, entrySize, depth + 1))
+                    {
+                        return false;
+                    }
+                }
+                else if (entryType == 0) // File
+                {
+                    if (offset + 12 > block.size())
+                    {
+                        return false;
+                    }
+                    uint32_t id, numKeys;
+                    char type[4];
+                    std::memcpy(&id, &block[offset + 0], 4);
+                    std::memcpy(type, &block[offset + 4], 4);
+                    std::memcpy(&numKeys, &block[offset + 8], 4);
+                    offset += 12;
+
+                    std::string name, description;
+                    if (!readName(name) || !readName(description) || static_cast<uint64_t>(numKeys) * 4 > block.size() - offset)
+                    {
+                        return false;
+                    }
+                    offset += static_cast<size_t>(numKeys) * 4;
+
+                    // the extension is stored backwards
+                    std::string ext(type, strnlen(type, 4));
+                    std::reverse(ext.begin(), ext.end());
+                    if (name.empty())
+                    {
+                        name = "unnamed_" + std::to_string(id);
+                    }
+
+                    RezEntry entry;
+                    entry.filename = prefix + name + (ext.empty() ? "" : "." + ext);
+                    entry.offset = entryPos;
+                    entry.size = entrySize;
+                    entry.flags = 0;
+                    entries.push_back(entry);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return true;
+        };
+
+    if (rootSize == 0 || !readDirectory("", rootPos, rootSize, 0) || entries.empty())
+    {
+        return false;
+    }
+    m_entries = std::move(entries);
+    return true;
+}
+
+// Combat Arms stores the two fields after a DTX's resource type the other way round; put back, the file is a LithTech DTX.
+static void FixDtxHeader(const std::string& filename, std::vector<char>& data)
+{
+    if (data.size() < 12 || filename.size() < 4 || String_ToLower(filename.substr(filename.size() - 4)) != ".dtx")
+    {
+        return;
+    }
+    auto isVersion = [](char byte) { const signed char v = static_cast<signed char>(byte); return v == -2 || v == -3 || v == -5; };
+    if (isVersion(data[4]) || !isVersion(data[8]))
+    {
+        return;
+    }
+    char first[4];
+    std::memcpy(first, &data[4], 4);
+    std::memcpy(&data[4], &data[8], 4);
+    std::memcpy(&data[8], first, 4);
+}
+
 bool RezExtractor::ParseDirectory(std::ifstream& in)
 {
+    m_plain = ParsePlainDirectory(in);
+    if (m_plain)
+    {
+        VortigauntLog::LogF("^5[REZ]^7 Plain LithTech archive\n");
+        ReportProgress(100);
+        return true;
+    }
 
     in.clear();
     in.seekg(0, std::ios::beg);
