@@ -682,8 +682,6 @@ bool RezExtractor::ExtractEntry(const RezEntry& entry, const std::string& output
 }
 
 
-// Plain LithTech REZ, header and directory layout after https://github.com/no-lith/RezExtract (MIT).
-// Returns false for anything that does not read as one from end to end, CrossFire's encrypted archives included.
 bool RezExtractor::ParsePlainDirectory(std::ifstream& in)
 {
     in.clear();
@@ -700,7 +698,6 @@ bool RezExtractor::ParsePlainDirectory(std::ifstream& in)
         std::memcpy(&value, header + at, 4);
         return value;
     };
-    // line ends, or the characters that stand in for them in the obfuscated header
     auto marker = [&](size_t at, char plain, char hidden) { return header[at] == plain || header[at] == hidden; };
     if (got < 139 || !marker(0, '\r', '&') || !marker(1, '\n', '#') || !marker(62, '\r', '!') || !marker(63, '\n', '"') ||
         !marker(124, '\r', '%') || !marker(125, '\n', '\''))
@@ -711,7 +708,6 @@ bool RezExtractor::ParsePlainDirectory(std::ifstream& in)
     size_t at = 127;
     if (header[126] == 0x2A)
     {
-        // head, 32 bytes, tail, then the same again as a check
         if (got < 207 || header[161] != (header[127] ^ 0x11) || header[194] != (header[160] ^ 0x11))
         {
             return false;
@@ -726,7 +722,6 @@ bool RezExtractor::ParsePlainDirectory(std::ifstream& in)
     {
         if (u32(at) != 1)
         {
-            // format 2 has seven more bytes before the version
             at += 7;
             if (got < at + 12 || u32(at) != 2)
             {
@@ -854,7 +849,6 @@ bool RezExtractor::ParsePlainDirectory(std::ifstream& in)
     return true;
 }
 
-// Combat Arms stores the two fields after a DTX's resource type the other way round; put back, the file is a LithTech DTX.
 static void FixDtxHeader(const std::string& filename, std::vector<char>& data)
 {
     if (data.size() < 12 || filename.size() < 4 || String_ToLower(filename.substr(filename.size() - 4)) != ".dtx")
