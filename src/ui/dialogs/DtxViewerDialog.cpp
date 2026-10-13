@@ -179,7 +179,8 @@ void DtxViewerDialog::onSaveBmp()
     if (outPath.isEmpty())
         return;
 
-    QImage imageToSave = m_currentImage;
+    // alpha dropped before any scaling: a BMP has none, and kept it bleeds green into the palette
+    QImage imageToSave = m_currentImage.convertToFormat(QImage::Format_RGB32);
 
     if (imageToSave.width() > 512 || imageToSave.height() > 512)
     {
@@ -200,20 +201,6 @@ void DtxViewerDialog::onSaveBmp()
     }
 
     QImage argb = imageToSave.convertToFormat(QImage::Format_ARGB32);
-
-    if (imageToSave.hasAlphaChannel()) {
-        for (int y = 0; y < argb.height(); ++y) {
-            QRgb* scanLine = reinterpret_cast<QRgb*>(argb.scanLine(y));
-            for (int x = 0; x < argb.width(); ++x) {
-                if (qAlpha(scanLine[x]) < 5) {// TODO: I need take a look this value or go another way, because some of textures we got still green background. not at all but some pixels are green in some textures.
-                    scanLine[x] = qRgb(0, 0, 0);
-                }
-                else {
-                    scanLine[x] = qRgb(qRed(scanLine[x]), qGreen(scanLine[x]), qBlue(scanLine[x]));
-                }
-            }
-        }
-    }
 
     if (!BMP::saveAsIndexed8(outPath.toStdString().c_str(),
                                   argb.width(), argb.height(),

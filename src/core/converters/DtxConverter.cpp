@@ -17,6 +17,35 @@ static std::string getUniqueTempPath() {
     return (std::filesystem::temp_directory_path() / ss.str()).string();
 }
 
+static void fitGoldSrcSize(std::vector<unsigned int>& pixels, int& width, int& height)
+{
+    while ((width > 512 || height > 512) && width > 1 && height > 1)
+    {
+        const int w = width / 2;
+        const int h = height / 2;
+        std::vector<unsigned int> half(static_cast<size_t>(w) * h);
+        for (int y = 0; y < h; ++y)
+        {
+            for (int x = 0; x < w; ++x)
+            {
+                const unsigned int* top = &pixels[static_cast<size_t>(y) * 2 * width + x * 2];
+                const unsigned int* bottom = top + width;
+                unsigned int out = 0;
+                for (int shift = 0; shift < 32; shift += 8)
+                {
+                    const unsigned int sum = ((top[0] >> shift) & 0xFF) + ((top[1] >> shift) & 0xFF) +
+                                             ((bottom[0] >> shift) & 0xFF) + ((bottom[1] >> shift) & 0xFF);
+                    out |= ((sum + 2) / 4) << shift;
+                }
+                half[static_cast<size_t>(y) * w + x] = out;
+            }
+        }
+        pixels = std::move(half);
+        width = w;
+        height = h;
+    }
+}
+
 // from https://github.com/YoungFine0825/LTB2FBX
 FormatMgr g_FormatMgr;
 
@@ -63,6 +92,19 @@ int DtxConverter::ConvertSingleDTXFile(const std::string& format, const std::str
             std::filesystem::remove(tempFilePath, ec);
         }
 		return DTX_CONVERT_DECODING_FAILED;
+	}
+
+	// DTX alpha is a gloss mask or cut-out, a BMP has none: left in, it skews the palette towards green
+	for (unsigned int& pixel : pixels)
+	{
+		pixel |= 0xFF000000;
+	}
+
+	if (w > 512 || h > 512)
+	{
+		const int fullW = w, fullH = h;
+		fitGoldSrcSize(pixels, w, h);
+		printf("Resized %dx%d to %dx%d (The limit for Goldsrc engine is 512x512).\n", fullW, fullH, w, h);
 	}
 
 	if (!BMP::saveAsIndexed8(outFilePath, w, h, pixels.data()))

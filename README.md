@@ -105,6 +105,7 @@ Special Thanks To:
 - Kungfulon for Crossfire REZ  (https://gist.github.com/kungfulon/dfa49323eb7a55db964f10174e57c19f)
 - Luigi Auriemma for XFS logic (https://aluigi.altervista.org/bms/xenesis.bms)
 - YoungFine0825 for LTB2FBX and DTX to TGA (https://github.com/YoungFine0825/LTB2FBX)
+- nolith for Lithtech REZ (https://github.com/no-lith/RezExtract)
 	
 
 
