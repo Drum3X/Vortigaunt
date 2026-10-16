@@ -40,7 +40,6 @@ struct Gr2ConverterSettings
     bool ExportMaterials = true;
     bool DeveloperMode = false; // Enable detailed debug messages
     bool MirrorUVY = true; // Mirror UV Y-axis (default true for backward compatibility)
-    bool InvertAlpha = false; // Invert alpha channel for DDS textures
     
 
 };
@@ -137,7 +136,6 @@ struct Gr2ConverterSettings
     bool ExportMaterials = true;
     bool DeveloperMode = false;
     bool MirrorUVY = true;
-    bool InvertAlpha = false;
     bool ExportToMap = false;
 
 };

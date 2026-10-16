@@ -139,7 +139,6 @@ private:
     QCheckBox*     m_ignoreMeshesCheck;
     QCheckBox*     m_ignoreAnimsCheck;
     QCheckBox*     m_mirrorUVYCheck;
-    QCheckBox*     m_invertAlphaCheck;  // For inverting alpha in GR2 DDS textures
     QCheckBox*     m_writeQCCheck;      // For generating QC file when exporting GR2 to SMD
     QCheckBox*     m_compileModelCheck = nullptr;  // run studiomdl on every QC that gets written
 

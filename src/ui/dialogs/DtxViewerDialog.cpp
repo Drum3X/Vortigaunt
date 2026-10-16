@@ -179,9 +179,8 @@ void DtxViewerDialog::onSaveBmp()
     if (outPath.isEmpty())
         return;
 
-    // alpha dropped before any scaling: a BMP has none, and kept it bleeds green into the palette
-    QImage imageToSave = m_currentImage.convertToFormat(QImage::Format_RGB32);
-
+    const QImage& imageToSave = m_currentImage;
+    BMP::GoldSrcTextureOptions options;
     if (imageToSave.width() > 512 || imageToSave.height() > 512)
     {
         const auto answer = QMessageBox::question(
@@ -194,17 +193,13 @@ void DtxViewerDialog::onSaveBmp()
             QMessageBox::Yes | QMessageBox::No,
             QMessageBox::Yes);
 
-        if (answer == QMessageBox::Yes)
+        if (answer != QMessageBox::Yes)
         {
-            imageToSave = imageToSave.scaled(512, 512, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            options.maxSize = (std::max)(imageToSave.width(), imageToSave.height());
         }
     }
 
-    QImage argb = imageToSave.convertToFormat(QImage::Format_ARGB32);
-
-    if (!BMP::saveAsIndexed8(outPath.toStdString().c_str(),
-                                  argb.width(), argb.height(),
-                                  reinterpret_cast<const uint32_t*>(argb.constBits())))
+    if (!BMP::saveGoldSrcTexture(outPath.toStdString(), imageToSave, options))
     {
         QMessageBox::warning(this,
                              tr("Save error"),

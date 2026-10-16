@@ -1499,7 +1499,8 @@ bool SpriteLoader::exportLithtechFramesToBmp(const std::string& outputDir, const
         std::string filename = prefix + "_" + std::to_string(i) + ".bmp";
         std::string outputPath = (std::filesystem::path(outputDir) / filename).string();
 
-        QImage argb = frame.image.convertToFormat(QImage::Format_ARGB32);
+        QImage argb = alphaCompositeOnto(frame.image.convertToFormat(QImage::Format_ARGB32), 0, 0, 0)
+                          .convertToFormat(QImage::Format_ARGB32);
         if (BMP::saveAsIndexed8(outputPath.c_str(),
                                      argb.width(), argb.height(),
                                      reinterpret_cast<const uint32_t*>(argb.constBits())))

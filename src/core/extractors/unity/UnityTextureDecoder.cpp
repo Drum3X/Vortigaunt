@@ -4,6 +4,7 @@
 #include "utils/Bmp.h"
 #include "utils/Png.h"
 #include "utils/BinaryUtils.h"
+#include "utils/FileIO.h"
 
 #define BCDEC_IMPLEMENTATION
 #include "utils/bcdec.h"
@@ -558,11 +559,11 @@ void UnityTextureDecoder::Convert(const UnityObjectInfo& objInfo, const UnityAss
 
     // Prepare output path using Sanitized Object Name
     std::string baseName = objInfo.name.empty() ? std::to_string(objInfo.pathId) : Utils::SanitizeFilename(objInfo.name);
-    std::filesystem::path outPath = std::filesystem::path(outputDir) / (baseName + (convertToBmp ? ".bmp" : ".png"));
+    const std::filesystem::path outPath = FileIO::toPath(outputDir) / FileIO::toPath(baseName + (convertToBmp ? ".bmp" : ".png"));
 
     bool success = convertToBmp
-        ? BMP::saveAsIndexed8(outPath.string(), w, h, argbPixels.data())
-        : PNG::saveArgb(outPath.string(), w, h, argbPixels.data());
+        ? BMP::saveGoldSrcTexture(FileIO::fromPath(outPath), w, h, argbPixels.data())
+        : PNG::saveArgb(FileIO::fromPath(outPath), w, h, argbPixels.data());
 
     if (!success) {
         VortigauntLog::LogF("ERROR: Failed to encode %s for PathID %lld\n",
@@ -570,5 +571,5 @@ void UnityTextureDecoder::Convert(const UnityObjectInfo& objInfo, const UnityAss
         return;
     }
 
-    VortigauntLog::LogF("Texture converted: %s (Format: %s)\n", outPath.string().c_str(), FormatName(format));
+    VortigauntLog::LogF("Texture converted: %s (Format: %s)\n", FileIO::fromPath(outPath).c_str(), FormatName(format));
 }

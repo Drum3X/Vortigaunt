@@ -457,13 +457,6 @@ MainWindow::MainWindow(QWidget* parent)
     m_mirrorUVYCheck->setVisible(false); // Hidden by default, shown only for GR2
     runLayout->addWidget(m_mirrorUVYCheck);
     
-    // Some Alpha is usually reduced on shiny, glittery items. (This is something I experienced in Metin2)
-	// and this option is useful for that.
-    m_invertAlphaCheck = new QCheckBox(tr("Invert Alpha"));
-    m_invertAlphaCheck->setToolTip(tr("Invert alpha channel for DDS textures (fixes transparency issues)"));
-    m_invertAlphaCheck->setVisible(false); // Hidden by default, shown only for GR2
-    runLayout->addWidget(m_invertAlphaCheck);
-
 
 	// TODO: its just for only GR2. Make for other formats too
     m_writeQCCheck = new QCheckBox(tr("Write QC"));
@@ -657,7 +650,6 @@ MainWindow::MainWindow(QWidget* parent)
         m_unityBmpCheck->setVisible(isUnity); // Show BMP conversion checkbox only for Unity mode
         m_gr2AnimGroup->setVisible(isGr2);
         m_mirrorUVYCheck->setVisible(isGr2); // Show Mirror UV Y checkbox only for GR2
-        m_invertAlphaCheck->setVisible(isGr2); // Show Invert Alpha checkbox only for GR2
         m_writeQCCheck->setVisible(isGr2 || isLtb || isFbxGlb || isWeaponModel); // Show Write QC checkbox  for GR2, Ltb & FBX/GLB
         m_compileModelCheck->setVisible(isGr2 || isLtb || isFbxGlb || isWeaponModel);
         updateWeaponModelControls();
@@ -702,7 +694,6 @@ MainWindow::MainWindow(QWidget* parent)
     bool isModelOp = initialGr2 || initialLtb;
     
     m_mirrorUVYCheck->setVisible(initialGr2);
-    m_invertAlphaCheck->setVisible(initialGr2);
     m_writeQCCheck->setVisible(initialGr2 || initialLtb || initialText.contains("FBX", Qt::CaseInsensitive) ||
                                initialText.contains("P/W", Qt::CaseInsensitive));
     m_compileModelCheck->setVisible(m_writeQCCheck->isVisibleTo(this));
@@ -2091,7 +2082,6 @@ void MainWindow::convertGr2(const QString& inputPath, const QString& outputDir)
     settings.ExportSkeleton = true;
     settings.ExportMaterials = true;
     settings.MirrorUVY = SettingsDialog::getMirrorUVY();
-    settings.InvertAlpha = m_invertAlphaCheck->isChecked();
     
     gr2Converter.SetConverterSettings(settings);
     

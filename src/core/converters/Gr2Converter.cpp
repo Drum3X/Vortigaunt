@@ -12,6 +12,7 @@
 #include <cstdint> 
 #include <cmath>   
 #include "utils/util.hpp"
+#include "utils/FileIO.h"
 
 #include "granny.h"
 
@@ -2112,33 +2113,17 @@ bool Gr2Converter::convertTextureto8IndexedBMP(const std::string& inputPath, con
         return false;
     }
 
-    // Invert alpha channel if requested (for DDS textures with inverted alpha)
-    if (m_settings.InvertAlpha && sourceImage.hasAlphaChannel())
-    {
-        // Convert to ARGB32 to ensure we can manipulate alpha
-        QImage argbImage = sourceImage.convertToFormat(QImage::Format_ARGB32);
-        for (int y = 0; y < argbImage.height(); ++y)
-        {
-            QRgb* scanLine = reinterpret_cast<QRgb*>(argbImage.scanLine(y));
-            for (int x = 0; x < argbImage.width(); ++x)
-            {
-                int alpha = qAlpha(scanLine[x]);
-                int invertedAlpha = 255 - alpha;
-                scanLine[x] = qRgba(qRed(scanLine[x]), qGreen(scanLine[x]), qBlue(scanLine[x]), invertedAlpha);
-            }
-        }
-        sourceImage = argbImage;
-        Vortigaunt_Printf("  Applied alpha inversion to texture");
-    }
-
-    // Use octree quantisation (same as CLI) for best quality
-    QImage argb = sourceImage.convertToFormat(QImage::Format_ARGB32);
-    if (!BMP::saveAsIndexed8(outputPath.c_str(),
-                                  argb.width(), argb.height(),
-                                  reinterpret_cast<const uint32_t*>(argb.constBits())))
+    // Metin2 keeps a gloss mask in the alpha, so it is dropped
+    BMP::GoldSrcTextureInfo info;
+    if (!BMP::saveGoldSrcTexture(outputPath, sourceImage, {}, &info))
     {
         Vortigaunt_Printf("  ERROR: Failed to save 8-bit BMP file: " + outputPath);
         return false;
+    }
+    if (info.resized)
+    {
+        Vortigaunt_Printf("  Resized " + std::to_string(sourceImage.width()) + "x" + std::to_string(sourceImage.height()) + " to " +
+                          std::to_string(info.width) + "x" + std::to_string(info.height) + " (GoldSrc limit is 512)");
     }
 
     return true;

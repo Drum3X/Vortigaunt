@@ -882,22 +882,10 @@ bool guessTextureByName(const std::vector<std::string>& keys, const std::vector<
     return bestScore > 0;
 }
 
-int nearestPowerOfTwo(int value, int maximum)
+// more than 2% of the picture is see-through
+bool hasTransparency(QImage image)
 {
-    if (value < 1) value = 1;
-    int p = 1;
-    while (p * 2 <= value) p *= 2;
-    if (static_cast<double>(value) / p > 1.41421356) p *= 2;
-    return std::clamp(p, 4, maximum);
-}
-
-bool saveGoldSrcTexture(QImage image, const fs::path& path, int maxSize, bool& hadAlpha, int& outWidth, int& outHeight)
-{
-    if (image.isNull()) return false;
-
     image = image.convertToFormat(QImage::Format_ARGB32);
-
-    // Does transparency matter in this picture?
     long long seeThrough = 0;
     const long long total = static_cast<long long>(image.width()) * image.height();
     const int step = std::max(1, static_cast<int>(std::sqrt(static_cast<double>(total) / 65536.0)));
@@ -911,19 +899,7 @@ bool saveGoldSrcTexture(QImage image, const fs::path& path, int maxSize, bool& h
             if (qAlpha(row[x]) < 128) seeThrough++;
         }
     }
-    hadAlpha = sampled > 0 && seeThrough * 50 > sampled;  // more than 2%
-
-    outWidth = nearestPowerOfTwo(image.width(), maxSize);
-    outHeight = nearestPowerOfTwo(image.height(), maxSize);
-    if (outWidth != image.width() || outHeight != image.height())
-    {
-        image = image.scaled(outWidth, outHeight, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-    }
-
-    image = image.convertToFormat(QImage::Format_RGB32).convertToFormat(QImage::Format_ARGB32);
-
-    return BMP::saveAsIndexed8(FileIO::fromPath(path), image.width(), image.height(),
-                               reinterpret_cast<const uint32_t*>(image.constBits()));
+    return sampled > 0 && seeThrough * 50 > sampled;
 }
 
 QImage decodeImageBytes(const uint8_t* data, size_t size)
@@ -1771,10 +1747,12 @@ FbxGlbConvertReport FbxGlbConverter::Convert(const std::string& inputPath,
                 kind = Placeholder;
             }
 
-            bool hadAlpha = false;
-            int width = 0, height = 0;
-            const fs::path bmpPath = outFolder / FileIO::toPath(material.smdName);
-            if (!saveGoldSrcTexture(image, bmpPath, options.maxTextureSize, hadAlpha, width, height))
+            const bool hadAlpha = hasTransparency(image);
+            BMP::GoldSrcTextureOptions textureOptions;
+            textureOptions.maxSize = options.maxTextureSize;
+            textureOptions.powerOfTwo = true;
+            BMP::GoldSrcTextureInfo written;
+            if (!BMP::saveGoldSrcTexture(FileIO::fromPath(outFolder / FileIO::toPath(material.smdName)), image, textureOptions, &written))
             {
                 warn("Could not write texture " + material.smdName);
                 continue;
@@ -1784,13 +1762,13 @@ FbxGlbConvertReport FbxGlbConverter::Convert(const std::string& inputPath,
             if (kind == FromModel)
             {
                 report.texturesWritten++;
-                VortigauntLog::LogF("  ^2texture^7 %s  %dx%d  (%s)%s", material.smdName.c_str(), width, height, origin.c_str(),
+                VortigauntLog::LogF("  ^2texture^7 %s  %dx%d  (%s)%s", material.smdName.c_str(), written.width, written.height, origin.c_str(),
                                     hadAlpha ? "  ^3has transparency^7" : "");
             }
             else if (kind == Guessed)
             {
                 report.texturesGuessed++;
-                VortigauntLog::LogF("  ^3texture^7 %s  %dx%d  (^3guessed by name:^7 %s)", material.smdName.c_str(), width, height, origin.c_str());
+                VortigauntLog::LogF("  ^3texture^7 %s  %dx%d  (^3guessed by name:^7 %s)", material.smdName.c_str(), written.width, written.height, origin.c_str());
             }
             else
             {

@@ -93,3 +93,9 @@ else()
 endif()
 
 add_subdirectory(src)
+
+option(VORTIGAUNT_TESTS "Build the regression tests (ctest)" ON)
+if(VORTIGAUNT_TESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt")
+    enable_testing()
+    add_subdirectory(tests)
+endif()

@@ -99,6 +99,7 @@ set(VORTIGAUNT_CORE
     utils/Platform.cpp
     utils/Dds.cpp
     utils/Png.cpp
+    utils/Bmp.cpp
     utils/ImageUtils.cpp
     core/extractors/pak/SnowCipher.cpp
     core/extractors/pak/PakFile.cpp
@@ -176,27 +177,31 @@ set(VORTIGAUNT_GUI
     core/VortigauntUpdateCheck.cpp
 )
 
-add_executable(VortigauntTool ${CLI_SOURCES} ${VORTIGAUNT_CORE_HEADERS} ${VORTIGAUNT_CORE})
-target_include_directories(VortigauntTool PRIVATE 
+# The core without Qt, shared by the CLI and the tests
+add_library(VortigauntCore STATIC ${VORTIGAUNT_CORE_HEADERS} ${VORTIGAUNT_CORE})
+target_include_directories(VortigauntCore PUBLIC
     ./
     ./core
     ./core/converters
     ./ui
     ./utils
 )
-target_link_libraries(VortigauntTool PRIVATE
+target_link_libraries(VortigauntCore PUBLIC
     assimp_includes rapidjson_headers zlib_headers lzma lz4
     gcl_headers audio_headers libimagequant
     unordered_dense::unordered_dense
 )
 if(ENABLE_LITHTECH)
-    target_link_libraries(VortigauntTool PRIVATE lithtech)
-    target_compile_definitions(VortigauntTool PRIVATE ENABLE_LITHTECH)
+    target_link_libraries(VortigauntCore PUBLIC lithtech)
+    target_compile_definitions(VortigauntCore PUBLIC ENABLE_LITHTECH)
 endif()
 if(ENABLE_GRANNY2)
-    target_link_libraries(VortigauntTool PRIVATE granny2)
-    target_compile_definitions(VortigauntTool PRIVATE ENABLE_GRANNY2)
+    target_link_libraries(VortigauntCore PUBLIC granny2)
+    target_compile_definitions(VortigauntCore PUBLIC ENABLE_GRANNY2)
 endif()
+
+add_executable(VortigauntTool ${CLI_SOURCES})
+target_link_libraries(VortigauntTool PRIVATE VortigauntCore)
 if(METIN2_SCRIPT_EFFECT)
     target_sources(VortigauntTool PRIVATE core/MseLoader.h core/MseLoader.cpp core/MdeLoader.h core/MdeLoader.cpp)
     target_compile_definitions(VortigauntTool PRIVATE METIN2_SCRIPT_EFFECT)

@@ -3,7 +3,6 @@
 #include "utils/Bmp.h"
 #include "utils/FileIO.h"
 #include "utils/ImageUtils.h"
-#include "libimagequant.h"
 #include "utils/util.hpp"
 
 
@@ -153,66 +152,13 @@ void WadArchive::generateMipmaps(WadTexture& texture)
 bool WadArchive::quantizeToIndexed(const uint8_t* rgbData, uint32_t width, uint32_t height,
                                  std::vector<uint8_t>& indexedData, uint8_t* palette)
 {
-    // Use libimagequant for high-quality palette generation (same as BMP::saveAsIndexed8 / SpriteLoader)
-    uint32_t pixelCount = width * height;
-
-    // Convert RGB -> RGBA (libimagequant requires 4 channels)
-    std::vector<uint8_t> rgbaBuffer(pixelCount * 4);
-    for (uint32_t i = 0; i < pixelCount; ++i)
+    const size_t pixelCount = static_cast<size_t>(width) * height;
+    std::vector<uint32_t> argb(pixelCount);
+    for (size_t i = 0; i < pixelCount; ++i)
     {
-        rgbaBuffer[i * 4 + 0] = rgbData[i * 3 + 0]; // R
-        rgbaBuffer[i * 4 + 1] = rgbData[i * 3 + 1]; // G
-        rgbaBuffer[i * 4 + 2] = rgbData[i * 3 + 2]; // B
-        rgbaBuffer[i * 4 + 3] = 255;                 // A (fully opaque)
+        argb[i] = 0xFF000000u | (rgbData[i * 3 + 0] << 16) | (rgbData[i * 3 + 1] << 8) | rgbData[i * 3 + 2];
     }
-
-    liq_attr* attr = liq_attr_create();
-    if (!attr) return false;
-
-    liq_set_speed(attr, 1); // Max quality
-    liq_set_max_colors(attr, 256);
-
-    liq_image* img = liq_image_create_rgba(attr, rgbaBuffer.data(),
-                                           static_cast<int>(width),
-                                           static_cast<int>(height), 0);
-    if (!img)
-    {
-        liq_attr_destroy(attr);
-        return false;
-    }
-
-    liq_result* res = nullptr;
-    if (liq_image_quantize(img, attr, &res) != LIQ_OK)
-    {
-        liq_image_destroy(img);
-        liq_attr_destroy(attr);
-        return false;
-    }
-
-    // Extract palette entries as RGB (WadTexture stores 3 bytes/color)
-    const liq_palette* pal = liq_get_palette(res);
-    std::memset(palette, 0, 768);
-    for (unsigned int i = 0; i < pal->count; ++i)
-    {
-        palette[i * 3 + 0] = pal->entries[i].r;
-        palette[i * 3 + 1] = pal->entries[i].g;
-        palette[i * 3 + 2] = pal->entries[i].b;
-    }
-
-    // Write remapped (indexed) pixel data
-    indexedData.resize(pixelCount);
-    if (liq_write_remapped_image(res, img, indexedData.data(), pixelCount) != LIQ_OK)
-    {
-        liq_result_destroy(res);
-        liq_image_destroy(img);
-        liq_attr_destroy(attr);
-        return false;
-    }
-
-    liq_result_destroy(res);
-    liq_image_destroy(img);
-    liq_attr_destroy(attr);
-    return true;
+    return BMP::quantize(argb.data(), static_cast<int>(width), static_cast<int>(height), false, palette, indexedData);
 }
 
 bool WadArchive::resizeAndValidate(WadTexture& texture)
@@ -410,114 +356,26 @@ bool WadArchive::loadViaQImage(const std::string& path, WadTexture& texture)
             argbPixels[(y + offsetY) * width + (x + offsetX)] = static_cast<uint32_t>(scanline[x]);
     }
 
-    // Detect whether the image has any fully-transparent pixels
-    // (semi-transparent pixels will be alpha-blended, not treated as transparent)
+    // fully see-through pixels become index 255 (blue); half see-through ones are blended onto black
     bool hasTransparency = false;
-    for (int i = 0; i < total; ++i)
+    for (uint32_t& c : argbPixels)
     {
-        if (((argbPixels[i] >> 24) & 0xFF) == 0)
-        {
-            hasTransparency = true;
-            break;
-        }
-    }
-
-
-
-    std::vector<uint8_t> rgbaBuffer(total * 4);
-    for (int i = 0; i < total; ++i)
-    {
-        uint32_t c = argbPixels[i];
-        uint8_t  a = (c >> 24) & 0xFF;
-        uint8_t  r = (c >> 16) & 0xFF;
-        uint8_t  g = (c >>  8) & 0xFF;
-        uint8_t  b = (c      ) & 0xFF;
-
+        const uint32_t a = c >> 24;
         if (a == 0)
         {
-            // Fully transparent → blue key placeholder (overridden after quantization)
-            rgbaBuffer[i * 4 + 0] = 0;
-            rgbaBuffer[i * 4 + 1] = 0;
-            rgbaBuffer[i * 4 + 2] = 255;
-            rgbaBuffer[i * 4 + 3] = 255;
+            hasTransparency = true;
         }
         else if (a < 255)
         {
-            // Semi-transparent → blend onto black background to preserve anti-aliased edges
-            // result = src * alpha/255  (black bg contributes 0)
-            float fa = a / 255.0f;
-            rgbaBuffer[i * 4 + 0] = static_cast<uint8_t>(r * fa + 0.5f);
-            rgbaBuffer[i * 4 + 1] = static_cast<uint8_t>(g * fa + 0.5f);
-            rgbaBuffer[i * 4 + 2] = static_cast<uint8_t>(b * fa + 0.5f);
-            rgbaBuffer[i * 4 + 3] = 255; // treat as opaque for quantizer
-        }
-        else
-        {
-            rgbaBuffer[i * 4 + 0] = r;
-            rgbaBuffer[i * 4 + 1] = g;
-            rgbaBuffer[i * 4 + 2] = b;
-            rgbaBuffer[i * 4 + 3] = 255;
+            const auto blend = [a](uint32_t v) { return (v * a + 127) / 255; };
+            c = 0xFF000000u | blend((c >> 16) & 0xFF) << 16 | blend((c >> 8) & 0xFF) << 8 | blend(c & 0xFF);
         }
     }
 
-    // Quantize: use max 255 colors when transparency is present (slot 255 reserved)
-    int maxColors = hasTransparency ? 255 : 256;
-
-    liq_attr* attr = liq_attr_create();
-    if (!attr) return false;
-    liq_set_speed(attr, 1);
-    liq_set_max_colors(attr, maxColors);
-
-    liq_image* img = liq_image_create_rgba(attr, rgbaBuffer.data(),
-                                           static_cast<int>(width),
-                                           static_cast<int>(height), 0);
-    if (!img) { liq_attr_destroy(attr); return false; }
-
-    liq_result* res = nullptr;
-    if (liq_image_quantize(img, attr, &res) != LIQ_OK)
+    if (!BMP::quantize(argbPixels.data(), static_cast<int>(width), static_cast<int>(height), hasTransparency,
+                       texture.palette, texture.mip0))
     {
-        liq_image_destroy(img);
-        liq_attr_destroy(attr);
         return false;
-    }
-
-    // Write remapped indexed data
-    texture.mip0.resize(total);
-    if (liq_write_remapped_image(res, img, texture.mip0.data(), total) != LIQ_OK)
-    {
-        liq_result_destroy(res);
-        liq_image_destroy(img);
-        liq_attr_destroy(attr);
-        return false;
-    }
-
-    // Build palette (WAD3 stores 3 bytes/color, 256 entries = 768 bytes)
-    const liq_palette* pal = liq_get_palette(res);
-    std::memset(texture.palette, 0, 768);
-    for (unsigned int i = 0; i < pal->count; ++i)
-    {
-        texture.palette[i * 3 + 0] = pal->entries[i].r;
-        texture.palette[i * 3 + 1] = pal->entries[i].g;
-        texture.palette[i * 3 + 2] = pal->entries[i].b;
-    }
-
-    liq_result_destroy(res);
-    liq_image_destroy(img);
-    liq_attr_destroy(attr);
-
-    if (hasTransparency)
-    {
-        // Force palette slot 255 = GoldSrc blue key {0, 0, 255}
-        texture.palette[255 * 3 + 0] = 0;
-        texture.palette[255 * 3 + 1] = 0;
-        texture.palette[255 * 3 + 2] = 255;
-
-        // Remap all fully-transparent pixels to index 255
-        for (int i = 0; i < total; ++i)
-        {
-            if (((argbPixels[i] >> 24) & 0xFF) == 0)
-                texture.mip0[i] = 255;
-        }
     }
 
     return resizeAndValidate(texture);

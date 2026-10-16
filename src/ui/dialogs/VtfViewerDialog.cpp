@@ -301,8 +301,8 @@ void VtfViewerDialog::onSaveBmp()
     if (outPath.isEmpty())
         return;
 
-    QImage imageToSave = m_currentImage;
-
+    QImage imageToSave = m_currentImage.convertToFormat(QImage::Format_ARGB32);
+    BMP::GoldSrcTextureOptions options;
     if (imageToSave.width() > 512 || imageToSave.height() > 512)
     {
         const auto answer = QMessageBox::question(
@@ -315,31 +315,23 @@ void VtfViewerDialog::onSaveBmp()
             QMessageBox::Yes | QMessageBox::No,
             QMessageBox::Yes);
 
-        if (answer == QMessageBox::Yes)
+        if (answer != QMessageBox::Yes)
         {
-            imageToSave = imageToSave.scaled(512, 512, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            options.maxSize = (std::max)(imageToSave.width(), imageToSave.height());
         }
     }
 
-    QImage argb = imageToSave.convertToFormat(QImage::Format_ARGB32);
-
-    if (imageToSave.hasAlphaChannel()) {
-        for (int y = 0; y < argb.height(); ++y) {
-            QRgb* scanLine = reinterpret_cast<QRgb*>(argb.scanLine(y));
-            for (int x = 0; x < argb.width(); ++x) {
-                if (qAlpha(scanLine[x]) < 5) {
-                    scanLine[x] = qRgb(0, 0, 0);
-                }
-                else {
-                    scanLine[x] = qRgb(qRed(scanLine[x]), qGreen(scanLine[x]), qBlue(scanLine[x]));
-                }
+    // fully see-through pixels go black
+    for (int y = 0; y < imageToSave.height(); ++y) {
+        QRgb* scanLine = reinterpret_cast<QRgb*>(imageToSave.scanLine(y));
+        for (int x = 0; x < imageToSave.width(); ++x) {
+            if (qAlpha(scanLine[x]) < 5) {
+                scanLine[x] = qRgb(0, 0, 0);
             }
         }
     }
 
-    if (!BMP::saveAsIndexed8(outPath.toStdString().c_str(),
-                             argb.width(), argb.height(),
-                             reinterpret_cast<const uint32_t*>(argb.constBits())))
+    if (!BMP::saveGoldSrcTexture(outPath.toStdString(), imageToSave, options))
     {
         QMessageBox::warning(this, tr("Save error"), tr("Failed to save BMP file."));
         return;

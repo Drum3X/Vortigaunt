@@ -26,9 +26,7 @@ src/ui/widgets/MseViewerWidget.h
 src/ui/widgets/MseSmdExporter.cpp
 src/ui/widgets/MseSprExporter.cpp
 
-# AnimationClip not ready.
-
-# Auto-Rig not ready. Build it with -DVORTIGAUNT_AUTORIG=ON.
+# Auto-Rig not ready
 src/core/autorig/AutoRig.h
 src/core/autorig/AutoRig.cpp
 src/core/autorig/HeatRig.h
@@ -43,3 +41,6 @@ src/core/autorig/PoseTransfer.h
 src/core/autorig/PoseTransfer.cpp
 src/ui/dialogs/AutoRigDialog.h
 src/ui/dialogs/AutoRigDialog.cpp
+
+# just doin tests in local
+/tests

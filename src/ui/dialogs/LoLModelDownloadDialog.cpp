@@ -1902,10 +1902,7 @@ void LoLModelDownloadDialog::onDownloadClicked()
             // Save as 8-bit indexed BMP using centralized bmp
             QString bmpPath = QDir(modelDir).filePath(QString::fromStdString(meshName) + ".bmp");
             
-            QImage argb = scaledImage.convertToFormat(QImage::Format_ARGB32);
-            if (BMP::saveAsIndexed8(bmpPath.toUtf8().constData(), 
-                                        argb.width(), argb.height(), 
-                                        reinterpret_cast<const uint32_t*>(argb.constBits()))) {
+            if (BMP::saveGoldSrcTexture(bmpPath.toStdString(), scaledImage)) {
                 textureCount++;
             } else {
                 logToDialog(tr("    Failed to save texture: %1").arg(QString::fromStdString(meshName) + ".bmp"));
@@ -1940,8 +1937,7 @@ void LoLModelDownloadDialog::onDownloadClicked()
                         QString bmpName = QFileInfo(file).completeBaseName() + ".bmp";
                         QString dstFile = QDir(dstDir).filePath(bmpName);
                         
-                        QImage argb = scaledImage.convertToFormat(QImage::Format_ARGB32);
-                        BMP::saveAsIndexed8(dstFile.toUtf8().constData(), argb.width(), argb.height(), reinterpret_cast<const uint32_t*>(argb.constBits()));
+                        BMP::saveGoldSrcTexture(dstFile.toStdString(), scaledImage);
                     }
                 }
                 logToDialog(tr("  Converted chroma textures for: %1").arg(cDirName));
