@@ -77,6 +77,8 @@ public:
 
     void WriteHeader(std::ofstream& file);
     std::string SanitizeNodeName(const std::string& name);
+    // studiomdl matches bone names without case and cuts them at 31 characters, so "Root" and "ROOT" are one bone to it
+    static std::vector<std::string> UniqueNodeNames(const std::vector<std::string>& names);
     void WriteNodes(std::ofstream& file, const aiScene* scene);
     void WriteSkeletonReference(std::ofstream& file, const aiScene* scene);
     void WriteSkeletonAnimation(std::ofstream& file, const aiScene* scene, int animIndex);

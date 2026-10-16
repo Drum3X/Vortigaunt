@@ -4,6 +4,9 @@
 #include <vector>
 #include <cstdint>
 
+#include "core/converters/IConverter.h"
+#include "utils/FileIO.h"
+
 #ifdef ENABLE_LITHTECH
 
 #include "bdefs.h"
@@ -23,11 +26,16 @@ enum
 };
 
 
-class DtxConverter
+class DtxConverter : public IConverter
 {
 public:
 	DtxConverter();
 	~DtxConverter();
+
+	const char* Name() const override { return "DTX"; }
+	bool CanConvert(const std::string& path) const override { return FileIO::lowerExtension(path) == ".dtx"; }
+	// writes <outputDir>/<name>.bmp
+	ConvertResult ConvertFile(const std::string& inputPath, const std::string& outputDir) override;
 	int ConvertSingleDTXFile(const std::string& format,const std::string& inputFilePath, const std::string& outFilePath);
 
 
@@ -57,11 +65,15 @@ enum
 	DTX_CONVERT_FAILED = 3,
 };
 
-class DtxConverter
+class DtxConverter : public IConverter
 {
 public:
 	DtxConverter() = default;
 	~DtxConverter() = default;
+
+	const char* Name() const override { return "DTX"; }
+	bool CanConvert(const std::string& path) const override { return FileIO::lowerExtension(path) == ".dtx"; }
+	ConvertResult ConvertFile(const std::string&, const std::string&) override { return { false, "DTX needs the LithTech SDK, which is Windows only" }; }
 	int ConvertSingleDTXFile(const std::string&, const std::string&, const std::string&) { return DTX_CONVERT_FAILED; }
     bool DecodeDTXToRGBA(const std::string&, std::vector<unsigned int>&, int&, int&) { return false; }
     bool DecodeDTXBufferToRGBA(const uint8_t*, size_t, std::vector<unsigned int>&, int&, int&) { return false; }

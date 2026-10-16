@@ -10,6 +10,7 @@ option(VORTIGAUNT_AUTORIG "Enable the GoldSrc Auto-Rig tool" OFF)
 
 set(VORTIGAUNT_CORE_HEADERS
     core/converters/Gr2Converter.h
+    core/converters/IConverter.h
     core/converters/FbxGlbConverter.h
     core/converters/WeaponModelConverter.h
     core/mdl/StudioModel.h
@@ -86,6 +87,7 @@ set(VORTIGAUNT_CORE
     core/WadMaker.cpp
     
     core/QCFile.cpp
+    core/converters/IConverter.cpp
     core/converters/FbxGlbConverter.cpp
     core/converters/WeaponModelConverter.cpp
     core/mdl/StudioModel.cpp
@@ -344,6 +346,7 @@ if(BUILD_GUI)
             shell/windows/DtxThumbnailProvider.def
             core/converters/DtxConverter.cpp
             core/converters/LzmaDecoder.cpp
+            utils/Bmp.cpp
         )
         add_library(DtxThumbnailProvider SHARED ${DTX_THUMBNAIL_PROVIDER_SOURCES})
         target_include_directories(DtxThumbnailProvider PRIVATE

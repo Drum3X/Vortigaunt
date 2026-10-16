@@ -9,6 +9,9 @@
 #include <vector>
 #include "utils/FileIO.h"
 #include "utils/util.hpp"
+#include "core/QCFile.h"
+
+#include <algorithm>
 
 // from https://github.com/YoungFine0825/LTB2FBX/blob/main/Source/Converter.cpp
 // Use system temp directory to avoid permission issues in Program Files
@@ -51,6 +54,78 @@ void ltbConverter::releaseGrabbedData()
 	m_materialsPtrList.clear();
 	m_nodeAnimPtrVecList.clear();
 	m_animPtrVec.clear();
+}
+
+bool ltbConverter::CanConvert(const std::string& path) const
+{
+	return FileIO::lowerExtension(path) == ".ltb";
+}
+
+ConvertResult ltbConverter::ConvertFile(const std::string& inputPath, const std::string& outputDir)
+{
+	namespace fs = std::filesystem;
+	ConvertResult result;
+	const std::string baseName = FileIO::fromPath(FileIO::toPath(inputPath).stem());
+	const fs::path folder = FileIO::toPath(outputDir) / FileIO::toPath(baseName);
+	std::error_code ec;
+	fs::create_directories(folder, ec);
+	result.outputFolder = FileIO::fromPath(folder);
+
+	VortigauntLog::LogF("Converting LTB: %s", inputPath.c_str());
+	const int ret = ConvertSingleLTBFile(inputPath, FileIO::fromPath(folder / FileIO::toPath(baseName + ".smd")));
+	if (ret != CONVERT_RET_OK)
+	{
+		switch (ret)
+		{
+		case CONVERT_RET_INVALID_INPUT_FILE: result.error = "could not open the file"; break;
+		case CONVERT_RET_DECODING_FAILED: result.error = "could not decompress the file"; break;
+		case CONVERT_RET_INVALID_HEADER: result.error = "not an LTB model"; break;
+		default: result.error = "could not load the model (code " + std::to_string(ret) + ")"; break;
+		}
+		VortigauntLog::LogF("  ^1FAILED:^7 %s", result.error.c_str());
+		return result;
+	}
+
+	// the writer names them <name>_reference.smd and <name>_anim_<sequence>.smd
+	std::vector<std::string> smdFiles, animations;
+	const std::string animPrefix = baseName + "_anim_";
+	for (const auto& entry : fs::directory_iterator(folder, ec))
+	{
+		const std::string name = FileIO::fromPath(entry.path().filename());
+		if (FileIO::lowerExtension(name) != ".smd" || name.rfind(baseName + "_", 0) != 0) continue;
+		smdFiles.push_back(name);
+		if (name.rfind(animPrefix, 0) == 0) animations.push_back(FileIO::fromPath(entry.path().stem()));
+	}
+	std::sort(smdFiles.begin(), smdFiles.end());
+	std::sort(animations.begin(), animations.end());
+	if (smdFiles.empty()) VortigauntLog::LogF("^3No SMD files were generated.");
+	for (const std::string& name : smdFiles) VortigauntLog::LogF("DEBUG:     ^4%s^7", name.c_str());
+	result.ok = true;
+
+	if (!m_setting.WriteQC) return result;
+
+	QCFile qc;
+	QCFileSettings qcSettings;
+	qcSettings.ModelName = baseName + ".mdl";
+	qcSettings.MeshName = baseName + "_reference";
+	qc.SetSettings(qcSettings);
+	for (const std::string& animation : animations)
+	{
+		qc.AddSequence(animation.substr(animPrefix.size()), animation, 30);
+	}
+	if (animations.empty()) qc.AddSequence("idle", qcSettings.MeshName, 30);
+
+	const std::string qcPath = FileIO::fromPath(folder / FileIO::toPath(baseName + ".qc"));
+	if (qc.Write(qcPath))
+	{
+		VortigauntLog::LogF("  QC file created: %s", qcPath.c_str());
+		result.qcFiles.push_back(qcPath);
+	}
+	else
+	{
+		VortigauntLog::LogF("^1Failed to create QC file:^7 %s", qc.GetError().c_str());
+	}
+	return result;
 }
 
 int ltbConverter::ConvertSingleLTBFile(const std::string& ltbFilePath, const std::string& outFilePath)

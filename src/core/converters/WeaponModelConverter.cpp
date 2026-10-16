@@ -1938,12 +1938,23 @@ WeaponModelResult convertWeapon(const std::string& inputPath, const std::string&
 
 bool WeaponModelConverter::IsViewModelFile(const std::string& path)
 {
-    const fs::path p = FileIO::toPath(path);
-    if (String_ToLower(FileIO::fromPath(p.extension())) != ".mdl")
+    if (FileIO::lowerExtension(path) != ".mdl")
     {
         return false;
     }
-    return String_ToLower(FileIO::fromPath(p.stem())).rfind("v_", 0) == 0;
+    return String_ToLower(FileIO::fromPath(FileIO::toPath(path).stem())).rfind("v_", 0) == 0;
+}
+
+ConvertResult WeaponModelConverter::ConvertFile(const std::string& inputPath, const std::string& outputDir)
+{
+    const WeaponModelResult report = Convert(inputPath, outputDir, m_options);
+    ConvertResult result;
+    result.ok = report.ok;
+    result.error = report.error;
+    result.outputFolder = report.outputFolder;
+    if (!report.pQcPath.empty()) result.qcFiles.push_back(report.pQcPath);
+    if (!report.wQcPath.empty()) result.qcFiles.push_back(report.wQcPath);
+    return result;
 }
 
 WeaponModelResult WeaponModelConverter::Convert(const std::string& inputPath, const std::string& outputDir,

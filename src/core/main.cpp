@@ -7,10 +7,13 @@
 #ifdef ENABLE_LITHTECH
 #include "de_file.h"
 #include "model.h"
-#include "LtbConverter.h"
-#include "DtxConverter.h"
 #include "core/extractors/rez/RezExtractor.h"
 #endif
+#include "LtbConverter.h"
+#include "DtxConverter.h"
+#include "core/converters/FbxGlbConverter.h"
+#include "core/converters/WeaponModelConverter.h"
+#include "utils/FileIO.h"
 
 #include "core/extractors/xfs/XfsExtractor.h"
 #include "core/extractors/pak/PakFile.h"
@@ -22,9 +25,7 @@
 #include "util.hpp"
 #include "fsutils.hpp"
 
-#ifdef ENABLE_GRANNY2
 #include "core/converters/Gr2Converter.h"
-#endif
 
 #include "AudioConvert.h"
 #include "WadMaker.h"
@@ -191,6 +192,61 @@ void ConvertLTB(const std::string& inputFilePath, const std::string& inputFormat
 }
 #endif // ENABLE_LITHTECH
 
+// every converter takes the files it knows; a single file goes to the one that knows it
+int ConvertModels(int argc, char** argv)
+{
+	const std::string input = argv[2];
+	std::string outputDir = "VortigauntOutput";
+	bool writeQC = true;
+	for (int i = 3; i < argc; ++i)
+	{
+		if (std::string(argv[i]) == "-noqc") writeQC = false;
+		else outputDir = argv[i];
+	}
+
+	FbxGlbConvertOptions meshOptions;
+	meshOptions.writeQC = writeQC;
+	FbxGlbConverter meshes;
+	meshes.SetOptions(meshOptions);
+
+	WeaponModelOptions weaponOptions;
+	weaponOptions.writeQC = writeQC;
+	WeaponModelConverter weapons;
+	weapons.SetOptions(weaponOptions);
+
+	ltbConverterSetting ltbSetting;
+	ltbSetting.WriteQC = writeQC;
+	ltbConverter ltb;
+	ltb.SetConvertSetting(ltbSetting);
+
+	Gr2Converter gr2;
+	DtxConverter dtx;
+
+	IConverter* converters[] = { &meshes, &weapons, &gr2, &ltb, &dtx };
+	const bool singleFile = FileIO::isRegularFile(input);
+	int total = 0, converted = 0;
+	for (IConverter* converter : converters)
+	{
+		if (singleFile && !converter->CanConvert(input)) continue;
+		const ConvertAssets summary = ConvertAll(*converter, input, outputDir);
+		if (summary.total == 0) continue;
+		printf("%s: %d of %d converted\n", converter->Name(), summary.converted, summary.total);
+		for (const auto& [file, error] : summary.failed)
+		{
+			printf("  failed: %s: %s\n", file.c_str(), error.c_str());
+		}
+		total += summary.total;
+		converted += summary.converted;
+	}
+	if (total == 0)
+	{
+		printf("Nothing to convert in %s\n", input.c_str());
+		return 1;
+	}
+	printf("Output: %s\n", outputDir.c_str());
+	return converted == total ? 0 : 1;
+}
+
 void recurseAndCollectFilePath(std::filesystem::path start, FilePathVec* filesVec)
 {
 	std::filesystem::directory_iterator end;
@@ -311,6 +367,8 @@ int main(int argc,char** argv)
 		printf("    (direct input also supports .gma - Garry's Mod Addon)\n");
 		printf("\n");
 		printf(" Model Convert:\n");
+		printf("    -convert <file_or_folder> [output_dir] [-noqc]\n");
+		printf("                                     FBX/GLB/glTF/OBJ, v_*.mdl (to p_/w_), GR2, LTB to SMD + QC, DTX to BMP\n");
 		printf("    -gr2 <input.gr2> <output.smd>    Convert GR2 to SMD\n");
 		printf("\n");
 		printf(" Wav Convert :\n");
@@ -330,6 +388,16 @@ int main(int argc,char** argv)
 		printf(" Drag & Drop: Drag .ltb, .dtx, .rez, .pak, .xfs, .unity3d, .bundle, .assets files or folders\n");
 		printf("****************************************************************\n");
 		return 0;
+	}
+
+	if (argc >= 2 && std::string(argv[1]) == "-convert")
+	{
+		if (argc < 3)
+		{
+			printf("Usage: VortigauntTool -convert <file_or_folder> [output_dir] [-noqc]\n");
+			return 1;
+		}
+		return ConvertModels(argc, argv);
 	}
 
 	// Unity extraction command

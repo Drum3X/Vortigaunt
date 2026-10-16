@@ -2082,6 +2082,32 @@ void Gr2Converter::renameTexturesToMatchSmd(const std::string& outputDir, const 
 
 
 
+ConvertResult Gr2Converter::ConvertFile(const std::string& inputPath, const std::string& outputDir)
+{
+    ConvertResult result;
+    const std::filesystem::path input = FileIO::toPath(inputPath);
+    const std::filesystem::path folder = FileIO::toPath(outputDir) / input.stem();
+    std::error_code ec;
+    std::filesystem::create_directories(folder, ec);
+    result.outputFolder = FileIO::fromPath(folder);
+
+    std::filesystem::path smd = folder / input.filename();
+    smd.replace_extension(".smd");
+    switch (ConvertSingleGr2File(inputPath, FileIO::fromPath(smd)))
+    {
+    case GR2_CONVERT_RET_OK:
+        result.ok = true;
+        Vortigaunt_Printf("Exporting SMD: ^4" + FileIO::fromPath(smd.filename()) + "^7");
+        return result;
+    case GR2_CONVERT_RET_INVALID_INPUT_FILE: result.error = "Invalid input file"; break;
+    case GR2_CONVERT_RET_LOAD_FAILED: result.error = "Failed to load GR2 file"; break;
+    case GR2_CONVERT_RET_NO_MESH: result.error = "No mesh found in GR2 file"; break;
+    default: result.error = "Export failed"; break;
+    }
+    Vortigaunt_Printf("  ^1FAILED:^7 " + result.error);
+    return result;
+}
+
 bool Gr2Converter::convertTextureto8IndexedBMP(const std::string& inputPath, const std::string& outputPath)
 {
 #ifdef QT_WIDGETS_LIB

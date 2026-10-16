@@ -7,6 +7,10 @@
 #include <atomic>
 #include <QTimer>
 #include "core/VortigauntLog.h"
+#include "core/converters/IConverter.h"
+#include <filesystem>
+#include <functional>
+class Gr2Converter;
 class LtbConverter;
 struct ltbConverterSetting;
 
@@ -111,6 +115,13 @@ private:
     void convertFbxGlb(const QString& inputPath, const QString& outputDir, bool writeQC);
 
     void convertViewModel(const QString& inputPath, const QString& outputDir, const WeaponModelOptions& options);
+
+    // runs a converter over a file or folder: progress, QC compiling and the failures for the summary box
+    ConvertAssets runConverter(IConverter& converter, const QString& inputPath, const QString& outputDir,
+                                const std::function<void(const ConvertResult&)>& afterFile = {});
+
+    // the animations picked in the list, and the QC, for a single GR2 model
+    void exportGr2Animations(Gr2Converter& gr2Converter, const std::filesystem::path& gr2File, const std::filesystem::path& outFolder);
 
     // Compiles a QC that was just written, when "Compile model" is ticked.
     void compileModelIfWanted(const QString& qcPath);

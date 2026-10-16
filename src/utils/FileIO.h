@@ -94,6 +94,17 @@ inline bool isRegularFile(const std::string& utf8Path)
     return std::filesystem::is_regular_file(toPath(utf8Path), ec);
 }
 
+// ".fbx" for "Model.FBX"
+inline std::string lowerExtension(const std::string& utf8Path)
+{
+    std::string ext = fromPath(toPath(utf8Path).extension());
+    for (char& c : ext)
+    {
+        if (c >= 'A' && c <= 'Z') c = static_cast<char>(c - 'A' + 'a');
+    }
+    return ext;
+}
+
 // Replace characters that are illegal in a Windows path component with '_'.
 // Used by the archive extractors so a hostile archive cannot escape the output folder.
 inline std::string sanitizePathComponent(const std::string& name)

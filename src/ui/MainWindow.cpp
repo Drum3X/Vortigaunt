@@ -63,6 +63,7 @@
 #include "core/converters/Gr2Converter.h"
 #include "core/converters/FbxGlbConverter.h"
 #include "core/converters/WeaponModelConverter.h"
+#include "utils/FileIO.h"
 #include "core/VortigauntLog.h"
 
 #ifdef ENABLE_GRANNY2
@@ -108,42 +109,6 @@ QString grabFileExt(const QString& filePath)
     if (idx < 0)
         return {};
     return filePath.mid(idx + 1).toLower();
-}
-
-QString replaceFileExt(const QString& filePath, const QString& ext)
-{
-    int idx = filePath.lastIndexOf('.');
-    QString base = (idx < 0) ? filePath : filePath.left(idx);
-    return base + "." + ext;
-}
-
-void recurseAndCollectFiles(const std::filesystem::path& start, std::vector<std::filesystem::path>& out)
-{
-    if (!std::filesystem::exists(start))
-        return;
-
-    if (std::filesystem::is_regular_file(start))
-    {
-        out.push_back(start);
-        return;
-    }
-
-    for (auto const& entry : std::filesystem::recursive_directory_iterator(start))
-    {
-        if (!entry.is_regular_file())
-            continue;
-        const auto& p = entry.path();
-        auto ext = p.extension().string();
-    if (ext == ".ltb" || ext == ".LTB" ||
-        ext == ".gr2" || ext == ".GR2" ||
-        ext == ".rez" || ext == ".REZ" ||
-        ext == ".pak" || ext == ".PAK" ||
-        ext == ".vpk" || ext == ".VPK" ||
-        ext == ".gma" || ext == ".GMA")
-    {
-        out.push_back(p);
-    }
-    }
 }
 
 
@@ -1122,6 +1087,7 @@ void MainWindow::onRun()
     bool unityTexturesToBmp = !m_unityBmpCheck || m_unityBmpCheck->isChecked();
 
     const bool fbxGlbWriteQC = !m_writeQCCheck || m_writeQCCheck->isChecked();
+    ltbEncSettings.WriteQC = fbxGlbWriteQC;
 
     // Better to hear about a missing compiler now than after the conversion.
     if (m_compileModelCheck->isVisibleTo(this) && m_compileModelCheck->isEnabled() && m_compileModelCheck->isChecked() &&
@@ -1409,58 +1375,41 @@ void MainWindow::onOpenAudioConverter()
     qtDialog->activateWindow();
 }
 
+ConvertAssets MainWindow::runConverter(IConverter& converter, const QString& inputPath, const QString& outputDir,
+                                       const std::function<void(const ConvertResult&)>& afterFile)
+{
+    const ConvertAssets summary = ConvertAll(converter, inputPath.toStdString(), outputDir.toStdString(),
+        [this, &afterFile](int index, int total, const std::string&, const ConvertResult& result) {
+            for (const std::string& qc : result.qcFiles)
+                compileModelIfWanted(QString::fromStdString(qc));
+            if (afterFile)
+                afterFile(result);
+            updateProgressSafe((index + 1) * 100 / total);
+            return true;
+        });
+
+    if (summary.total == 0)
+    {
+        VortigauntLog::Vortigaunt_Printf(QStringLiteral("^3No %1 files found in '%2'.").arg(converter.Name()).arg(inputPath));
+    }
+    else if (summary.total > 1)
+    {
+        VortigauntLog::Vortigaunt_Printf(QStringLiteral("^2%1 of %2 %3 files converted.").arg(summary.converted).arg(summary.total).arg(converter.Name()));
+    }
+    for (const auto& [file, error] : summary.failed)
+    {
+        m_extractionErrors.push_back({ QFileInfo(QString::fromStdString(file)).fileName(), QString::fromStdString(error), 0 });
+    }
+    return summary;
+}
+
 void MainWindow::convertFbxGlb(const QString& inputPath, const QString& outputDir, bool writeQC)
 {
-    // A single model, or every FBX / GLB / glTF under a folder.
-    std::vector<std::filesystem::path> files;
-    const std::filesystem::path start(inputPath.toStdWString());
-    std::error_code ec;
-    if (std::filesystem::is_regular_file(start, ec))
-    {
-        files.push_back(start);
-    }
-    else if (std::filesystem::is_directory(start, ec))
-    {
-        for (const auto& entry : std::filesystem::recursive_directory_iterator(start, ec))
-        {
-            if (!entry.is_regular_file(ec))
-                continue;
-            if (FbxGlbConverter::IsSupportedFile(QString::fromStdWString(entry.path().wstring()).toStdString()))
-                files.push_back(entry.path());
-        }
-    }
-
-    if (files.empty())
-    {
-        VortigauntLog::Vortigaunt_Printf(QStringLiteral("No .fbx / .glb / .gltf / .obj files found in '%1'.").arg(inputPath));
-        return;
-    }
-
     FbxGlbConvertOptions options;
     options.writeQC = writeQC;
-
     FbxGlbConverter converter;
-    int converted = 0;
-    for (const auto& p : files)
-    {
-        const QString inFile = QString::fromStdWString(p.wstring());
-        if (!FbxGlbConverter::IsSupportedFile(inFile.toStdString()))
-        {
-            VortigauntLog::Vortigaunt_Printf(QStringLiteral("^3Skipped:^7 %1 is not an FBX, GLB, glTF or OBJ file.").arg(inFile));
-            continue;
-        }
-
-        const FbxGlbConvertReport report = converter.Convert(inFile.toStdString(), outputDir.toStdString(), options);
-        if (report.ok)
-            converted++;
-        if (!report.qcPath.empty())
-            compileModelIfWanted(QString::fromStdString(report.qcPath));
-    }
-
-    if (files.size() > 1)
-    {
-        VortigauntLog::Vortigaunt_Printf(QStringLiteral("^2%1 of %2 models converted.").arg(converted).arg(files.size()));
-    }
+    converter.SetOptions(options);
+    runConverter(converter, inputPath, outputDir);
 }
 
 void MainWindow::compileModelIfWanted(const QString& qcPath)
@@ -1504,177 +1453,16 @@ void MainWindow::updateWeaponModelControls()
 
 void MainWindow::convertViewModel(const QString& inputPath, const QString& outputDir, const WeaponModelOptions& options)
 {
-    // A single v_ model, or every v_*.mdl under a folder.
-    std::vector<std::filesystem::path> files;
-    const std::filesystem::path start(inputPath.toStdWString());
-    std::error_code ec;
-    if (std::filesystem::is_regular_file(start, ec))
-    {
-        files.push_back(start);
-    }
-    else if (std::filesystem::is_directory(start, ec))
-    {
-        for (const auto& entry : std::filesystem::recursive_directory_iterator(start, ec))
-        {
-            if (!entry.is_regular_file(ec))
-                continue;
-            if (WeaponModelConverter::IsViewModelFile(QString::fromStdWString(entry.path().wstring()).toStdString()))
-                files.push_back(entry.path());
-        }
-    }
-
-    if (files.empty())
-    {
-        VortigauntLog::Vortigaunt_Printf(QStringLiteral("No v_*.mdl files found in '%1'.").arg(inputPath));
-        return;
-    }
-
     WeaponModelConverter converter;
-    int converted = 0;
-    for (const auto& p : files)
-    {
-        // The converter writes its own account of the model to the log.
-        const QString inFile = QString::fromStdWString(p.wstring());
-        const WeaponModelResult report = converter.Convert(inFile.toStdString(), outputDir.toStdString(), options);
-        if (report.ok)
-            converted++;
-        if (!report.pQcPath.empty())
-            compileModelIfWanted(QString::fromStdString(report.pQcPath));
-        if (!report.wQcPath.empty())
-            compileModelIfWanted(QString::fromStdString(report.wQcPath));
-    }
-
-    if (files.size() > 1)
-    {
-        VortigauntLog::Vortigaunt_Printf(QStringLiteral("^2%1 of %2 models converted.").arg(converted).arg(files.size()));
-    }
+    converter.SetOptions(options);
+    runConverter(converter, inputPath, outputDir);
 }
 
 void MainWindow::convertLtb(const QString& inputPath, const QString& outputDir, const ltbConverterSetting& settings)
 {
-    std::vector<std::filesystem::path> files;
-
-    std::filesystem::path start = std::filesystem::path(inputPath.toStdWString());
-    recurseAndCollectFiles(start, files);
-
-    if (files.empty())
-    {
-        VortigauntLog::Vortigaunt_Printf(QStringLiteral("No .ltb files found in '%1'.").arg(inputPath));
-        return;
-    }
-
-    ltbConverter ltbConverter;
-    ltbConverter.SetConvertSetting(settings);
-
-    for (const auto& p : files)
-    {
-        const QString inFile = QString::fromStdWString(p.wstring());
-        const QString ext = grabFileExt(inFile);
-
-        if (ext == "ltb")
-        {
-            QString outFile = replaceFileExt(inFile, "smd");
-            if (!outputDir.isEmpty())
-            {
-                QFileInfo fi(inFile);
-                QString baseName = fi.completeBaseName();
-                QString targetFolder = QDir(outputDir).filePath(baseName);
-                
-                std::error_code ec;
-                std::filesystem::create_directories(targetFolder.toStdWString(), ec);
-                
-                outFile = QDir(targetFolder).filePath(baseName + ".smd");
-            }
-
-            VortigauntLog::Vortigaunt_Printf(QStringLiteral("Converting LTB..."));
-
-            int ret = ltbConverter.ConvertSingleLTBFile(inFile.toStdString(),
-                                                        outFile.toStdString());
-            if (ret == CONVERT_RET_OK)
-            {
-                VortigauntLog::Vortigaunt_Printf(QStringLiteral("^2OK"));
-
-                // List the actual generated SMD files
-                QFileInfo outInfo(outFile);
-                QDir outDir(outInfo.absolutePath());
-                const QString baseName = outInfo.completeBaseName();
-
-                QStringList filters;
-                filters << QStringLiteral("%1_*.smd").arg(baseName);
-                const QFileInfoList files =
-                    outDir.entryInfoList(filters, QDir::Files, QDir::Name);
-
-                if (!files.isEmpty())
-                {
-                    VortigauntLog::Vortigaunt_Printf(QStringLiteral("DEBUG:   ^5SMD files:^7"));
-                    for (const QFileInfo& fi : files)
-                    {
-                        VortigauntLog::Vortigaunt_Printf(QStringLiteral("DEBUG:     ^4%1^7").arg(fi.fileName()));
-                    }
-                }
-                else
-                {
-                    VortigauntLog::Vortigaunt_Printf(QStringLiteral("  ^3No SMD files were generated."));
-                }
-
-                // Generate QC file if checkbox is checked
-                if (m_writeQCCheck->isChecked())
-                {
-                    QCFile qcWriter;
-                    QCFileSettings qcSettings;
-
-                    qcSettings.ModelName = baseName.toStdString() + ".mdl";
-
-                    qcSettings.MeshName = (baseName + "_reference").toStdString();
-                    qcSettings.Scale = 1.0f;
-                    qcSettings.Fps = 30;
-
-                    qcWriter.SetSettings(qcSettings);
-
-                    // Add sequences 
-                    QStringList animFilters;
-                    animFilters << QStringLiteral("%1_anim_*.smd").arg(baseName);
-                    const QFileInfoList animFiles = outDir.entryInfoList(animFilters, QDir::Files, QDir::Name);
-
-                    if (!animFiles.isEmpty())
-                    {
-                        for (const QFileInfo& fi : animFiles)
-                        {
-                            QString animFileName = fi.completeBaseName();
-                            QString prefix = baseName + "_anim_";
-                            QString seqName = animFileName;
-                            if (seqName.startsWith(prefix)) {
-                                seqName = seqName.mid(prefix.length());
-                            }
-
-                            qcWriter.AddSequence(seqName.toStdString(), animFileName.toStdString(), 30);
-                        }
-                    }
-                    else
-                    {
-                        // No animations
-                        qcWriter.AddSequence("idle", qcSettings.MeshName, 30);
-                    }
-
-                    // Write QC file
-                    std::filesystem::path qcPath = outInfo.absoluteFilePath().toStdWString();
-                    qcPath.replace_extension(".qc");
-
-                    if (qcWriter.Write(String_UTF16toUTF8(qcPath.generic_u16string())))
-                    {
-                        VortigauntLog::Vortigaunt_Printf(QStringLiteral("  QC file created: %1").arg(QString::fromStdWString(qcPath.generic_wstring())));
-                        compileModelIfWanted(QString::fromStdWString(qcPath.wstring()));
-                    }
-                    else
-                    {
-                        VortigauntLog::Vortigaunt_Printf(QStringLiteral("  ^1Failed to create QC file:^7 %1").arg(QString::fromStdString(qcWriter.GetError())));
-                    }
-                }
-            }
-            else
-                VortigauntLog::Vortigaunt_Printf(QStringLiteral("ERROR:   FAILED (code %1)").arg(ret));
-        }
-    }
+    ltbConverter converter;
+    converter.SetConvertSetting(settings);
+    runConverter(converter, inputPath, outputDir);
 }
 
 void MainWindow::extractArchiveRez(const QStringList& paths, const QString& outputDir)
@@ -2037,338 +1825,171 @@ void MainWindow::extractArchiveVpk(const QStringList& paths, const QString& outp
 
 void MainWindow::convertGr2(const QString& inputPath, const QString& outputDir)
 {
-    std::vector<std::filesystem::path> files;
-
-    std::filesystem::path start = std::filesystem::path(inputPath.toStdWString());
-    
-    // Check if input is a file or directory
-    if (std::filesystem::is_regular_file(start))
-    {
-        files.push_back(start);
-    }
-    else if (std::filesystem::is_directory(start))
-    {
-        // Collect all .gr2 files recursively
-        for (auto const& entry : std::filesystem::recursive_directory_iterator(start))
-        {
-            if (!entry.is_regular_file())
-                continue;
-            const auto& p = entry.path();
-            auto ext = p.extension().string();
-            if (ext == ".gr2" || ext == ".GR2")
-            {
-                files.push_back(p);
-            }
-        }
-    }
-    else
-    {
-        VortigauntLog::Vortigaunt_Printf(QStringLiteral("^1Error:^7 Invalid input path: ^4%1^7").arg(inputPath));
-        return;
-    }
-
-    if (files.empty())
-    {
-        VortigauntLog::Vortigaunt_Printf(QStringLiteral("^3Warning:^7 No .gr2 files found in '^4%1^7'.").arg(inputPath));
-        return;
-    }
-
-    Gr2Converter gr2Converter;
     Gr2ConverterSettings settings;
-    
-    // Get options from checkboxes
     settings.ExportMeshes = !m_ignoreMeshesCheck->isChecked();
     settings.ExportAnimations = !m_ignoreAnimsCheck->isChecked();
     settings.ExportSkeleton = true;
     settings.ExportMaterials = true;
     settings.MirrorUVY = SettingsDialog::getMirrorUVY();
-    
+
+    Gr2Converter gr2Converter;
     gr2Converter.SetConverterSettings(settings);
+
+    // the animation list belongs to a single model
+    const std::filesystem::path start = std::filesystem::path(inputPath.toStdWString());
+    const bool isSingleFile = std::filesystem::is_regular_file(start) && m_gr2AnimGroup->isVisible();
+    runConverter(gr2Converter, inputPath, outputDir, [&](const ConvertResult& result) {
+        if (isSingleFile && result.ok)
+            exportGr2Animations(gr2Converter, start, FileIO::toPath(result.outputFolder));
+    });
+}
+
+void MainWindow::exportGr2Animations(Gr2Converter& gr2Converter, const std::filesystem::path& gr2File, const std::filesystem::path& outFolder)
+{
+    std::filesystem::path outPath = outFolder / gr2File.filename();
+    outPath.replace_extension(".smd");
+
     
-
-
-    size_t gr2OkCount = 0;
-    size_t gr2FailCount = 0;
-
-    for (const auto& gr2File : files)
+    // Create animation path: {filename}_anims
+    std::filesystem::path animDir = outPath.parent_path();
+    QString baseName = QString::fromStdWString(gr2File.stem().generic_wstring());
+    animDir /= (baseName + "_anims").toStdWString();
+    
+    std::error_code ec;
+    std::filesystem::create_directories(animDir, ec);
+    
+    // Check if user has selected animation files
+    QList<QListWidgetItem*> selectedItems = m_animationListWidget->selectedItems();
+    
+    // If nothing is selected, export all items in the list
+    if (selectedItems.isEmpty() && m_animationListWidget->count() > 0)
     {
-        // Get output file name for logging
-        QString inputFileName = QString::fromStdWString(gr2File.filename().wstring());
-        QString outputFileName = inputFileName;
-        outputFileName.replace(".gr2", ".smd", Qt::CaseInsensitive);
-        outputFileName.replace(".GR2", ".smd", Qt::CaseInsensitive);
-
-        // Determine output file path - create model subfolder based on model name
-        std::filesystem::path outPath = std::filesystem::path(outputDir.toStdWString());
-        
-        // Get model name (filename without extension)
-        std::filesystem::path modelName = gr2File.stem();
-        
-        // Check if input is a single file or directory
-        bool isSingleFile = std::filesystem::is_regular_file(start) && files.size() == 1;
-        
-        if (isSingleFile)
+        // Select all items programmatically so the selection is visible
+        m_animationListWidget->selectAll();
+        selectedItems = m_animationListWidget->selectedItems();
+    }
+    
+    bool hasSelectedFiles = !selectedItems.isEmpty();
+    bool hasBrowsedFiles = false;
+    
+    // Check if any selected item has a file path (browsed files or loaded from directory)
+    for (QListWidgetItem* item : selectedItems)
+    {
+        QString filePath = item->data(Qt::UserRole).toString();
+        if (!filePath.isEmpty())
         {
-            // Single file mode - create subfolder with model name
-            // Example: hanma_boss.gr2 -> VortigauntOutput/hanma_boss/hanma_boss.smd
-            outPath /= modelName;  // Create model subfolder
-            outPath /= gr2File.filename();  // Add filename inside subfolder
+            hasBrowsedFiles = true;
+            break;
         }
-        else
+    }
+    
+    // If no browsed files but items are selected, they might be from GR2 file
+    // In that case, we need to find the corresponding GR2 animation files
+    if (!hasBrowsedFiles && !selectedItems.isEmpty())
+    {
+        // Selected items are animation names from GR2, but we need to find the actual GR2 files
+        // The animation names might correspond to GR2 files in the same directory
+        QString inputDir = QFileInfo(m_inputPathEdit->text()).absolutePath();
+        for (QListWidgetItem* item : selectedItems)
         {
-            // Folder mode - preserve directory structure but add model subfolder
-            std::filesystem::path relPath = std::filesystem::relative(gr2File, start);
-            if (!relPath.empty())
+            QString animName = item->text();
+            // Try to find a GR2 file with this name in the input directory
+            QString possibleGr2File = inputDir + "/" + animName;
+            if (animName.endsWith(".gr2", Qt::CaseInsensitive))
             {
-                // Get relative parent path and add model subfolder
-                std::filesystem::path relParent = relPath.parent_path();
-                if (!relParent.empty())
+                // Already has .gr2 extension
+                if (QFileInfo(possibleGr2File).exists())
                 {
-                    outPath /= relParent;
-                }
-                outPath /= modelName;  // Create model subfolder
-                outPath /= gr2File.filename();  // Add filename
-            }
-            else
-            {
-                // Fallback: create model subfolder
-                outPath /= modelName;
-                outPath /= gr2File.filename();
-            }
-        }
-        
-        // Get output format from combo
-        QString outputFormat = m_outputFormatCombo->currentData().toString();
-        
-        outPath.replace_extension(".smd");
-        
-        
-        // Create parent directories (including model subfolder)
-        std::error_code ec;
-        std::filesystem::create_directories(outPath.parent_path(), ec);
-
-        QString qOutFile = QString::fromStdWString(outPath.generic_wstring());
-        
-        // Export to SMD format
-        int result = gr2Converter.ConvertSingleGr2File(
-            String_UTF16toUTF8(gr2File.generic_u16string()),
-            String_UTF16toUTF8(outPath.generic_u16string())
-        );
-        
-        if (result == GR2_CONVERT_RET_OK)
-        {
-            VortigauntLog::Vortigaunt_Printf(QStringLiteral("Exporting SMD: ^4%1^7").arg(outputFileName));
-            ++gr2OkCount;
-        }
-        else
-        {
-            QString errorMsg;
-            switch (result)
-            {
-                case GR2_CONVERT_RET_INVALID_INPUT_FILE:
-                    errorMsg = "Invalid input file";
-                    break;
-                case GR2_CONVERT_RET_LOAD_FAILED:
-                    errorMsg = "Failed to load GR2 file";
-                    break;
-                case GR2_CONVERT_RET_NO_MESH:
-                    errorMsg = "No mesh found in GR2 file";
-                    break;
-                case GR2_CONVERT_RET_EXPORT_FAILED:
-                    errorMsg = "Export failed";
-                    break;
-                default:
-                    errorMsg = QString("Unknown error (code: %1)").arg(result);
-                    break;
-            }
-            VortigauntLog::Vortigaunt_Printf(QStringLiteral("  ^1FAILED:^7 %1").arg(errorMsg));
-            ++gr2FailCount;
-        }
-        
-        // Export animations (only for single file mode)
-        if (isSingleFile && m_gr2AnimGroup->isVisible())
-        {
-            
-            // Create animation path: {filename}_anims
-            std::filesystem::path animDir = outPath.parent_path();
-            QString baseName = QString::fromStdWString(gr2File.stem().generic_wstring());
-            animDir /= (baseName + "_anims").toStdWString();
-            
-            std::error_code ec;
-            std::filesystem::create_directories(animDir, ec);
-            
-            // Check if user has selected animation files
-            QList<QListWidgetItem*> selectedItems = m_animationListWidget->selectedItems();
-            
-            // If nothing is selected, export all items in the list
-            if (selectedItems.isEmpty() && m_animationListWidget->count() > 0)
-            {
-                // Select all items programmatically so the selection is visible
-                m_animationListWidget->selectAll();
-                selectedItems = m_animationListWidget->selectedItems();
-            }
-            
-            bool hasSelectedFiles = !selectedItems.isEmpty();
-            bool hasBrowsedFiles = false;
-            
-            // Check if any selected item has a file path (browsed files or loaded from directory)
-            for (QListWidgetItem* item : selectedItems)
-            {
-                QString filePath = item->data(Qt::UserRole).toString();
-                if (!filePath.isEmpty())
-                {
-                    hasBrowsedFiles = true;
-                    break;
-                }
-            }
-            
-            // If no browsed files but items are selected, they might be from GR2 file
-            // In that case, we need to find the corresponding GR2 animation files
-            if (!hasBrowsedFiles && !selectedItems.isEmpty())
-            {
-                // Selected items are animation names from GR2, but we need to find the actual GR2 files
-                // The animation names might correspond to GR2 files in the same directory
-                QString inputDir = QFileInfo(m_inputPathEdit->text()).absolutePath();
-                for (QListWidgetItem* item : selectedItems)
-                {
-                    QString animName = item->text();
-                    // Try to find a GR2 file with this name in the input directory
-                    QString possibleGr2File = inputDir + "/" + animName;
-                    if (animName.endsWith(".gr2", Qt::CaseInsensitive))
-                    {
-                        // Already has .gr2 extension
-                        if (QFileInfo(possibleGr2File).exists())
-                        {
-                            item->setData(Qt::UserRole, possibleGr2File);
-                            hasSelectedFiles = true;
-                        }
-                    }
-                    else
-                    {
-                        // Try with .gr2 extension
-                        QString withExt = possibleGr2File + ".gr2";
-                        if (QFileInfo(withExt).exists())
-                        {
-                            item->setData(Qt::UserRole, withExt);
-                            hasSelectedFiles = true;
-                        }
-                    }
-                }
-            }
-            
-            if (hasSelectedFiles)
-            {
-                // Export selected animation files (browsed files)
-                for (QListWidgetItem* item : selectedItems)
-                {
-                    QString filePath = item->data(Qt::UserRole).toString();
-                    if (!filePath.isEmpty())
-                    {
-                        QFileInfo fileInfo(filePath);
-                        QString fileName = fileInfo.fileName();
-                        QString baseFileName = fileInfo.baseName();
-                        
-                        // Create output path for animation
-                        std::filesystem::path animOutPath = animDir;
-                        QString safeFileName = baseFileName;
-                        // Sanitize filename
-                        for (QChar& c : safeFileName)
-                        {
-                            if (c == ' ' || c == '/' || c == '\\' || c == ':' || c == '*' || c == '?' || c == '"' || c == '<' || c == '>' || c == '|')
-                                c = '_';
-                        }
-                        animOutPath /= (safeFileName + ".smd").toStdWString();
-                        
-                        // Convert file based on extension
-                        if (fileInfo.suffix().toLower() == "smd")
-                        {
-                            // Copy SMD file
-                            try {
-                                std::filesystem::copy_file(filePath.toStdWString(), animOutPath, std::filesystem::copy_options::overwrite_existing);
-                                VortigauntLog::Vortigaunt_Printf(QStringLiteral("DEBUG:   ? Animation copied -> %1").arg(QString::fromStdWString(animOutPath.generic_wstring())));
-                            } catch (const std::exception& e) {
-                                VortigauntLog::Vortigaunt_Printf(QStringLiteral("  ? Failed to copy animation: %1").arg(fileName));
-                            }
-                        }
-                        else if (fileInfo.suffix().toLower() == "gr2")
-                        {
-                            // Convert GR2 file to SMD (animation only)
-                            
-                            // Create a new converter for this animation file
-                            Gr2Converter animConverter;
-                            Gr2ConverterSettings animSettings;
-                            animSettings.ExportMeshes = false; // Only export skeleton for animation
-                            animSettings.ExportAnimations = true;
-                            animSettings.ExportSkeleton = true;
-                            animSettings.ExportMaterials = false;
-                            animSettings.MirrorUVY = m_mirrorUVYCheck->isChecked();
-                            animConverter.SetConverterSettings(animSettings);
-                            
-
-                            
-                            // Pass main GR2 file path as skeleton source
-                            QString mainGr2Path = m_inputPathEdit->text();
-                            
-                            // Find the correct animation index for this animation name
-                            int animIndex = 0;
-                            std::vector<std::string> animNames = animConverter.GetAnimationNames(filePath.toUtf8().toStdString());
-                            QString animNameFromList = item->text();
-                            for (size_t i = 0; i < animNames.size(); ++i)
-                            {
-                                if (QString::fromStdString(animNames[i]) == animNameFromList)
-                                {
-                                    animIndex = static_cast<int>(i);
-                                    break;
-                                }
-                            }
-
-                            
-                            int animResult = animConverter.ConvertGr2Animation(
-                                filePath.toUtf8().toStdString(), 
-                                String_UTF16toUTF8(animOutPath.generic_u16string()), 
-                                animIndex,
-                                mainGr2Path.toUtf8().toStdString()); // Pass skeleton source
-
-                            if (animResult == GR2_CONVERT_RET_OK)
-                            {
-                                // Use the actual output filename for logging
-                                QString smdFileName = QString::fromStdWString(animOutPath.filename().generic_wstring());
-                                VortigauntLog::Vortigaunt_Printf(QStringLiteral("  Exporting Animation: %1").arg(smdFileName));
-                            }
-                            else
-                            {
-                                VortigauntLog::Vortigaunt_Printf(QStringLiteral("  %1 -> FAILED").arg(fileName));
-                            }
-                        }
-                        else
-                        {
-                            VortigauntLog::Vortigaunt_Printf(QStringLiteral("  Skipping unsupported file format: %1").arg(fileName));
-                        }
-                    }
+                    item->setData(Qt::UserRole, possibleGr2File);
+                    hasSelectedFiles = true;
                 }
             }
             else
             {
-                // Export all animations from GR2 file
-                std::vector<std::string> animNames = gr2Converter.GetAnimationNames(String_UTF16toUTF8(gr2File.generic_u16string()));
+                // Try with .gr2 extension
+                QString withExt = possibleGr2File + ".gr2";
+                if (QFileInfo(withExt).exists())
+                {
+                    item->setData(Qt::UserRole, withExt);
+                    hasSelectedFiles = true;
+                }
+            }
+        }
+    }
+    
+    if (hasSelectedFiles)
+    {
+        // Export selected animation files (browsed files)
+        for (QListWidgetItem* item : selectedItems)
+        {
+            QString filePath = item->data(Qt::UserRole).toString();
+            if (!filePath.isEmpty())
+            {
+                QFileInfo fileInfo(filePath);
+                QString fileName = fileInfo.fileName();
+                QString baseFileName = fileInfo.baseName();
                 
-                for (size_t i = 0; i < animNames.size(); ++i)
+                // Create output path for animation
+                std::filesystem::path animOutPath = animDir;
+                QString safeFileName = baseFileName;
+                // Sanitize filename
+                for (QChar& c : safeFileName)
                 {
-                    QString animName = QString::fromStdString(animNames[i]);
-                    
-                    // Create output path for animation
-                    std::filesystem::path animOutPath = animDir;
-                    QString safeAnimName = animName;
-                    // Sanitize filename
-                    for (QChar& c : safeAnimName)
-                    {
-                        if (c == ' ' || c == '/' || c == '\\' || c == ':' || c == '*' || c == '?' || c == '"' || c == '<' || c == '>' || c == '|')
-                            c = '_';
+                    if (c == ' ' || c == '/' || c == '\\' || c == ':' || c == '*' || c == '?' || c == '"' || c == '<' || c == '>' || c == '|')
+                        c = '_';
+                }
+                animOutPath /= (safeFileName + ".smd").toStdWString();
+                
+                // Convert file based on extension
+                if (fileInfo.suffix().toLower() == "smd")
+                {
+                    // Copy SMD file
+                    try {
+                        std::filesystem::copy_file(filePath.toStdWString(), animOutPath, std::filesystem::copy_options::overwrite_existing);
+                        VortigauntLog::Vortigaunt_Printf(QStringLiteral("DEBUG:   ? Animation copied -> %1").arg(QString::fromStdWString(animOutPath.generic_wstring())));
+                    } catch (const std::exception& e) {
+                        VortigauntLog::Vortigaunt_Printf(QStringLiteral("  ? Failed to copy animation: %1").arg(fileName));
                     }
-                    animOutPath /= (safeAnimName + ".smd").toStdWString();
+                }
+                else if (fileInfo.suffix().toLower() == "gr2")
+                {
+                    // Convert GR2 file to SMD (animation only)
                     
-                    int animResult = gr2Converter.ConvertGr2Animation(String_UTF16toUTF8(gr2File.generic_u16string()), String_UTF16toUTF8(animOutPath.generic_u16string()), static_cast<int>(i));
+                    // Create a new converter for this animation file
+                    Gr2Converter animConverter;
+                    Gr2ConverterSettings animSettings;
+                    animSettings.ExportMeshes = false; // Only export skeleton for animation
+                    animSettings.ExportAnimations = true;
+                    animSettings.ExportSkeleton = true;
+                    animSettings.ExportMaterials = false;
+                    animSettings.MirrorUVY = m_mirrorUVYCheck->isChecked();
+                    animConverter.SetConverterSettings(animSettings);
                     
+
+                    
+                    // Pass main GR2 file path as skeleton source
+                    QString mainGr2Path = m_inputPathEdit->text();
+                    
+                    // Find the correct animation index for this animation name
+                    int animIndex = 0;
+                    std::vector<std::string> animNames = animConverter.GetAnimationNames(filePath.toUtf8().toStdString());
+                    QString animNameFromList = item->text();
+                    for (size_t i = 0; i < animNames.size(); ++i)
+                    {
+                        if (QString::fromStdString(animNames[i]) == animNameFromList)
+                        {
+                            animIndex = static_cast<int>(i);
+                            break;
+                        }
+                    }
+
+                    
+                    int animResult = animConverter.ConvertGr2Animation(
+                        filePath.toUtf8().toStdString(), 
+                        String_UTF16toUTF8(animOutPath.generic_u16string()), 
+                        animIndex,
+                        mainGr2Path.toUtf8().toStdString()); // Pass skeleton source
+
                     if (animResult == GR2_CONVERT_RET_OK)
                     {
                         // Use the actual output filename for logging
@@ -2377,133 +1998,159 @@ void MainWindow::convertGr2(const QString& inputPath, const QString& outputDir)
                     }
                     else
                     {
-                        VortigauntLog::Vortigaunt_Printf(QStringLiteral("  %1 -> FAILED").arg(animName));
+                        VortigauntLog::Vortigaunt_Printf(QStringLiteral("  %1 -> FAILED").arg(fileName));
                     }
-                }
-            }
-            
-            // Generate QC file if checkbox is checked
-            if (m_writeQCCheck->isChecked() && result == GR2_CONVERT_RET_OK)
-            {
-                QCFile qcWriter;
-                QCFileSettings qcSettings;
-                
-                // Model name: basename.mdl
-                qcSettings.ModelName = String_UTF16toUTF8(gr2File.stem().generic_u16string()) + ".mdl";
-                
-                // Mesh SMD name (without extension)
-                qcSettings.MeshName = String_UTF16toUTF8(gr2File.stem().generic_u16string());
-                qcSettings.Scale = 1.0f;
-                qcSettings.Fps = 30;
-                
-                qcWriter.SetSettings(qcSettings);
-                
-                // Add sequences from exported animations
-                // Get animation directory relative path
-                QString baseName = QString::fromStdWString(gr2File.stem().generic_wstring());
-                std::string animRelDir = (baseName + "_anims").toStdString();
-                
-                // First, try to get animations from the animation list widget
-                // These are the external animation GR2 files user has added
-                bool hasAnimationsFromList = false;
-                if (m_animationListWidget->count() > 0)
-                {
-                    for (int i = 0; i < m_animationListWidget->count(); ++i)
-                    {
-                        QListWidgetItem* item = m_animationListWidget->item(i);
-                        if (item)
-                        {
-                            QString filePath = item->data(Qt::UserRole).toString();
-                            QString itemText = item->text();
-                            
-                            // Get animation name from file path or item text
-                            QString animName;
-                            if (!filePath.isEmpty())
-                            {
-                                // From file path (external GR2 file)
-                                QFileInfo fileInfo(filePath);
-                                animName = fileInfo.baseName();
-                            }
-                            else
-                            {
-                                // From item text (internal animation name)
-                                animName = itemText;
-                            }
-                            
-                            // Sanitize animation name
-                            std::string safeAnimName = animName.toStdString();
-                            for (char& c : safeAnimName)
-                            {
-                                if (c == ' ' || c == '/' || c == '\\' || c == ':' || c == '*' || c == '?' || c == '"' || c == '<' || c == '>' || c == '|')
-                                    c = '_';
-                            }
-                            
-                            // Build relative path to animation SMD
-                            std::string animSmdPath = animRelDir + "\\" + safeAnimName;
-                            qcWriter.AddSequence(safeAnimName, animSmdPath, 30);
-                            hasAnimationsFromList = true;
-                        }
-                    }
-                }
-                
-                // If no animations from list, try to get from GR2 file internal animations
-                if (!hasAnimationsFromList)
-                {
-                    std::vector<std::string> animNames = gr2Converter.GetAnimationNames(String_UTF16toUTF8(gr2File.generic_u16string()));
-                    
-                    if (!animNames.empty())
-                    {
-                        for (const auto& animName : animNames)
-                        {
-                            // Sanitize animation name
-                            std::string safeAnimName = animName;
-                            for (char& c : safeAnimName)
-                            {
-                                if (c == ' ' || c == '/' || c == '\\' || c == ':' || c == '*' || c == '?' || c == '"' || c == '<' || c == '>' || c == '|')
-                                    c = '_';
-                            }
-                            
-                            // Build relative path to animation SMD
-                            std::string animSmdPath = animRelDir + "\\" + safeAnimName;
-                            qcWriter.AddSequence(safeAnimName, animSmdPath, 30);
-                        }
-                    }
-                    else
-                    {
-                        // No animations at all - add a default idle sequence using the mesh
-                        qcWriter.AddSequence("idle", qcSettings.MeshName, 30);
-                    }
-                }
-                
-                // Write QC file
-                std::filesystem::path qcPath = outPath;
-                qcPath.replace_extension(".qc");
-                
-                if (qcWriter.Write(String_UTF16toUTF8(qcPath.generic_u16string())))
-                {
-                    VortigauntLog::Vortigaunt_Printf(QStringLiteral("  QC file created: %1").arg(QString::fromStdWString(qcPath.generic_wstring())));
-                    compileModelIfWanted(QString::fromStdWString(qcPath.wstring()));
                 }
                 else
                 {
-                    VortigauntLog::Vortigaunt_Printf(QStringLiteral("  Failed to create QC file: %1").arg(QString::fromStdString(qcWriter.GetError())));
+                    VortigauntLog::Vortigaunt_Printf(QStringLiteral("  Skipping unsupported file format: %1").arg(fileName));
                 }
             }
         }
     }
-    
-
-	VortigauntLog::Vortigaunt_Printf(QStringLiteral("^2Granny files Converted to %1.").arg(outputDir));
-    //VortigauntLog::LogF(("Convert finished. GR2 files converted to %s."));
-    if (gr2FailCount > 0)
+    else
     {
-        VortigauntLog::Vortigaunt_Printf(QStringLiteral(" Granny file Convert Failed: %1").arg(gr2FailCount));
+        // Export all animations from GR2 file
+        std::vector<std::string> animNames = gr2Converter.GetAnimationNames(String_UTF16toUTF8(gr2File.generic_u16string()));
+        
+        for (size_t i = 0; i < animNames.size(); ++i)
+        {
+            QString animName = QString::fromStdString(animNames[i]);
+            
+            // Create output path for animation
+            std::filesystem::path animOutPath = animDir;
+            QString safeAnimName = animName;
+            // Sanitize filename
+            for (QChar& c : safeAnimName)
+            {
+                if (c == ' ' || c == '/' || c == '\\' || c == ':' || c == '*' || c == '?' || c == '"' || c == '<' || c == '>' || c == '|')
+                    c = '_';
+            }
+            animOutPath /= (safeAnimName + ".smd").toStdWString();
+            
+            int animResult = gr2Converter.ConvertGr2Animation(String_UTF16toUTF8(gr2File.generic_u16string()), String_UTF16toUTF8(animOutPath.generic_u16string()), static_cast<int>(i));
+            
+            if (animResult == GR2_CONVERT_RET_OK)
+            {
+                // Use the actual output filename for logging
+                QString smdFileName = QString::fromStdWString(animOutPath.filename().generic_wstring());
+                VortigauntLog::Vortigaunt_Printf(QStringLiteral("  Exporting Animation: %1").arg(smdFileName));
+            }
+            else
+            {
+                VortigauntLog::Vortigaunt_Printf(QStringLiteral("  %1 -> FAILED").arg(animName));
+            }
+        }
+    }
+    
+    // Generate QC file if checkbox is checked
+    if (m_writeQCCheck->isChecked())
+    {
+        QCFile qcWriter;
+        QCFileSettings qcSettings;
+        
+        // Model name: basename.mdl
+        qcSettings.ModelName = String_UTF16toUTF8(gr2File.stem().generic_u16string()) + ".mdl";
+        
+        // Mesh SMD name (without extension)
+        qcSettings.MeshName = String_UTF16toUTF8(gr2File.stem().generic_u16string());
+        qcSettings.Scale = 1.0f;
+        qcSettings.Fps = 30;
+        
+        qcWriter.SetSettings(qcSettings);
+        
+        // Add sequences from exported animations
+        // Get animation directory relative path
+        QString baseName = QString::fromStdWString(gr2File.stem().generic_wstring());
+        std::string animRelDir = (baseName + "_anims").toStdString();
+        
+        // First, try to get animations from the animation list widget
+        // These are the external animation GR2 files user has added
+        bool hasAnimationsFromList = false;
+        if (m_animationListWidget->count() > 0)
+        {
+            for (int i = 0; i < m_animationListWidget->count(); ++i)
+            {
+                QListWidgetItem* item = m_animationListWidget->item(i);
+                if (item)
+                {
+                    QString filePath = item->data(Qt::UserRole).toString();
+                    QString itemText = item->text();
+                    
+                    // Get animation name from file path or item text
+                    QString animName;
+                    if (!filePath.isEmpty())
+                    {
+                        // From file path (external GR2 file)
+                        QFileInfo fileInfo(filePath);
+                        animName = fileInfo.baseName();
+                    }
+                    else
+                    {
+                        // From item text (internal animation name)
+                        animName = itemText;
+                    }
+                    
+                    // Sanitize animation name
+                    std::string safeAnimName = animName.toStdString();
+                    for (char& c : safeAnimName)
+                    {
+                        if (c == ' ' || c == '/' || c == '\\' || c == ':' || c == '*' || c == '?' || c == '"' || c == '<' || c == '>' || c == '|')
+                            c = '_';
+                    }
+                    
+                    // Build relative path to animation SMD
+                    std::string animSmdPath = animRelDir + "\\" + safeAnimName;
+                    qcWriter.AddSequence(safeAnimName, animSmdPath, 30);
+                    hasAnimationsFromList = true;
+                }
+            }
+        }
+        
+        // If no animations from list, try to get from GR2 file internal animations
+        if (!hasAnimationsFromList)
+        {
+            std::vector<std::string> animNames = gr2Converter.GetAnimationNames(String_UTF16toUTF8(gr2File.generic_u16string()));
+            
+            if (!animNames.empty())
+            {
+                for (const auto& animName : animNames)
+                {
+                    // Sanitize animation name
+                    std::string safeAnimName = animName;
+                    for (char& c : safeAnimName)
+                    {
+                        if (c == ' ' || c == '/' || c == '\\' || c == ':' || c == '*' || c == '?' || c == '"' || c == '<' || c == '>' || c == '|')
+                            c = '_';
+                    }
+                    
+                    // Build relative path to animation SMD
+                    std::string animSmdPath = animRelDir + "\\" + safeAnimName;
+                    qcWriter.AddSequence(safeAnimName, animSmdPath, 30);
+                }
+            }
+            else
+            {
+                // No animations at all - add a default idle sequence using the mesh
+                qcWriter.AddSequence("idle", qcSettings.MeshName, 30);
+            }
+        }
+        
+        // Write QC file
+        std::filesystem::path qcPath = outPath;
+        qcPath.replace_extension(".qc");
+        
+        if (qcWriter.Write(String_UTF16toUTF8(qcPath.generic_u16string())))
+        {
+            VortigauntLog::Vortigaunt_Printf(QStringLiteral("  QC file created: %1").arg(QString::fromStdWString(qcPath.generic_wstring())));
+            compileModelIfWanted(QString::fromStdWString(qcPath.wstring()));
+        }
+        else
+        {
+            VortigauntLog::Vortigaunt_Printf(QStringLiteral("  Failed to create QC file: %1").arg(QString::fromStdString(qcWriter.GetError())));
+        }
     }
 }
-
-
-
-
 
 // Drag & Drop support
 void MainWindow::dragEnterEvent(QDragEnterEvent* event)

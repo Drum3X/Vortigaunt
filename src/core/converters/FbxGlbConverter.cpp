@@ -125,28 +125,6 @@ std::string sanitize(const std::string& in, const char* fallback)
     return out.empty() ? std::string(fallback) : out;
 }
 
-std::string uniqueName(std::string base, size_t maxLength, std::set<std::string>& taken)
-{
-    if (base.size() > maxLength)
-    {
-        base.resize(maxLength);
-    }
-    std::string candidate = base;
-    int counter = 1;
-    while (taken.count(String_ToLower(candidate)))
-    {
-        const std::string suffix = "_" + std::to_string(counter++);
-        std::string stem = base;
-        if (stem.size() + suffix.size() > maxLength)
-        {
-            stem.resize(maxLength - suffix.size());
-        }
-        candidate = stem + suffix;
-    }
-    taken.insert(String_ToLower(candidate));
-    return candidate;
-}
-
 class GltfSidecar
 {
 public:
@@ -916,13 +894,22 @@ QImage decodeImageBytes(const uint8_t* data, size_t size)
 
 bool FbxGlbConverter::IsSupportedFile(const std::string& path)
 {
-    const std::string ext = String_ToLower(FileIO::fromPath(FileIO::toPath(path).extension()));
+    const std::string ext = FileIO::lowerExtension(path);
     return ext == ".fbx" || ext == ".glb" || ext == ".gltf" || ext == ".obj";
 }
 
-FbxGlbConvertReport FbxGlbConverter::Convert(const std::string& inputPath,
-                                             const std::string& outputDir,
-                                             const FbxGlbConvertOptions& options)
+ConvertResult FbxGlbConverter::ConvertFile(const std::string& inputPath, const std::string& outputDir)
+{
+    const FbxGlbConvertReport report = Convert(inputPath, outputDir, m_options);
+    ConvertResult result;
+    result.ok = report.ok;
+    result.error = report.error;
+    result.outputFolder = report.outputFolder;
+    if (!report.qcPath.empty()) result.qcFiles.push_back(report.qcPath);
+    return result;
+}
+
+FbxGlbConvertReport FbxGlbConverter::Convert(const std::string& inputPath, const std::string& outputDir, const FbxGlbConvertOptions& options)
 {
     FbxGlbConvertReport report;
     auto fail = [&](const std::string& message) {
@@ -1014,7 +1001,7 @@ FbxGlbConvertReport FbxGlbConverter::Convert(const std::string& inputPath,
                 base = modelName + "_" + std::to_string(materials.size());
             }
 
-            m.smdName = uniqueName(sanitize(base, "texture"), kGoldSrcTextureNameLength - 1 - 4, takenTextureNames) + ".bmp";
+            m.smdName = String_UniqueName(sanitize(base, "texture"), kGoldSrcTextureNameLength - 1 - 4, takenTextureNames) + ".bmp";
 
             it = materialSlot.emplace(sourceIndex, static_cast<int>(materials.size())).first;
             materials.push_back(m);
@@ -1356,7 +1343,7 @@ FbxGlbConvertReport FbxGlbConverter::Convert(const std::string& inputPath,
             OutBone bone;
             bone.node = static_cast<int>(i);
             bone.parent = (nodes[i].parent >= 0) ? nodes[nodes[i].parent].bone : -1;
-            bone.name = uniqueName(sanitize(nodes[i].name, "bone"), kGoldSrcBoneNameLength - 1, takenBoneNames);
+            bone.name = String_UniqueName(sanitize(nodes[i].name, "bone"), kGoldSrcBoneNameLength - 1, takenBoneNames);
             const aiMatrix4x4& world = nodes[i].world;
             bone.rotation = orthonormalize(aiMatrix3x3(world));
             bone.position = aiVector3D(world.a4, world.b4, world.c4);
@@ -1553,7 +1540,7 @@ FbxGlbConvertReport FbxGlbConverter::Convert(const std::string& inputPath,
             std::string rawName = anim->mName.C_Str();
             const size_t bar = rawName.find_last_of('|');
             if (bar != std::string::npos && bar + 1 < rawName.size()) rawName = rawName.substr(bar + 1);
-            const std::string animName = uniqueName(sanitize(rawName, "anim"), 48, takenAnimNames);
+            const std::string animName = String_UniqueName(sanitize(rawName, "anim"), 48, takenAnimNames);
 
             if (animFolder.empty())
             {

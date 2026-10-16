@@ -31,6 +31,21 @@ DtxConverter::~DtxConverter()
 }
 
 
+ConvertResult DtxConverter::ConvertFile(const std::string& inputPath, const std::string& outputDir)
+{
+	ConvertResult result;
+	result.outputFolder = outputDir;
+	std::filesystem::path bmp = FileIO::toPath(outputDir) / FileIO::toPath(inputPath).filename();
+	bmp.replace_extension(".bmp");
+	switch (ConvertSingleDTXFile("bmp", inputPath, FileIO::fromPath(bmp)))
+	{
+	case DTX_CONVERT_OK: result.ok = true; break;
+	case DTX_CONVERT_DECODING_FAILED: result.error = "could not decode the texture"; break;
+	default: result.error = "could not write the BMP"; break;
+	}
+	return result;
+}
+
 int DtxConverter::ConvertSingleDTXFile(const std::string& format, const std::string& inputFilePath, const std::string& outFilePath)
 {
     std::string tempFilePath = getUniqueTempPath();

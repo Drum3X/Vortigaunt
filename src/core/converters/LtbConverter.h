@@ -6,10 +6,14 @@
 #include <memory>
 #include <functional>
 
+#include "core/converters/IConverter.h"
+#include "utils/FileIO.h"
+
 struct ltbConverterSetting
 {
 	bool IgnoreMeshes = false;
 	bool IgnoreAnimations = false;
+	bool WriteQC = false;
 };
 
 #ifdef ENABLE_LITHTECH
@@ -62,13 +66,16 @@ typedef std::vector<NodeAnimation*> NodeAnimationsPtrVec;
 /**
  * @brief Converts LithTech LTB models to SMD format
  */
-class ltbConverter
+class ltbConverter : public IConverter
 {
 public:
 	ltbConverter();
 	~ltbConverter();
 
-
+	const char* Name() const override { return "LTB"; }
+	bool CanConvert(const std::string& path) const override;
+	// writes <outputDir>/<name>/<name>_reference.smd, its animations and, with WriteQC, <name>.qc
+	ConvertResult ConvertFile(const std::string& inputPath, const std::string& outputDir) override;
 
 	int ConvertSingleLTBFile(const std::string& inputFilePath, const std::string& outFilePath);
 	int LoadLTBModel(const std::string& modelFilePath, LTBModelPtr ltbModel);
@@ -138,11 +145,15 @@ enum
 
 
 // just stubs for compile
-class ltbConverter
+class ltbConverter : public IConverter
 {
 public:
 	ltbConverter() = default;
 	~ltbConverter() = default;
+
+	const char* Name() const override { return "LTB"; }
+	bool CanConvert(const std::string& path) const override { return FileIO::lowerExtension(path) == ".ltb"; }
+	ConvertResult ConvertFile(const std::string&, const std::string&) override { return { false, "LTB needs the LithTech SDK, which is Windows only" }; }
 
 	int ConvertSingleLTBFile(const std::string&, const std::string&) { return CONVERT_RET_LOADING_MODEL_FAILED; }
 	void SetConvertSetting(ltbConverterSetting) {}

@@ -9,11 +9,11 @@
 #define VORTIGAUNT_VERSION_STRING "1.2.0b"
 
 // Build info (populated by CMake at configure time)
-#define VORTIGAUNT_GIT_COMMIT "eb36f48"
+#define VORTIGAUNT_GIT_COMMIT "98c9f60"
 #define VORTIGAUNT_GIT_BRANCH "master"
 #define VORTIGAUNT_BUILD_TYPE "Release"
 #define VORTIGAUNT_OS "Windows"
-#define VORTIGAUNT_LINES_OF_CODE 63163
+#define VORTIGAUNT_LINES_OF_CODE 63192
 
 // GitHub repository for update checks
 #define VORTIGAUNT_GITHUB_OWNER "iQuitt"

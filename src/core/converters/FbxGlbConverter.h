@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include "core/converters/IConverter.h"
+
 struct FbxGlbConvertOptions
 {
     bool writeQC = true;
@@ -59,7 +61,7 @@ struct FbxGlbConvertReport
     std::vector<std::string> warnings;
 };
 
-class FbxGlbConverter
+class FbxGlbConverter : public IConverter
 {
 public:
 
@@ -67,4 +69,13 @@ public:
 
 
     FbxGlbConvertReport Convert(const std::string& inputPath, const std::string& outputDir, const FbxGlbConvertOptions& options = FbxGlbConvertOptions());
+
+    void SetOptions(const FbxGlbConvertOptions& options) { m_options = options; }
+
+    const char* Name() const override { return "FBX/GLB/OBJ"; }
+    bool CanConvert(const std::string& path) const override { return IsSupportedFile(path); }
+    ConvertResult ConvertFile(const std::string& inputPath, const std::string& outputDir) override;
+
+private:
+    FbxGlbConvertOptions m_options;
 };

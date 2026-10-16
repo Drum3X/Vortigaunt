@@ -4,6 +4,9 @@
 #include <memory>
 #include <vector>
 
+#include "core/converters/IConverter.h"
+#include "utils/FileIO.h"
+
 #include <map>
 
 #ifdef ENABLE_GRANNY2
@@ -47,13 +50,16 @@ struct Gr2ConverterSettings
 /**
  * @brief Converts Granny2 GR2 models to SMD/MAP format for GoldSrc
  */
-class Gr2Converter
+class Gr2Converter : public IConverter
 {
 public:
-
-    
     Gr2Converter();
     ~Gr2Converter();
+
+    const char* Name() const override { return "GR2"; }
+    bool CanConvert(const std::string& path) const override { return FileIO::lowerExtension(path) == ".gr2"; }
+    // writes <outputDir>/<name>/<name>.smd and its textures
+    ConvertResult ConvertFile(const std::string& inputPath, const std::string& outputDir) override;
 
     int ConvertSingleGr2File(const std::string& inputFilePath, const std::string& outputFilePath);
     int ConvertGr2Animation(const std::string& inputFilePath, const std::string& outputFilePath, int animationIndex, const std::string& skeletonSourceFile = "");
@@ -143,13 +149,15 @@ struct Gr2ConverterSettings
 /**
  * @brief Stub: GR2 converter. 
  */
-class Gr2Converter
+class Gr2Converter : public IConverter
 {
 public:
-
-    
     Gr2Converter() {}
     ~Gr2Converter() {}
+
+    const char* Name() const override { return "GR2"; }
+    bool CanConvert(const std::string& path) const override { return FileIO::lowerExtension(path) == ".gr2"; }
+    ConvertResult ConvertFile(const std::string&, const std::string&) override { return { false, "GR2 needs the Granny2 SDK, which is Windows only" }; }
 
     int ConvertSingleGr2File(const std::string&, const std::string&) { return GR2_CONVERT_RET_LOAD_FAILED; }
     int ConvertGr2Animation(const std::string&, const std::string&, int, const std::string& = "") { return GR2_CONVERT_RET_LOAD_FAILED; }

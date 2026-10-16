@@ -228,13 +228,31 @@ std::string SmdWriter::SanitizeNodeName(const std::string& name)
     return result;
 }
 
+std::vector<std::string> SmdWriter::UniqueNodeNames(const std::vector<std::string>& names)
+{
+    // mstudiobone_t::name holds 32 characters with the terminator
+    std::vector<std::string> unique;
+    std::set<std::string> taken;
+    for (const std::string& name : names)
+    {
+        unique.push_back(String_UniqueName(name, 31, taken));
+    }
+    return unique;
+}
+
 void SmdWriter::WriteNodes(std::ofstream& file, const aiScene* scene)
 {
     file << "nodes\n";
 
+    std::vector<std::string> names;
+    for (aiNode* node : m_nodeList) {
+        names.push_back(SanitizeNodeName(node->mName.C_Str()));
+    }
+    names = UniqueNodeNames(names);
+
     for (size_t i = 0; i < m_nodeList.size(); i++) {
         aiNode* node = m_nodeList[i];
-        std::string nodeName = SanitizeNodeName(node->mName.C_Str());
+        const std::string& nodeName = names[i];
 
         // Find parent index
         int parentIndex = -1;
@@ -708,8 +726,15 @@ void SmdWriter::WriteManualNodes(std::ofstream& file)
 {
     file << "nodes\n";
     
+    std::vector<std::string> names;
     for (const auto& bone : m_manualBones) {
-        file << "  " << bone.index << " \"" << bone.name << "\" " << bone.parentIndex << "\n";
+        names.push_back(bone.name);
+    }
+    names = UniqueNodeNames(names);
+
+    for (size_t i = 0; i < m_manualBones.size(); i++) {
+        const SmdBone& bone = m_manualBones[i];
+        file << "  " << bone.index << " \"" << names[i] << "\" " << bone.parentIndex << "\n";
     }
     
     file << "end\n";

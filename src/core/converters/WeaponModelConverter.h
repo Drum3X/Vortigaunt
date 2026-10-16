@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#include "core/converters/IConverter.h"
+
 // This is a converter for GoldSrc weapon models. It can convert a model into a view model (p_) and a world model (w_).
 // It can also generate the QC files for compiling the models. The converter can be used in a command-line tool or as a library.
 
@@ -71,10 +73,19 @@ struct WeaponModelResult
     std::vector<std::string> warnings;
 };
 
-class WeaponModelConverter
+class WeaponModelConverter : public IConverter
 {
 public:
     static bool IsViewModelFile(const std::string& path);
 
     WeaponModelResult Convert(const std::string& inputPath, const std::string& outputDir, const WeaponModelOptions& options = WeaponModelOptions());
+
+    void SetOptions(const WeaponModelOptions& options) { m_options = options; }
+
+    const char* Name() const override { return "v_ to p_/w_"; }
+    bool CanConvert(const std::string& path) const override { return IsViewModelFile(path); }
+    ConvertResult ConvertFile(const std::string& inputPath, const std::string& outputDir) override;
+
+private:
+    WeaponModelOptions m_options;
 };
