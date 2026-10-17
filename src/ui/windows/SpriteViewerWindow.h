@@ -18,10 +18,12 @@
 #include <QTreeView>
 #include <QFileSystemModel>
 #include <QSplitter>
+#include <QStackedWidget>
 #include <stack>
 
 #include "SpriteLoader.h"
 
+class QAction;
 class QMimeData;
 
 // Custom widget for zoomable preview with background toggle
@@ -96,11 +98,33 @@ class SpriteViewerWindow : public QDialog
     Q_OBJECT
 
 public:
+    // what the sprite tab shows: one sprite, frames made into a sprite, or sprites fixed in a batch
+    enum class Mode
+    {
+        View,
+        Create,
+        Fix,
+    };
+
     explicit SpriteViewerWindow(QWidget* parent = nullptr);
     ~SpriteViewerWindow() override = default;
-    
+
     // Public method to load sprite (for command-line support)
     void openSprite(const QString& filePath);
+
+    void setMode(Mode mode);
+
+    // the commands, for the ribbon; enabled while they can be used
+    QAction* openAction() const { return m_openAction; }
+    QAction* saveAction() const { return m_saveAction; }
+    QAction* saveAsAction() const { return m_saveAsAction; }
+    QAction* extractFrameAction() const { return m_extractFrameAction; }
+    QAction* extractAllFramesAction() const { return m_extractAllFramesAction; }
+    QAction* previousAction() const { return m_previousAction; }
+    QAction* nextAction() const { return m_nextAction; }
+    QAction* viewModeAction() const { return m_viewModeAction; }
+    QAction* createModeAction() const { return m_createModeAction; }
+    QAction* fixModeAction() const { return m_fixModeAction; }
 
 protected:
     void dragEnterEvent(QDragEnterEvent* event) override;
@@ -180,6 +204,7 @@ private slots:
 
 private:
     void setupUI();
+    void createActions();
     QWidget* createFileBrowserWidget();
     QWidget* createFileTabWidget();
     QWidget* createCreateTabWidget();
@@ -211,22 +236,28 @@ private:
     QStringList m_navigationHistory;
     int m_historyIndex = -1;
     
+    // Commands, shown in the ribbon
+    QAction* m_openAction = nullptr;
+    QAction* m_saveAction = nullptr;
+    QAction* m_saveAsAction = nullptr;
+    QAction* m_extractFrameAction = nullptr;
+    QAction* m_extractAllFramesAction = nullptr;
+    QAction* m_previousAction = nullptr;
+    QAction* m_nextAction = nullptr;
+    QAction* m_viewModeAction = nullptr;
+    QAction* m_createModeAction = nullptr;
+    QAction* m_fixModeAction = nullptr;
+
     // UI Elements - File Tab
     QLineEdit* m_fileSpritePathEdit;
-    QPushButton* m_fileOpenButton;
-    QPushButton* m_saveButton;        // Quick save (Ctrl+S)
-    QPushButton* m_saveAsButton;      // Save As
-    QPushButton* m_extractFrameButton;
-    QPushButton* m_extractAllFramesButton;
-    QPushButton* m_fixSpriteButton;
+    QLabel* m_fileNameLabel = nullptr;
+    QPushButton* m_fixSpriteButton = nullptr;  // V3 sprites only
     QLabel* m_fileInfoLabel;
     QListWidget* m_fileFrameListWidget;
     ZoomablePreviewWidget* m_previewWidget;
     QScrollArea* m_fileFrameScrollArea;
     QPushButton* m_filePlayButton;
     QPushButton* m_fileStopButton;
-    QPushButton* m_prevSpriteButton;
-    QPushButton* m_nextSpriteButton;
     QSpinBox* m_fileAnimationSpeedSpin;
     QLabel* m_zoomLabel;
     QComboBox* m_spriteTypeEditCombo;
@@ -237,6 +268,7 @@ private:
     QLabel* m_bgLabel;
     QLabel* m_coordLabel;  // X, Y coordinates display
     QLabel* m_selectionLabel;  // Selection rectangle info (x, y, w, h)
+    QWidget* m_paletteGroup = nullptr;  // hidden for sprites without a palette
     PaletteWidget* m_paletteWidget;
     QLabel* m_paletteInfoLabel;
     QPushButton* m_paletteBrightnessUp;
@@ -270,9 +302,7 @@ private:
     bool isOriginalState() const;
     
     // UI Elements - Create Tab
-    QTabWidget* m_tabWidget = nullptr;
-    int m_createTabIndex = -1;
-    int m_fixTabIndex = -1;
+    QStackedWidget* m_modeStack = nullptr;
 
     QListWidget* m_createFrameList;
     QPushButton* m_browseFramesButton;

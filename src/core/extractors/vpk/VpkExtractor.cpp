@@ -2,6 +2,7 @@
 #include "VpkFile.h"
 #include "core/VortigauntLog.h"
 #include "utils/util.hpp"
+#include "utils/FileIO.h"
 
 #include <filesystem>
 #include <fstream>
@@ -123,13 +124,13 @@ bool VpkExtractor::ExtractSingle(const std::string& vpkPath, const std::string& 
         VortigauntLog::LogF("  [%zu/%zu] %s", i + 1, entries.size(), entry.fullPath.c_str());
 
         std::vector<uint8_t> data = vpk.ExtractEntry(entry);
-        if (data.empty())
+        if (data.empty() && entry.preloadBytes + entry.entryLength > 0)
         {
             VortigauntLog::LogF("    -> FAILED (empty data)");
             continue;
         }
 
-        fs::path outFilePath = outputPath / fs::path(entry.fullPath);
+        fs::path outFilePath = outputPath / FileIO::safeRelativePath(entry.fullPath);
         std::error_code dirEc;
         fs::create_directories(outFilePath.parent_path(), dirEc);
 

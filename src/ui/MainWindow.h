@@ -1,34 +1,40 @@
 #pragma once
 
 #include <QMainWindow>
-#include <type_traits>
-#include <utility>
-#include <QThread>
 #include <atomic>
-#include <QTimer>
-#include "core/VortigauntLog.h"
-#include "core/converters/IConverter.h"
 #include <filesystem>
 #include <functional>
-class Gr2Converter;
-class LtbConverter;
-struct ltbConverterSetting;
+#include "core/VortigauntLog.h"
+#include "core/converters/IConverter.h"
 
-class QLineEdit;
-class QPushButton;
-class QComboBox;
-class QCheckBox;
-class QDoubleSpinBox;
-class QLabel;
+class Gr2Converter;
+struct ltbConverterSetting;
 struct WeaponModelOptions;
-class QPlainTextEdit;
+
 class QAction;
-class QListWidget;
+class QCheckBox;
+class QComboBox;
+class QDockWidget;
+class QDoubleSpinBox;
 class QGroupBox;
 class QLabel;
-class QShortcut;
-class QProgressBar;
+class QLineEdit;
+class QListWidget;
 class QMenu;
+class QPlainTextEdit;
+class QProgressBar;
+class QPushButton;
+class QShortcut;
+class QStackedWidget;
+class QTabWidget;
+class QTreeWidget;
+class QTreeWidgetItem;
+class ArchiveWorkspace;
+class GLBViewer;
+class RibbonBar;
+class TextureWorkspace;
+class SpriteViewerWindow;
+class WadMakerDialog;
 class VortigauntUpdateCheck;
 
 class MainWindow : public QMainWindow
@@ -36,31 +42,49 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 public:
     explicit MainWindow(QWidget* parent = nullptr);
-    
+
+    // files go in as they are, folders by every file in them that has an operation
+    void addPaths(const QStringList& paths);
+
+    // empty: the default from the settings
+    void setOutputDir(const QString& folder);
+
+    // shows the Archives tab with the archive open in it
+    void openArchive(const QString& path);
+
+    // shows the Textures tab with the files (or folders of them) open in it
+    void openTextures(const QStringList& paths);
+
+    // shows the Sprites tab with the sprite open in it
+    void openSprite(const QString& path);
+
+    // shows the WAD tab with the WAD open in it
+    void openWad(const QString& path);
+
     // Drag & drop support
     void dragEnterEvent(QDragEnterEvent* event) override;
     void dropEvent(QDropEvent* event) override;
     bool eventFilter(QObject* watched, QEvent* event) override;
 
+protected:
+    void closeEvent(QCloseEvent* event) override;
+
 private slots:
-    // UI event handlers (signal-slot connections)
-    void onBrowseInput();
+    void onAddFiles();
+
+    void onAddFolder();
 
     void onBrowseOutput();
 
+    void onOpenOutputFolder();
+
     void onRun();
 
-    void onOpenDtxViewer();
+    void onStop();
 
-    void onOpenPakViewer();
+    void onFileSelectionChanged();
 
-    void onOpenRezViewer();
-
-    void onOpenXfsViewer();
-
-    void onOpenSpriteViewer();
-
-    void onOpenLithtechSpriteViewer();
+    void onWorkspaceChanged(int index);
 
     void onOpenLoLModelDownloader();
 
@@ -73,14 +97,8 @@ private slots:
 #ifdef ENABLE_AUTORIG
     void onOpenAutoRigDialog();
 #endif
-    
+
     void onOpenSettings();
-
-    void onOpenWadMaker();
-
-    void onOpenVpkViewer();
-
-    void onOpenVtfViewer();
 
     void onOpenAudioConverter();
 
@@ -92,11 +110,78 @@ private slots:
 
     void onCheckForUpdates();
 
-
 private:
+    // what is done with a file in the list, picked from its name
+    enum class FileOp
+    {
+        None,
+        Ltb,
+        Gr2,
+        Mesh,
+        Weapon,
+        Dtx,
+        Rez,
+        Pak,
+        Xfs,
+        Vpk,
+        Unity,
+    };
+
+    struct FileJob
+    {
+        QTreeWidgetItem* item;
+        QString path;
+        FileOp op;
+        QString outputDir;
+    };
+
+    void setupRibbon();
+
+    void setupDocks();
+
+    void setupPreview();
+
     void setupStatusBar();
 
+    // a tool in a tab of the centre instead of a window of its own
+    void openToolTab(QWidget* tool, const QString& title);
+
+    void closeToolTab(QWidget* tool);
+
+    // one tab for the tool; opening it again shows that tab
+    void openToolOnce(const char* key, const QString& title, const std::function<QWidget*()>& create);
+
+    // a tab of the centre that is kept when it is closed, with the ribbon tab that belongs to it
+    struct Workspace
+    {
+        QWidget* widget;
+        int ribbonTab;
+        QString title;
+    };
+
+    void showWorkspace(QWidget* widget);
+
+    const Workspace* workspaceOf(QWidget* widget) const;
+
     void setupKeyboardShortcuts();
+
+    static FileOp detectFileOp(const QString& path);
+
+    static QString fileOpName(FileOp op);
+
+    void addFileRow(const QString& path, const QString& outputSubfolder);
+
+    // UI thread only
+    void setRowStatus(QTreeWidgetItem* item, const QString& status, const QColor& color);
+
+    // from a worker thread
+    void setRowStatusLater(QTreeWidgetItem* item, const QString& status, const QColor& color);
+
+    QString outputDir() const;
+
+    void updatePropertiesFor(FileOp op);
+
+    void showPreview(const QString& path, FileOp op);
 
     // Extract Archives
     void extractArchiveRez(const QStringList& paths, const QString& outputDir);
@@ -107,14 +192,16 @@ private:
 
     void extractArchiveVpk(const QStringList& paths, const QString& outputDir);
 
-    // Model/Texture Convert
-    void convertLtb(const QString& inputPath, const QString& outputDir, const ltbConverterSetting& settings);
+    // Model/Texture Convert; true when every file converted
+    bool convertLtb(const QString& inputPath, const QString& outputDir, const ltbConverterSetting& settings);
 
-    void convertGr2(const QString& inputPath, const QString& outputDir);
+    bool convertGr2(const QString& inputPath, const QString& outputDir, bool withAnimations);
 
-    void convertFbxGlb(const QString& inputPath, const QString& outputDir, bool writeQC);
+    bool convertFbxGlb(const QString& inputPath, const QString& outputDir, bool writeQC);
 
-    void convertViewModel(const QString& inputPath, const QString& outputDir, const WeaponModelOptions& options);
+    bool convertViewModel(const QString& inputPath, const QString& outputDir, const WeaponModelOptions& options);
+
+    bool convertDtx(const QString& inputPath, const QString& outputDir);
 
     // runs a converter over a file or folder: progress, QC compiling and the failures for the summary box
     ConvertAssets runConverter(IConverter& converter, const QString& inputPath, const QString& outputDir,
@@ -126,27 +213,64 @@ private:
     // Compiles a QC that was just written, when "Compile model" is ticked.
     void compileModelIfWanted(const QString& qcPath);
 
-    // Shows the V -> P/W options only in that mode, and the reference model
-    // field only when the weapon type asks for one.
+    // The reference model field only when the weapon type asks for one.
     void updateWeaponModelControls();
 
-    // UI
-    void updateOperationComboForFile(const QString& filePath);
-
-    void loadGr2Animations();
+    void loadGr2Animations(const QString& gr2Path);
 
     void gr2AddAnimationItem(const QString& fileName, const QString& filePath);
 
-    void handleDroppedFiles(const QList<QUrl>& urls);
+    // Ribbon, workspaces and panels
+    RibbonBar*     m_ribbon = nullptr;
+    std::vector<Workspace> m_persistentWorkspaces;
+    QTabWidget*    m_workspaces = nullptr;
+    ArchiveWorkspace* m_archiveWorkspace = nullptr;
+    TextureWorkspace* m_textureWorkspace = nullptr;
+    SpriteViewerWindow* m_spriteWorkspace = nullptr;
+    WadMakerDialog* m_wadWorkspace = nullptr;
+    bool           m_convertDocksShown = true;
+    bool           m_filesDockWasVisible = true;
+    bool           m_propertiesDockWasVisible = true;
+    QDockWidget*   m_filesDock = nullptr;
+    QDockWidget*   m_propertiesDock = nullptr;
+    QDockWidget*   m_logDock = nullptr;
+    QByteArray     m_defaultLayout;
 
+    QAction*       m_addFilesAction = nullptr;
+    QAction*       m_addFolderAction = nullptr;
+    QAction*       m_clearListAction = nullptr;
+    QAction*       m_runAction = nullptr;
+    QAction*       m_stopAction = nullptr;
+    QAction*       m_writeQCAction = nullptr;
+    QAction*       m_compileAction = nullptr;
+    QAction*       m_outputFolderAction = nullptr;
+    QAction*       m_openOutputAction = nullptr;
+    QAction*       m_resetLayoutAction = nullptr;
 
-    QLineEdit*     m_inputPathEdit;
-    QPushButton*   m_browseInputButton;
-    QLineEdit*     m_outputPathEdit;
-    QPushButton*   m_browseOutputButton;
-    QComboBox*     m_operationCombo;
-    QComboBox*     m_outputFormatCombo;
-    QLabel*        m_outputFormatLabel;
+    // Files panel
+    QTreeWidget*   m_fileList = nullptr;
+    QLabel*        m_fileCountLabel = nullptr;
+    QString        m_outputDir;  // empty: the default from the settings
+
+    // Properties panel
+    QLabel*        m_selectedNameLabel = nullptr;
+    QComboBox*     m_fileOpCombo = nullptr;
+    QLabel*        m_noSelectionLabel = nullptr;
+    QGroupBox*     m_weaponGroup = nullptr;
+    QGroupBox*     m_modelGroup = nullptr;
+    QGroupBox*     m_archiveGroup = nullptr;
+    QGroupBox*     m_unityGroup = nullptr;
+    QGroupBox*     m_textureGroup = nullptr;
+
+    // Preview
+    QStackedWidget* m_preview = nullptr;
+    QLabel*        m_previewHint = nullptr;
+    GLBViewer*     m_modelPreview = nullptr;
+    QLabel*        m_imagePreview = nullptr;
+    QLabel*        m_previewInfo = nullptr;
+    QPushButton*   m_previewOpenButton = nullptr;
+    QString        m_previewPath;
+
     QCheckBox*     m_ignoreMeshesCheck;
     QCheckBox*     m_ignoreAnimsCheck;
     QCheckBox*     m_mirrorUVYCheck;
@@ -154,13 +278,9 @@ private:
     QCheckBox*     m_compileModelCheck = nullptr;  // run studiomdl on every QC that gets written
 
     // V model -> P/W model
-    QLabel*         m_weaponScaleLabel = nullptr;
     QDoubleSpinBox* m_weaponScaleSpin = nullptr;   // 0 = worked out from the hands
-    QLabel*         m_weaponMirrorLabel = nullptr;
     QComboBox*      m_weaponMirrorCombo = nullptr; // auto / yes / no
-    QLabel*         m_gameDirLabel = nullptr;
     QComboBox*      m_gameDirCombo = nullptr;
-    QLabel*         m_weaponTypeLabel = nullptr;
     QComboBox*      m_weaponTypeCombo = nullptr;   // how the weapon is held: gun, knife, grenade, as a reference model
     QLineEdit*      m_weaponReferenceEdit = nullptr;
     QPushButton*    m_weaponReferenceBrowse = nullptr;
@@ -168,64 +288,49 @@ private:
     QCheckBox*     m_separateFoldersCheck;  // For multiple extraction
     QCheckBox*     m_unityBmpCheck;         // Unity mode: convert textures to 8-bit BMP (unchecked = 32-bit PNG)
     QPlainTextEdit* m_logEdit;
-    
+
     QGroupBox*     m_gr2AnimGroup;
     QListWidget*   m_animationListWidget;
-    QPushButton* m_runButton;
+    QString        m_animationListOwner;  // the GR2 the list was filled for
 
-
-    
-    // Language menu
-    QMenu*         m_languageMenu;
-    
-    // Menu actions for retranslation
-    QAction*       m_dtxViewAction; // Texture of Lithtech Engine
-    QAction*       m_pakViewAction; // Counter Strike Online PAK Archive
-    QAction*       m_rezViewAction; // Lithtech Engine Archive
-	QAction*       m_xfsViewAction; // Xenesis File System Archive
-    QAction*       m_vpkViewAction; // Source Engine VPK Archive
-    QAction*       m_vtfViewAction; // Source Engine VTF Texture Viewer
-    QAction*       m_spriteViewAction; // Goldsrc Sprite Viewer
-	QAction*       m_lithtechSpriteAction; // Lithtech Sprite Viewer
-	QAction*       m_lolModelAction; // Khada LoL Model Downloader
-    QAction*       m_mseViewAction; // Metin2 Script Effect
+    // Tool actions
+    QAction*       m_lolModelAction = nullptr; // Khada LoL Model Downloader
+    QAction*       m_mseViewAction = nullptr; // Metin2 Script Effect
 #ifdef ENABLE_AUTORIG
-	QAction*       m_autoRigAction; // Auto-Rig (Beta)
+    QAction*       m_autoRigAction = nullptr; // Auto-Rig (Beta)
 #endif
-    QAction*       m_wadMakerAction;
-    QAction*       m_audioConvertAction;
-    QAction*       m_steamWorkshopAction;
-    QAction*       m_settingsAction;
-    QMenu*         m_toolsMenu;
-    QMenu*         m_settingsMenu;
-    QAction*       m_checkUpdateAction;
+    QAction*       m_audioConvertAction = nullptr;
+    QAction*       m_steamWorkshopAction = nullptr;
+    QAction*       m_settingsAction = nullptr;
+    QMenu*         m_settingsMenu = nullptr;
+    QMenu*         m_languageMenu = nullptr;
+    QAction*       m_checkUpdateAction = nullptr;
     VortigauntUpdateCheck* m_updateChecker;
-    
 
-    QAction* m_qtAboutAction;
-    QAction* m_vortiAboutAction;
+    QAction* m_qtAboutAction = nullptr;
+    QAction* m_vortiAboutAction = nullptr;
 
-   
-    
     // Log filtering
     QComboBox*     m_logFilterCombo;
     QPushButton*   m_saveLogButton;
     QPushButton*   m_clearLogButton;
     VortigauntLog::LogLevel m_currentLogFilter;
-    
+
     // Status bar
     QLabel*        m_statusLabel;
+    QPushButton*   m_outputButton = nullptr;
     QProgressBar*  m_progressBar;
-    
+
     // Keyboard shortcuts
     QShortcut*     m_shortcutBrowseInput;
     QShortcut*     m_shortcutBrowseOutput;
     QShortcut*     m_shortcutRun;
     QShortcut*     m_shortcutClearLog;
-    
+
     // Re-entrancy protection for processEvents
     std::atomic<bool> m_processingEvents;
-    
+    std::atomic<bool> m_cancelRequested{ false };
+
     // Error tracking
     struct ExtractionError {
         QString filename;
@@ -233,20 +338,10 @@ private:
         size_t entryIndex;
     };
     std::vector<ExtractionError> m_extractionErrors;
-    
-    // Multiple file selection support
-    QStringList m_selectedInputFiles;
 
     // Background Threading Support
     bool m_isProcessing{ false };
     void runInBackground(std::function<void()> task);
     void setUiProcessing(bool processing);
     void updateProgressSafe(int percent);
-        
-
-    
-
-    
 };
-
-

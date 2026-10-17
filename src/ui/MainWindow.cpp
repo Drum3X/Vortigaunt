@@ -40,6 +40,18 @@
 #include <QSettings>
 #include <QRegularExpression>
 #include <QFile>
+#include <QCloseEvent>
+#include <QDirIterator>
+#include <QDockWidget>
+#include <QFormLayout>
+#include <QHeaderView>
+#include <QScrollArea>
+#include <QSet>
+#include <QStackedWidget>
+#include <QToolButton>
+#include <QTabWidget>
+#include <QTreeWidget>
+#include <QKeyEvent>
 #include <cstdio>
 #include <memory>
 
@@ -64,17 +76,19 @@
 #include "core/converters/FbxGlbConverter.h"
 #include "core/converters/WeaponModelConverter.h"
 #include "utils/FileIO.h"
+#include "utils/ImageUtils.h"
 #include "core/VortigauntLog.h"
+#include "core/converters/DtxConverter.h"
+#include "UiUtils.h"
+#include "widgets/GLBViewer.h"
+#include "widgets/RibbonBar.h"
 
 #ifdef ENABLE_GRANNY2
 #include <granny.h>
 #endif
-#include "DtxViewerDialog.h"
-#include "VtfViewerDialog.h"
-#include "PakViewerWindow.h"
-#include "RezViewerWindow.h"
-#include "XfsViewerWindow.h"
-#include "VpkViewerWindow.h"
+#include "workspaces/ArchiveSource.h"
+#include "workspaces/ArchiveWorkspace.h"
+#include "workspaces/TextureWorkspace.h"
 #include "SpriteViewerWindow.h"
 #include "LoLModelDownloadDialog.h"
 #include "SteamWorkshopDownloaderDialog.h"
@@ -103,6 +117,59 @@
 
 
 
+namespace
+{
+
+enum class StatusKind
+{
+    Waiting,
+    Running,
+    Done,
+    Failed,
+};
+
+// file list item data
+constexpr int kPathRole = Qt::UserRole;
+constexpr int kOpRole = Qt::UserRole + 1;
+constexpr int kSubfolderRole = Qt::UserRole + 2;
+
+// bigger models freeze the window while they load
+constexpr qint64 kMaxPreviewBytes = 60ll * 1024 * 1024;
+
+// ribbon icons
+
+//TODO: get a fuckin better icons
+constexpr const char* kIconFile = "M14 3H6v18h12V7z M14 3v4h4 M12 11v6 M9 14h6";
+constexpr const char* kIconFolder = "M3 6h7l2 2h9v11H3z M12 11v6 M9 14h6";
+constexpr const char* kIconClear = "M5 7h14 M9 7V4h6v3 M7 7l1 13h8l1-13";
+constexpr const char* kIconPlay = "M7 4l12 8-12 8z";
+constexpr const char* kIconStop = "M6 6h12v12H6z";
+constexpr const char* kIconQc = "M5 3h10l4 4v14H5z M8 12h8 M8 16h6";
+constexpr const char* kIconCompile = "M14 4l-4 16 M7 8l-4 4 4 4 M17 8l4 4-4 4";
+constexpr const char* kIconOutput = "M3 6h7l2 2h9v11H3z M13 13h5 M16 10l3 3-3 3";
+constexpr const char* kIconOpen = "M3 6h7l2 2h9v11H3z M10 16l6-6 M11 10h5v5";
+constexpr const char* kIconArchive = "M3 7h18v13H3z M3 7l2-3h14l2 3 M10 12h4";
+constexpr const char* kIconArchiveAdd = "M3 7h18v13H3z M3 7l2-3h14l2 3 M12 10v7 M8.5 13.5h7";
+constexpr const char* kIconExtract = "M3 7h18v13H3z M3 7l2-3h14l2 3 M12 10v7 M9 14l3 3 3-3";
+constexpr const char* kIconExtractAll = "M3 6h7l2 2h9v11H3z M12 11v6 M9 14l3 3 3-3";
+constexpr const char* kIconClose = "M6 6l12 12 M18 6L6 18";
+constexpr const char* kIconSend = "M4 12h12 M12 8l4 4-4 4 M20 5v14";
+constexpr const char* kIconTextureAdd = "M14 3H3v18h18V10 M3 16l5-5 4 4 3-3 6 6 M18 2v7 M14.5 5.5h7";
+constexpr const char* kIconSave = "M5 3h11l3 3v15H5z M8 3v5h7V3 M8 21v-7h8v7";
+constexpr const char* kIconFrame = "M3 3h18v18H3z M3 16l5-5 4 4 3-3 6 6";
+constexpr const char* kIconPrevious = "M15 5l-7 7 7 7";
+constexpr const char* kIconNext = "M9 5l7 7-7 7";
+constexpr const char* kIconView = "M2 12l5-5h10l5 5-5 5H7z M10 10h4v4h-4z";
+constexpr const char* kIconCreate = "M3 5h7v14H3z M14 5h7v14h-7z M17.5 9v6 M14.5 12h6";
+constexpr const char* kIconFix = "M14 4l6 6-9 9H5v-6z M12 6l6 6";
+constexpr const char* kIconRename = "M4 20h4l11-11-4-4L4 16z M13 7l4 4";
+constexpr const char* kIconSprite = "M3 5h7v14H3z M14 5h7v14h-7z";
+constexpr const char* kIconWad = "M4 4h16v16H4z M4 12h16 M12 4v16";
+constexpr const char* kIconAudio = "M4 10v4 M8 7v10 M12 4v16 M16 8v8 M20 11v2";
+constexpr const char* kIconDownload = "M12 4v11 M7 10l5 5 5-5 M4 20h16";
+constexpr const char* kIconRig = "M12 3v6 M12 9l-6 5 M12 9l6 5 M12 9v8 M9 21l3-4 3 4";
+constexpr const char* kIconSettings = "M4 6h9 M17 6h3 M15 4v4 M4 12h3 M11 12h9 M9 10v4 M4 18h11 M19 18h1 M17 16v4";
+
 QString grabFileExt(const QString& filePath)
 {
     int idx = filePath.lastIndexOf('.');
@@ -110,6 +177,22 @@ QString grabFileExt(const QString& filePath)
         return {};
     return filePath.mid(idx + 1).toLower();
 }
+
+// readable on the dark and on the light theme
+QColor statusColor(StatusKind kind)
+{
+    const bool dark = QApplication::palette().color(QPalette::Base).lightness() < 128;
+    switch (kind)
+    {
+    case StatusKind::Running: return dark ? QColor(229, 192, 123) : QColor(150, 100, 0);
+    case StatusKind::Done: return dark ? QColor(111, 207, 143) : QColor(20, 120, 50);
+    case StatusKind::Failed: return dark ? QColor(240, 140, 132) : QColor(180, 30, 30);
+    case StatusKind::Waiting: break;
+    }
+    return QApplication::palette().color(QPalette::PlaceholderText);
+}
+
+} // namespace
 
 
 MainWindow::MainWindow(QWidget* parent)
@@ -125,345 +208,429 @@ MainWindow::MainWindow(QWidget* parent)
     setWindowIcon(QIcon(":/app2.png")); // qt already support ico so linux can draw the ico. but somehow the execute file icon is not visible so thats why its png.
 	// windows also support png but just to be sure
 #endif
-    resize(minimumWidth(), minimumHeight());
     setAcceptDrops(true);
-    setMinimumWidth(1024);
-    setMinimumHeight(768);
+    setMinimumSize(1024, 700);
+    resize(1360, 860);
+    setDockNestingEnabled(true);
 
-    // Menu bar with Tools entries
-    m_toolsMenu = menuBar()->addMenu(tr("Tools"));
+    QSettings settings("Vortigaunt", "VortigauntTool");
+    m_outputDir = settings.value("MainWindow/outputDir").toString();
 
-    //Lithtech Submenu
-#ifdef ENABLE_LITHTECH
-    QMenu* lithtechMenu = m_toolsMenu->addMenu(tr("Lithtech"));
-    
-    m_rezViewAction = lithtechMenu->addAction(tr("REZ Viewer..."));
-    connect(m_rezViewAction, &QAction::triggered, this, &MainWindow::onOpenRezViewer);
+    setupPreview();
+    setupDocks();
+    setupRibbon();
+    setupStatusBar();
+    setupKeyboardShortcuts();
 
-    m_dtxViewAction = lithtechMenu->addAction(tr("DTX Viewer..."));
-    connect(m_dtxViewAction, &QAction::triggered, this, &MainWindow::onOpenDtxViewer);
-    
-    m_lithtechSpriteAction = lithtechMenu->addAction(tr("Lithtech Sprite Viewer..."));
-    connect(m_lithtechSpriteAction, &QAction::triggered, this, &MainWindow::onOpenLithtechSpriteViewer);
-#else
-    
-    QMenu* lithtechMenu = m_toolsMenu->addMenu(tr("Lithtech"));
-    m_rezViewAction = lithtechMenu->addAction(tr("REZ Viewer..."));
-    connect(m_rezViewAction, &QAction::triggered, this, &MainWindow::onOpenRezViewer);
-#endif
+    m_processingEvents = false;
 
-    // GoldSource Submenu
-    QMenu* goldSrcMenu = m_toolsMenu->addMenu(tr("GoldSrc"));
+    m_defaultLayout = saveState();
+    restoreGeometry(settings.value("MainWindow/geometry").toByteArray());
+    restoreState(settings.value("MainWindow/layout").toByteArray());
+    onFileSelectionChanged();
 
-    m_spriteViewAction = goldSrcMenu->addAction(tr("Sprite Viewer..."));
-    connect(m_spriteViewAction, &QAction::triggered, this, &MainWindow::onOpenSpriteViewer);
+    // Check for updates on startup (with a short delay to let the UI load first)
+    QTimer::singleShot(2000, this, [this]() {
+        if (!m_updateChecker)
+        {
+            m_updateChecker = new VortigauntUpdateCheck(this);
+        }
+        m_updateChecker->checkForUpdates(true);
+    });
+}
 
-    m_wadMakerAction = goldSrcMenu->addAction(tr("WAD Editor..."));
-    connect(m_wadMakerAction, &QAction::triggered, this, &MainWindow::onOpenWadMaker);
-    
-    m_pakViewAction = goldSrcMenu->addAction(tr("PAK Viewer (CSO)..."));
-    connect(m_pakViewAction, &QAction::triggered, this, &MainWindow::onOpenPakViewer);
+void MainWindow::closeEvent(QCloseEvent* event)
+{
+    m_workspaces->setCurrentIndex(0);
+    QSettings settings("Vortigaunt", "VortigauntTool");
+    settings.setValue("MainWindow/geometry", saveGeometry());
+    settings.setValue("MainWindow/layout", saveState());
+    settings.setValue("MainWindow/outputDir", m_outputDir);
+    QMainWindow::closeEvent(event);
+}
 
-    m_vpkViewAction = goldSrcMenu->addAction(tr("VPK / GMA Viewer (Source)..."));
-    connect(m_vpkViewAction, &QAction::triggered, this, &MainWindow::onOpenVpkViewer);
+void MainWindow::setupRibbon()
+{
+    m_ribbon = new RibbonBar(this);
+    setMenuWidget(m_ribbon);
 
-    m_vtfViewAction = goldSrcMenu->addAction(tr("VTF Viewer (Source)..."));
-    connect(m_vtfViewAction, &QAction::triggered, this, &MainWindow::onOpenVtfViewer);
+    auto command = [this](const QString& label, const QString& tip, const char* icon) {
+        auto* action = new QAction(UiUtils::lineIcon(QString::fromLatin1(icon)), tip, this);
+        action->setIconText(label);
+        return action;
+    };
+    auto tool = [](QAction* action, const QString& label, const char* icon) {
+        action->setIcon(UiUtils::lineIcon(QString::fromLatin1(icon)));
+        action->setIconText(label);
+    };
 
-    m_audioConvertAction = goldSrcMenu->addAction(tr("Convert WAV for Goldsrc..."));
+    m_addFilesAction = command(tr("Add\nfiles"), tr("Add files (Ctrl+O)"), kIconFile);
+    m_addFolderAction = command(tr("Add\nfolder"), tr("Add every file in a folder that Vortigaunt can convert"), kIconFolder);
+    m_clearListAction = command(tr("Clear\nlist"), tr("Remove every file from the list"), kIconClear);
+    m_runAction = command(tr("Convert"), tr("Convert every file in the list (F5)"), kIconPlay);
+    m_stopAction = command(tr("Stop"), tr("Stop after the file being converted"), kIconStop);
+    m_stopAction->setEnabled(false);
+    m_writeQCAction = command(tr("Write\nQC"), tr("Generate QC file for studiomdl compilation"), kIconQc);
+    m_compileAction = command(tr("Compile\nmodel"), tr("Run studiomdl on the QC to produce the .mdl. Set the location of studiomdl in Settings."), kIconCompile);
+    m_outputFolderAction = command(tr("Output\nfolder"), tr("Choose the output folder (Ctrl+Shift+O)"), kIconOutput);
+    m_openOutputAction = command(tr("Open\noutput"), tr("Open the output folder"), kIconOpen);
+    connect(m_addFilesAction, &QAction::triggered, this, &MainWindow::onAddFiles);
+    connect(m_addFolderAction, &QAction::triggered, this, &MainWindow::onAddFolder);
+    connect(m_clearListAction, &QAction::triggered, this, [this]() {
+        m_fileList->clear();
+        onFileSelectionChanged();
+    });
+    connect(m_runAction, &QAction::triggered, this, &MainWindow::onRun);
+    connect(m_stopAction, &QAction::triggered, this, &MainWindow::onStop);
+    connect(m_outputFolderAction, &QAction::triggered, this, &MainWindow::onBrowseOutput);
+    connect(m_openOutputAction, &QAction::triggered, this, &MainWindow::onOpenOutputFolder);
+    // the ribbon toggles and the Properties checkboxes are the same setting
+    m_writeQCAction->setCheckable(true);
+    m_compileAction->setCheckable(true);
+    m_writeQCAction->setChecked(m_writeQCCheck->isChecked());
+    m_compileAction->setChecked(m_compileModelCheck->isChecked());
+    m_compileAction->setEnabled(m_writeQCCheck->isChecked());
+    connect(m_writeQCAction, &QAction::toggled, m_writeQCCheck, &QCheckBox::setChecked);
+    connect(m_writeQCCheck, &QCheckBox::toggled, m_writeQCAction, &QAction::setChecked);
+    connect(m_writeQCCheck, &QCheckBox::toggled, m_compileAction, &QAction::setEnabled);
+    connect(m_compileAction, &QAction::toggled, m_compileModelCheck, &QCheckBox::setChecked);
+    connect(m_compileModelCheck, &QCheckBox::toggled, m_compileAction, &QAction::setChecked);
+
+    QAction* openArchiveAction = command(tr("Open\narchive"), tr("Open REZ, PAK, XFS, VPK or GMA archives"), kIconArchive);
+    QAction* closeArchiveAction = command(tr("Close\narchive"), tr("Close the archive shown"), kIconClose);
+    QAction* extractSelectedAction = command(tr("Extract\nselected"), tr("Extract the selected files to the output folder"), kIconExtract);
+    QAction* extractAllAction = command(tr("Extract\nall"), tr("Extract every file of the archive to the output folder"), kIconExtractAll);
+    QAction* sendToConvertAction = command(tr("Send to\nConvert"), tr("Extract the selected files and add them to the Convert list"), kIconSend);
+    connect(openArchiveAction, &QAction::triggered, this, [this]() {
+        showWorkspace(m_archiveWorkspace);
+        m_archiveWorkspace->openArchiveDialog();
+    });
+    connect(closeArchiveAction, &QAction::triggered, m_archiveWorkspace, &ArchiveWorkspace::closeCurrentArchive);
+    connect(extractSelectedAction, &QAction::triggered, m_archiveWorkspace, &ArchiveWorkspace::extractSelected);
+    connect(extractAllAction, &QAction::triggered, m_archiveWorkspace, &ArchiveWorkspace::extractAll);
+    connect(sendToConvertAction, &QAction::triggered, m_archiveWorkspace, &ArchiveWorkspace::sendSelectedToConvert);
+
+    QAction* openTexturesAction = command(tr("Open\ntextures"), tr("Open DTX, VTF, DDS, TGA, BMP, PNG or JPG files"), kIconTextureAdd);
+    QAction* openTextureFolderAction = command(tr("Open\nfolder"), tr("Open every texture in a folder and its sub-folders"), kIconFolder);
+    QAction* removeTexturesAction = command(tr("Remove"), tr("Remove the selected textures from the list"), kIconClose);
+    QAction* clearTexturesAction = command(tr("Clear"), tr("Remove every texture from the list"), kIconClear);
+    QAction* exportBmpAction = command(tr("Export\nBMP"), tr("Save every texture in the list, or the ones the search shows, as GoldSrc BMPs to the output folder"), kIconSave);
+    QAction* exportPngAction = command(tr("Export\nPNG"), tr("Save every texture in the list, or the ones the search shows, as PNGs to the output folder"), kIconSave);
+    connect(openTexturesAction, &QAction::triggered, this, [this]() {
+        showWorkspace(m_textureWorkspace);
+        m_textureWorkspace->openFilesDialog();
+    });
+    connect(openTextureFolderAction, &QAction::triggered, this, [this]() {
+        showWorkspace(m_textureWorkspace);
+        m_textureWorkspace->openFolderDialog();
+    });
+    connect(removeTexturesAction, &QAction::triggered, m_textureWorkspace, &TextureWorkspace::removeSelected);
+    connect(clearTexturesAction, &QAction::triggered, m_textureWorkspace, &TextureWorkspace::clear);
+    connect(exportBmpAction, &QAction::triggered, m_textureWorkspace, &TextureWorkspace::exportBmp);
+    connect(exportPngAction, &QAction::triggered, m_textureWorkspace, &TextureWorkspace::exportPng);
+
+    // the sprite and WAD tabs bring their own commands; a command shows its tab first
+    auto workspaceCommand = [this, &tool](QAction* action, const QString& label, const char* icon, QWidget* workspace) {
+        tool(action, label, icon);
+        connect(action, &QAction::triggered, this, [this, workspace]() { showWorkspace(workspace); }, Qt::DirectConnection);
+        return action;
+    };
+    workspaceCommand(m_spriteWorkspace->openAction(), tr("Open\nsprite"), kIconOpen, m_spriteWorkspace);
+    workspaceCommand(m_spriteWorkspace->saveAction(), tr("Save"), kIconSave, m_spriteWorkspace);
+    workspaceCommand(m_spriteWorkspace->saveAsAction(), tr("Save\nas"), kIconSave, m_spriteWorkspace);
+    workspaceCommand(m_spriteWorkspace->extractFrameAction(), tr("Extract\nframe"), kIconFrame, m_spriteWorkspace);
+    workspaceCommand(m_spriteWorkspace->extractAllFramesAction(), tr("Extract\nall"), kIconExtractAll, m_spriteWorkspace);
+    workspaceCommand(m_spriteWorkspace->previousAction(), tr("Previous"), kIconPrevious, m_spriteWorkspace);
+    workspaceCommand(m_spriteWorkspace->nextAction(), tr("Next"), kIconNext, m_spriteWorkspace);
+    workspaceCommand(m_spriteWorkspace->viewModeAction(), tr("View"), kIconView, m_spriteWorkspace);
+    workspaceCommand(m_spriteWorkspace->createModeAction(), tr("Create\nfrom images"), kIconCreate, m_spriteWorkspace);
+    workspaceCommand(m_spriteWorkspace->fixModeAction(), tr("Fix\nV3 to V2"), kIconFix, m_spriteWorkspace);
+    workspaceCommand(m_wadWorkspace->newAction(), tr("New\nWAD"), kIconFile, m_wadWorkspace);
+    workspaceCommand(m_wadWorkspace->openAction(), tr("Open\nWAD"), kIconOpen, m_wadWorkspace);
+    workspaceCommand(m_wadWorkspace->saveAction(), tr("Save"), kIconSave, m_wadWorkspace);
+    workspaceCommand(m_wadWorkspace->saveAsAction(), tr("Save\nas"), kIconSave, m_wadWorkspace);
+    workspaceCommand(m_wadWorkspace->addImagesAction(), tr("Add\nimages"), kIconTextureAdd, m_wadWorkspace);
+    workspaceCommand(m_wadWorkspace->removeAction(), tr("Remove"), kIconClose, m_wadWorkspace);
+    workspaceCommand(m_wadWorkspace->extractAction(), tr("Extract"), kIconExtract, m_wadWorkspace);
+    workspaceCommand(m_wadWorkspace->renameAction(), tr("Rename"), kIconRename, m_wadWorkspace);
+    m_audioConvertAction = new QAction(tr("Convert WAV for Goldsrc..."), this);
+    tool(m_audioConvertAction, tr("Convert\nWAV"), kIconAudio);
     connect(m_audioConvertAction, &QAction::triggered, this, &MainWindow::onOpenAudioConverter);
-
+    m_lolModelAction = new QAction(tr("League of Legends Models..."), this);
+    tool(m_lolModelAction, tr("LoL\nmodels"), kIconDownload);
+    connect(m_lolModelAction, &QAction::triggered, this, &MainWindow::onOpenLoLModelDownloader);
+    m_steamWorkshopAction = new QAction(tr("Steam Workshop Downloader..."), this);
+    tool(m_steamWorkshopAction, tr("Steam\nWorkshop"), kIconDownload);
+    connect(m_steamWorkshopAction, &QAction::triggered, this, &MainWindow::onOpenSteamWorkshopDownloader);
+#ifdef ENABLE_LITHTECH
+#endif
 #ifdef ENABLE_AUTORIG
-    m_autoRigAction = goldSrcMenu->addAction(tr("Auto-Rig (Beta)"));
+    m_autoRigAction = new QAction(tr("Auto-Rig (Beta)"), this);
+    tool(m_autoRigAction, tr("Auto-Rig\n(beta)"), kIconRig);
     connect(m_autoRigAction, &QAction::triggered, this, &MainWindow::onOpenAutoRigDialog);
 #endif
-    
-
-    // Other Submenu
-    QMenu* otherMenu = m_toolsMenu->addMenu(tr("Other"));
-
-    m_lolModelAction = otherMenu->addAction(tr("League of Legends Models..."));
-    connect(m_lolModelAction, &QAction::triggered, this, &MainWindow::onOpenLoLModelDownloader);
-
-    m_steamWorkshopAction = otherMenu->addAction(tr("Steam Workshop Downloader..."));
-    connect(m_steamWorkshopAction, &QAction::triggered, this, &MainWindow::onOpenSteamWorkshopDownloader);
-
-    m_xfsViewAction = otherMenu->addAction(tr("XFS Viewer (Xenesis File System)..."));
-    connect(m_xfsViewAction, &QAction::triggered, this, &MainWindow::onOpenXfsViewer);
-    
-
 #ifdef METIN2_SCRIPT_EFFECT
-    m_mseViewAction = otherMenu->addAction(tr("Metin2 Script Effect Viewer..."));
+    m_mseViewAction = new QAction(tr("Metin2 Script Effect Viewer..."), this);
+    tool(m_mseViewAction, tr("MSE\nviewer"), kIconSprite);
     connect(m_mseViewAction, &QAction::triggered, this, &MainWindow::onOpenMseViewer);
 #endif
 
-    // Settings menu
-    m_settingsMenu = menuBar()->addMenu(tr("Settings"));
+    const int convertTab = m_ribbon->addTab(tr("Convert"));
+    QWidget* filesGroup = m_ribbon->addGroup(convertTab, tr("Files"));
+    m_ribbon->addButton(filesGroup, m_addFilesAction);
+    m_ribbon->addButton(filesGroup, m_addFolderAction);
+    m_ribbon->addButton(filesGroup, m_clearListAction);
+    QWidget* runGroup = m_ribbon->addGroup(convertTab, tr("Run"));
+    m_ribbon->addButton(runGroup, m_runAction, true);
+    m_ribbon->addButton(runGroup, m_stopAction);
+    QWidget* modelGroup = m_ribbon->addGroup(convertTab, tr("Model"));
+    m_ribbon->addButton(modelGroup, m_writeQCAction);
+    m_ribbon->addButton(modelGroup, m_compileAction);
+    QWidget* outputGroup = m_ribbon->addGroup(convertTab, tr("Output"));
+    m_ribbon->addButton(outputGroup, m_outputFolderAction);
+    m_ribbon->addButton(outputGroup, m_openOutputAction);
+
+    const int archiveTab = m_ribbon->addTab(tr("Archives"));
+    m_persistentWorkspaces.push_back({ m_archiveWorkspace, archiveTab, tr("Archives") });
+    QWidget* archiveGroup = m_ribbon->addGroup(archiveTab, tr("Archive"));
+    m_ribbon->addButton(archiveGroup, openArchiveAction);
+    m_ribbon->addButton(archiveGroup, closeArchiveAction);
+    QWidget* extractGroup = m_ribbon->addGroup(archiveTab, tr("Extract"));
+    m_ribbon->addButton(extractGroup, extractSelectedAction);
+    m_ribbon->addButton(extractGroup, extractAllAction);
+    m_ribbon->addButton(extractGroup, sendToConvertAction);
+
+    const int textureTab = m_ribbon->addTab(tr("Textures"));
+    m_persistentWorkspaces.push_back({ m_textureWorkspace, textureTab, tr("Textures") });
+    QWidget* textureGroup = m_ribbon->addGroup(textureTab, tr("Textures"));
+    m_ribbon->addButton(textureGroup, openTexturesAction);
+    m_ribbon->addButton(textureGroup, openTextureFolderAction);
+    m_ribbon->addButton(textureGroup, removeTexturesAction);
+    m_ribbon->addButton(textureGroup, clearTexturesAction);
+    QWidget* textureExportGroup = m_ribbon->addGroup(textureTab, tr("Export"));
+    m_ribbon->addButton(textureExportGroup, exportBmpAction);
+    m_ribbon->addButton(textureExportGroup, exportPngAction);
+
+    const int spriteTab = m_ribbon->addTab(tr("Sprites"));
+    m_persistentWorkspaces.push_back({ m_spriteWorkspace, spriteTab, tr("Sprites") });
+    QWidget* spriteFileGroup = m_ribbon->addGroup(spriteTab, tr("Sprite"));
+    m_ribbon->addButton(spriteFileGroup, m_spriteWorkspace->openAction());
+    m_ribbon->addButton(spriteFileGroup, m_spriteWorkspace->saveAction());
+    m_ribbon->addButton(spriteFileGroup, m_spriteWorkspace->saveAsAction());
+    QWidget* spriteFramesGroup = m_ribbon->addGroup(spriteTab, tr("Frames"));
+    m_ribbon->addButton(spriteFramesGroup, m_spriteWorkspace->extractFrameAction());
+    m_ribbon->addButton(spriteFramesGroup, m_spriteWorkspace->extractAllFramesAction());
+    QWidget* spriteBrowseGroup = m_ribbon->addGroup(spriteTab, tr("Folder"));
+    m_ribbon->addButton(spriteBrowseGroup, m_spriteWorkspace->previousAction());
+    m_ribbon->addButton(spriteBrowseGroup, m_spriteWorkspace->nextAction());
+    QWidget* spriteModeGroup = m_ribbon->addGroup(spriteTab, tr("Mode"));
+    m_ribbon->addButton(spriteModeGroup, m_spriteWorkspace->viewModeAction());
+    m_ribbon->addButton(spriteModeGroup, m_spriteWorkspace->createModeAction());
+    m_ribbon->addButton(spriteModeGroup, m_spriteWorkspace->fixModeAction());
+
+    const int wadTab = m_ribbon->addTab(tr("WAD"));
+    m_persistentWorkspaces.push_back({ m_wadWorkspace, wadTab, tr("WAD") });
+    QWidget* wadFileGroup = m_ribbon->addGroup(wadTab, tr("WAD"));
+    m_ribbon->addButton(wadFileGroup, m_wadWorkspace->newAction());
+    m_ribbon->addButton(wadFileGroup, m_wadWorkspace->openAction());
+    m_ribbon->addButton(wadFileGroup, m_wadWorkspace->saveAction());
+    m_ribbon->addButton(wadFileGroup, m_wadWorkspace->saveAsAction());
+    QWidget* wadTextureGroup = m_ribbon->addGroup(wadTab, tr("Textures"));
+    m_ribbon->addButton(wadTextureGroup, m_wadWorkspace->addImagesAction());
+    m_ribbon->addButton(wadTextureGroup, m_wadWorkspace->removeAction());
+    m_ribbon->addButton(wadTextureGroup, m_wadWorkspace->extractAction());
+    m_ribbon->addButton(wadTextureGroup, m_wadWorkspace->renameAction());
+
+    const int toolsTab = m_ribbon->addTab(tr("Tools"));
+    QWidget* soundGroup = m_ribbon->addGroup(toolsTab, tr("Sound"));
+    m_ribbon->addButton(soundGroup, m_audioConvertAction);
+    QWidget* downloadGroup = m_ribbon->addGroup(toolsTab, tr("Download"));
+    m_ribbon->addButton(downloadGroup, m_lolModelAction);
+    m_ribbon->addButton(downloadGroup, m_steamWorkshopAction);
+#if defined(ENABLE_AUTORIG) || defined(METIN2_SCRIPT_EFFECT)
+    QWidget* experimentalGroup = m_ribbon->addGroup(toolsTab, tr("Experimental"));
+#endif
+#ifdef ENABLE_AUTORIG
+    m_ribbon->addButton(experimentalGroup, m_autoRigAction);
+#endif
+#ifdef METIN2_SCRIPT_EFFECT
+    m_ribbon->addButton(experimentalGroup, m_mseViewAction);
+#endif
+
+    // Settings, language, updates and about live in one menu at the end of the tab row
+    m_settingsMenu = new QMenu(this);
     m_settingsAction = m_settingsMenu->addAction(tr("Configure..."));
     connect(m_settingsAction, &QAction::triggered, this, &MainWindow::onOpenSettings);
 
-
-    // About Menu
-    QMenu* m_aboutMenu = menuBar()->addMenu(tr("About"));
-
-	m_vortiAboutAction = m_aboutMenu->addAction(tr("About Vortigaunt"));
-    connect(m_vortiAboutAction, &QAction::triggered, this, [this] { AboutDialog dlg(this); dlg.exec(); });
-
-	m_qtAboutAction = m_aboutMenu->addAction(tr("About Qt"));
-	connect(m_qtAboutAction, &QAction::triggered, this, &QApplication::aboutQt);
-    
-    // Update menu
-    QMenu* m_updateMenu = menuBar()->addMenu(tr("Update"));
-
-    m_checkUpdateAction = m_updateMenu->addAction(tr("Check for Updates..."));
-    connect(m_checkUpdateAction, &QAction::triggered, this, &MainWindow::onCheckForUpdates);
-    
-    // Language submenu
     m_languageMenu = m_settingsMenu->addMenu(tr("Language"));
-    QStringList languages = LanguageManager::instance().getAvailableLanguages();
-    QString currentLang = LanguageManager::instance().getCurrentLanguage();
-    
-    for (const QString& lang : languages)
-    {       
-        QString displayName = LanguageManager::instance().getLanguageDisplayName(lang);
-        QAction* langAction = m_languageMenu->addAction(displayName);
+    const QString currentLang = LanguageManager::instance().getCurrentLanguage();
+    for (const QString& lang : LanguageManager::instance().getAvailableLanguages())
+    {
+        QAction* langAction = m_languageMenu->addAction(LanguageManager::instance().getLanguageDisplayName(lang));
         langAction->setCheckable(true);
         langAction->setChecked(lang.toLower() == currentLang.toLower());
         langAction->setData(lang);
-        
         connect(langAction, &QAction::triggered, this, [this, lang]() {
-            QString currentLang = LanguageManager::instance().getCurrentLanguage();
-            if (lang.toLower() != currentLang.toLower())
-            {
-                LanguageManager::instance().loadLanguage(lang);
-                
-                // Show restart dialog
-                // I did this on purpose ngl i dont want mess up directlyx load. maybe later
-                QMessageBox msgBox(this);
-                msgBox.setWindowTitle(tr("Restart Required"));
-                msgBox.setText(tr("The application needs to restart for the language change to take effect."));
-                msgBox.setIcon(QMessageBox::Information);
-                msgBox.setStandardButtons(QMessageBox::Ok);
-                msgBox.exec();
-                
-                // Restart application
-                QProcess::startDetached(QCoreApplication::applicationFilePath(), QCoreApplication::arguments());
-                QCoreApplication::quit();
-            }
+            if (lang.toLower() == LanguageManager::instance().getCurrentLanguage().toLower())
+                return;
+            LanguageManager::instance().loadLanguage(lang);
+            QMessageBox msgBox(this);
+            msgBox.setWindowTitle(tr("Restart Required"));
+            msgBox.setText(tr("The application needs to restart for the language change to take effect."));
+            msgBox.setIcon(QMessageBox::Information);
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.exec();
+            QProcess::startDetached(QCoreApplication::applicationFilePath(), QCoreApplication::arguments());
+            QCoreApplication::quit();
         });
     }
-    
-    QWidget* cornerWidget = new QWidget(this);
-    QHBoxLayout* cornerLayout = new QHBoxLayout(cornerWidget);
-    cornerLayout->setContentsMargins(0, 0, 16, 0); // slight right margin
-    cornerLayout->setSpacing(8);
 
+    m_resetLayoutAction = m_settingsMenu->addAction(tr("Reset panel layout"));
+    connect(m_resetLayoutAction, &QAction::triggered, this, [this]() {
+        restoreState(m_defaultLayout);
+        for (QDockWidget* dock : { m_filesDock, m_propertiesDock, m_logDock })
+            dock->show();
+    });
+    m_settingsMenu->addSeparator();
+    m_checkUpdateAction = m_settingsMenu->addAction(tr("Check for Updates..."));
+    connect(m_checkUpdateAction, &QAction::triggered, this, &MainWindow::onCheckForUpdates);
+    m_vortiAboutAction = m_settingsMenu->addAction(tr("About Vortigaunt"));
+    connect(m_vortiAboutAction, &QAction::triggered, this, [this] { AboutDialog dlg(this); dlg.exec(); });
+    m_qtAboutAction = m_settingsMenu->addAction(tr("About Qt"));
+    connect(m_qtAboutAction, &QAction::triggered, this, &QApplication::aboutQt);
 
-    // i know most ppl tryna click this but they close the app 
-    // so TODO: find a better place for this
-    const QString menuBtnStyle = R"(
-        QPushButton {
-            border: none; padding: 4px 8px; background: transparent;
-            color: palette(windowText);
-        }
-        QPushButton:hover {
-            background: rgba(128, 128, 128, 0.15);
-        }
-        QPushButton:pressed {
-            background: rgba(128, 128, 128, 0.25);
-        }
-    )";
-
-    QPushButton* discordBtn = new QPushButton(tr("Discord"), cornerWidget);
-    discordBtn->setIcon(QIcon(":/discord.png"));
-    discordBtn->setIconSize(QSize(20, 20));
+    auto cornerButton = [this](const QString& text, const QIcon& icon) {
+        auto* button = new QToolButton(m_ribbon);
+        button->setText(text);
+        button->setIcon(icon);
+        button->setIconSize(QSize(18, 18));
+        button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        button->setAutoRaise(true);
+        button->setCursor(Qt::PointingHandCursor);
+        m_ribbon->corner()->addWidget(button);
+        return button;
+    };
+    QToolButton* discordBtn = cornerButton(tr("Discord"), QIcon(":/discord.png"));
     discordBtn->setToolTip(tr("Join our Discord"));
-    discordBtn->setFlat(true);
-    discordBtn->setCursor(Qt::PointingHandCursor);
-    discordBtn->setStyleSheet(menuBtnStyle);
-    connect(discordBtn, &QPushButton::clicked, this, []() {
+    connect(discordBtn, &QToolButton::clicked, this, []() {
         QDesktopServices::openUrl(QUrl("https://discord.gg/PZ9JzgHHKa"));
     });
-    cornerLayout->addWidget(discordBtn);
-
-    QPushButton* githubBtn = new QPushButton(tr("GitHub"), cornerWidget);
-    githubBtn->setIcon(QIcon(":/github.png"));
-    githubBtn->setIconSize(QSize(20, 20));
+    QToolButton* githubBtn = cornerButton(tr("GitHub"), QIcon(":/github.png"));
     githubBtn->setToolTip(tr("GitHub Repository of Vortigaunt"));
-    githubBtn->setFlat(true);
-    githubBtn->setCursor(Qt::PointingHandCursor);
-    githubBtn->setStyleSheet(menuBtnStyle);
-    connect(githubBtn, &QPushButton::clicked, this, []() {
+    connect(githubBtn, &QToolButton::clicked, this, []() {
         QDesktopServices::openUrl(QUrl("https://github.com/iQuitt/Vortigaunt"));
     });
-    cornerLayout->addWidget(githubBtn);
+    QToolButton* settingsBtn = cornerButton(tr("Settings"), UiUtils::lineIcon(QString::fromLatin1(kIconSettings), 18));
+    settingsBtn->setMenu(m_settingsMenu);
+    settingsBtn->setPopupMode(QToolButton::InstantPopup);
 
-    menuBar()->setCornerWidget(cornerWidget, Qt::TopRightCorner);
+    connect(m_ribbon, &RibbonBar::currentTabChanged, this, [this](int tab) {
+        if (tab == 0)
+        {
+            m_workspaces->setCurrentIndex(0);
+            return;
+        }
+        for (const Workspace& workspace : m_persistentWorkspaces)
+        {
+            if (workspace.ribbonTab == tab)
+                showWorkspace(workspace.widget);
+        }
+    });
+}
 
-    auto* central = new QWidget(this);
-    auto* mainLayout = new QVBoxLayout();
+void MainWindow::setupDocks()
+{
+    // Files
+    auto* filesPanel = new QWidget(this);
+    auto* filesLayout = new QVBoxLayout(filesPanel);
+    filesLayout->setContentsMargins(0, 0, 0, 0);
+    filesLayout->setSpacing(0);
 
-    // Input group
-    auto* inputGroup = new QGroupBox(tr("Input"));
-    auto* inputLayout = new QVBoxLayout();
+    m_fileList = new QTreeWidget(filesPanel);
+    m_fileList->setObjectName("FileList");
+    m_fileList->setColumnCount(3);
+    m_fileList->setHeaderLabels({ tr("File"), tr("Operation"), tr("Status") });
+    m_fileList->setRootIsDecorated(false);
+    m_fileList->setUniformRowHeights(true);
+    m_fileList->setAlternatingRowColors(true);
+    m_fileList->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    m_fileList->header()->setStretchLastSection(false);
+    m_fileList->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+    m_fileList->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    m_fileList->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    m_fileList->setContextMenuPolicy(Qt::ActionsContextMenu);
+    auto* removeAction = new QAction(tr("Remove from list"), m_fileList);
+    removeAction->setShortcut(QKeySequence::Delete);
+    removeAction->setShortcutContext(Qt::WidgetShortcut);
+    m_fileList->addAction(removeAction);
+    connect(removeAction, &QAction::triggered, this, [this]() {
+        if (m_isProcessing)
+            return;
+        qDeleteAll(m_fileList->selectedItems());
+        onFileSelectionChanged();
+    });
+    connect(m_fileList, &QTreeWidget::itemSelectionChanged, this, &MainWindow::onFileSelectionChanged);
+    filesLayout->addWidget(m_fileList, 1);
 
-    auto* pathLayout = new QHBoxLayout();
-    pathLayout->addWidget(new QLabel(tr("Path:")));
-    m_inputPathEdit = new QLineEdit();
-    m_inputPathEdit->setPlaceholderText(tr("Select input file or drag & drop here..."));
-    m_browseInputButton = new QPushButton(tr("Browse..."));
-    pathLayout->addWidget(m_inputPathEdit, 1);
-    pathLayout->addWidget(m_browseInputButton);
+    m_fileCountLabel = new QLabel(filesPanel);
+    m_fileCountLabel->setContentsMargins(6, 4, 6, 4);
+    m_fileCountLabel->setForegroundRole(QPalette::PlaceholderText);
+    filesLayout->addWidget(m_fileCountLabel);
 
-    inputLayout->addLayout(pathLayout);
-    inputGroup->setLayout(inputLayout);
+    m_filesDock = new QDockWidget(tr("Files"), this);
+    m_filesDock->setObjectName("FilesDock");
+    m_filesDock->setWidget(filesPanel);
+    addDockWidget(Qt::LeftDockWidgetArea, m_filesDock);
 
-    // Output group
-    auto* outputGroup = new QGroupBox(tr("Output"));
-    auto* outputLayout = new QHBoxLayout();
-    outputLayout->addWidget(new QLabel(tr("Folder (optional):")));
-    m_outputPathEdit = new QLineEdit();
-    m_outputPathEdit->setPlaceholderText(tr("Leave empty for default output folder..."));
-    m_browseOutputButton = new QPushButton(tr("Browse..."));
-    outputLayout->addWidget(m_outputPathEdit, 1);
-    outputLayout->addWidget(m_browseOutputButton);
-    outputGroup->setLayout(outputLayout);
+    // Properties
+    auto* properties = new QWidget(this);
+    auto* propertiesLayout = new QVBoxLayout(properties);
 
-    // Operation + options
-    auto* optionsGroup = new QGroupBox(tr("Operation"));
-    auto* optionsLayout = new QVBoxLayout();
+    m_selectedNameLabel = new QLabel(properties);
+    QFont nameFont = m_selectedNameLabel->font();
+    nameFont.setBold(true);
+    m_selectedNameLabel->setFont(nameFont);
+    m_selectedNameLabel->setWordWrap(true);
+    propertiesLayout->addWidget(m_selectedNameLabel);
 
-    auto* opLayout = new QHBoxLayout();
-    opLayout->addWidget(new QLabel(tr("Mode:")));
-    m_operationCombo = new QComboBox();
-    m_operationCombo->addItem(tr("Convert LTB"));
-    m_operationCombo->addItem(tr("Convert GR2"));
-    m_operationCombo->addItem(tr("Convert FBX/GLB/OBJ"));
-    m_operationCombo->addItem(tr("Convert V model to P/W model"));
-#ifdef METIN2_SCRIPT_EFFECT
-    m_operationCombo->addItem(tr("Convert MSE Effect (Metin2 Effect Script)"));
-#endif
-    m_operationCombo->addItem(tr("Extract REZ file"));
-    //m_operationCombo->addItem(tr("Multi-REZ extract (folder with  REZ)"));
-    m_operationCombo->addItem(tr("PAK (Counter Strike Online)"));
-    m_operationCombo->addItem(tr("Extract VPK / GMA (Source Engine)"));
-    //m_operationCombo->addItem(tr("Multi-PAK extract (folder with PAK)"));
-    m_operationCombo->addItem(tr("Extract UnityFS / Assets"));
-    opLayout->addWidget(m_operationCombo, 1);
-    optionsLayout->addLayout(opLayout);
+    auto* opRow = new QHBoxLayout();
+    opRow->addWidget(new QLabel(tr("Operation:"), properties));
+    m_fileOpCombo = new QComboBox(properties);
+    for (FileOp op : { FileOp::None, FileOp::Ltb, FileOp::Gr2, FileOp::Mesh, FileOp::Weapon, FileOp::Dtx,
+                       FileOp::Rez, FileOp::Pak, FileOp::Xfs, FileOp::Vpk, FileOp::Unity })
+    {
+        m_fileOpCombo->addItem(fileOpName(op), static_cast<int>(op));
+    }
+    m_fileOpCombo->setToolTip(tr("Picked from the file name; change it when the guess is wrong"));
+    opRow->addWidget(m_fileOpCombo, 1);
+    propertiesLayout->addLayout(opRow);
+    connect(m_fileOpCombo, QOverload<int>::of(&QComboBox::activated), this, [this](int index) {
+        const FileOp op = static_cast<FileOp>(m_fileOpCombo->itemData(index).toInt());
+        for (QTreeWidgetItem* item : m_fileList->selectedItems())
+        {
+            item->setData(0, kOpRole, static_cast<int>(op));
+            item->setText(1, fileOpName(op));
+        }
+        onFileSelectionChanged();
+    });
 
-    // Output format for LTB/GR2
-    auto* fmtLayout = new QHBoxLayout();
-    m_outputFormatLabel = new QLabel(tr("Convert To:"));
-    fmtLayout->addWidget(m_outputFormatLabel);
-    m_outputFormatCombo = new QComboBox();
-    m_outputFormatCombo->addItem(tr("SMD (GoldSource)"), QStringLiteral("smd"));
-    fmtLayout->addWidget(m_outputFormatCombo, 1);
-    optionsLayout->addLayout(fmtLayout);
+    m_noSelectionLabel = new QLabel(tr("Select a file in the list to see its settings."), properties);
+    m_noSelectionLabel->setWordWrap(true);
+    m_noSelectionLabel->setForegroundRole(QPalette::PlaceholderText);
+    propertiesLayout->addWidget(m_noSelectionLabel);
 
-
-
-    m_ignoreMeshesCheck = new QCheckBox(tr("Ignore meshes"));
-	m_ignoreMeshesCheck->setVisible(false); 
-
-    m_ignoreAnimsCheck = new QCheckBox(tr("Ignore animations"));
-    m_ignoreAnimsCheck->setVisible(false);
-
-    m_separateFoldersCheck = new QCheckBox(tr("Extract multiple file to separate folders"));
-    m_separateFoldersCheck->setChecked(false);
-	m_separateFoldersCheck->setVisible(false);
-    m_separateFoldersCheck->setToolTip(tr("When extracting REZ/PAK/XFS files, create a separate folder for each file"));
-
-    m_unityBmpCheck = new QCheckBox(tr("Convert textures to BMP (8-bit)"));
-    m_unityBmpCheck->setChecked(true);
-    m_unityBmpCheck->setVisible(false);
-    m_unityBmpCheck->setToolTip(tr("When unchecked, Unity textures are exported as 32-bit PNG with alpha channel"));
-
-    optionsLayout->addWidget(m_ignoreMeshesCheck);
-    optionsLayout->addWidget(m_ignoreAnimsCheck);
-    optionsLayout->addWidget(m_separateFoldersCheck);
-    optionsLayout->addWidget(m_unityBmpCheck);
-    
-
-
-    optionsGroup->setLayout(optionsLayout);
-
-    // GR2 Animation Export Group (initially hidden)
-    m_gr2AnimGroup = new QGroupBox(tr("GR2 Animation Files"));
-    auto* animLayout = new QVBoxLayout();
-    
-    animLayout->addWidget(new QLabel(tr("Animations (will be exported to {filename}_anims folder):\nDrag and drop animation files here or use the browse button.")));
-    m_animationListWidget = new QListWidget();
-    m_animationListWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    m_animationListWidget->setAcceptDrops(true);
-    m_animationListWidget->setDragDropMode(QAbstractItemView::DropOnly);
-    m_animationListWidget->viewport()->setAcceptDrops(true);
-    animLayout->addWidget(m_animationListWidget);
-    
-    // Install event filter for drag-drop on animation list
-    m_animationListWidget->viewport()->installEventFilter(this);
-    
-    // Browse button to add animation files
-    auto* animButtonLayout = new QHBoxLayout();
-    auto* browseAnimButton = new QPushButton(tr("Browse Animation Files..."));
-    animButtonLayout->addWidget(browseAnimButton);
-    animButtonLayout->addStretch();
-    animLayout->addLayout(animButtonLayout);
-    
-    m_gr2AnimGroup->setLayout(animLayout);
-    m_gr2AnimGroup->setVisible(false); // Hidden by default
-
-    // Run button with Mirror UV Y checkbox (initially hidden, shown only for GR2)
-	// When you export the GR2 to Smd or another format, the texture UV Y axis is flipped.
-	// Generally you need this option enabled for correct texture orientation.
-    auto* runLayout = new QHBoxLayout();
-    m_mirrorUVYCheck = new QCheckBox(tr("Mirror UV Y-axis"));
-    m_mirrorUVYCheck->setToolTip(tr("Mirror UV Y-axis for GR2 to SMD conversion (fixes texture orientation)"));
-    m_mirrorUVYCheck->setVisible(false); // Hidden by default, shown only for GR2
-    runLayout->addWidget(m_mirrorUVYCheck);
-    
-
-	// TODO: its just for only GR2. Make for other formats too
-    m_writeQCCheck = new QCheckBox(tr("Write QC"));
-    m_writeQCCheck->setToolTip(tr("Generate QC file for studiomdl compilation"));
-    m_writeQCCheck->setVisible(false); // Hidden by default, shown only for GR2
-    runLayout->addWidget(m_writeQCCheck);
-
-    // Shown with Write QC; there is nothing to compile without a QC
-    m_compileModelCheck = new QCheckBox(tr("Compile model"));
-    m_compileModelCheck->setToolTip(tr("Run studiomdl on the QC to produce the .mdl. Set the location of studiomdl in Settings."));
-    m_compileModelCheck->setVisible(false);
-    m_compileModelCheck->setEnabled(m_writeQCCheck->isChecked());
-    runLayout->addWidget(m_compileModelCheck);
-    connect(m_writeQCCheck, &QCheckBox::toggled, m_compileModelCheck, &QCheckBox::setEnabled);
-
-    // V model -> P/W model: size and mirroring of the result
-    m_weaponScaleLabel = new QLabel(tr("Scale:"));
-    m_weaponScaleSpin = new QDoubleSpinBox();
-    m_weaponScaleSpin->setRange(0.0, 20.0);
-    m_weaponScaleSpin->setDecimals(2);
-    m_weaponScaleSpin->setSingleStep(0.05);
-    m_weaponScaleSpin->setValue(0.0);
-    m_weaponScaleSpin->setSpecialValueText(tr("Auto"));
-    m_weaponScaleSpin->setToolTip(tr("Size of the P/W model relative to the V model. Auto works it out from the size of the V model's hands; "
-                                     "the log shows the value it used, which is a good starting point for setting it by hand."));
-    m_weaponMirrorLabel = new QLabel(tr("Mirror:"));
-    m_weaponMirrorCombo = new QComboBox();
-    m_weaponMirrorCombo->addItem(tr("Auto"), -1);
-    m_weaponMirrorCombo->addItem(tr("Yes"), 1);
-    m_weaponMirrorCombo->addItem(tr("No"), 0);
-    m_weaponMirrorCombo->setToolTip(tr("V models are usually built left handed and flipped by the engine, so the P/W model has to be the mirror image. "
-                                       "Auto mirrors when the weapon stands on the left of the view."));
-    m_gameDirLabel = new QLabel(tr("Game:"));
-    m_gameDirCombo = new QComboBox();
+    // V model -> P/W model
+    m_weaponGroup = new QGroupBox(tr("Weapon"), properties);
+    auto* weaponForm = new QFormLayout(m_weaponGroup);
+    m_gameDirCombo = new QComboBox(m_weaponGroup);
     m_gameDirCombo->addItem(tr("Counter-Strike"), static_cast<int>(GameDir::cstrike));
     m_gameDirCombo->addItem(tr("Half-Life"), static_cast<int>(GameDir::valve));
     m_gameDirCombo->addItem(tr("Sven Co-op"), static_cast<int>(GameDir::svencoop));
     m_gameDirCombo->setToolTip(tr("The game the P model is for. Each has its own player skeleton and hand size, "
                                      "and holds a weapon a little differently."));
+    weaponForm->addRow(tr("Game:"), m_gameDirCombo);
 
-    m_weaponTypeLabel = new QLabel(tr("Weapon:"));
-    m_weaponTypeCombo = new QComboBox();
+    m_weaponTypeCombo = new QComboBox(m_weaponGroup);
     m_weaponTypeCombo->addItem(tr("Auto"), static_cast<int>(WeaponType::Auto));
     m_weaponTypeCombo->addItem(tr("Gun"), static_cast<int>(WeaponType::Gun));
     m_weaponTypeCombo->addItem(tr("Knife / melee"), static_cast<int>(WeaponType::Knife));
@@ -474,11 +641,18 @@ MainWindow::MainWindow(QWidget* parent)
     m_weaponTypeCombo->setToolTip(tr("How the player holds the weapon. P models of one kind all sit in the hand the same way: "
                                      "a gun points along the hand, a knife stands up out of the fist, a grenade lies in the palm. "
                                      "For anything else, pick a p_ model that is held the way this one should be."));
-    m_weaponReferenceEdit = new QLineEdit();
+    weaponForm->addRow(tr("Weapon:"), m_weaponTypeCombo);
+
+    auto* referenceRow = new QWidget(m_weaponGroup);
+    auto* referenceLayout = new QHBoxLayout(referenceRow);
+    referenceLayout->setContentsMargins(0, 0, 0, 0);
+    m_weaponReferenceEdit = new QLineEdit(referenceRow);
     m_weaponReferenceEdit->setPlaceholderText(tr("Reference p_ model (.mdl)"));
-    m_weaponReferenceEdit->setMinimumWidth(80);
-    m_weaponReferenceBrowse = new QPushButton(tr("..."));
+    m_weaponReferenceBrowse = new QPushButton(tr("..."), referenceRow);
     m_weaponReferenceBrowse->setMaximumWidth(32);
+    referenceLayout->addWidget(m_weaponReferenceEdit, 1);
+    referenceLayout->addWidget(m_weaponReferenceBrowse);
+    weaponForm->addRow(referenceRow);
     connect(m_weaponReferenceBrowse, &QPushButton::clicked, this, [this]() {
         const QString file = QFileDialog::getOpenFileName(this, tr("Select a reference p_ model"), m_weaponReferenceEdit->text(),
                                                           tr("GoldSrc model (*.mdl);;All files (*.*)"));
@@ -487,216 +661,650 @@ MainWindow::MainWindow(QWidget* parent)
     });
     connect(m_weaponTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int) { updateWeaponModelControls(); });
 
-    m_weaponUpsideDownCheck = new QCheckBox(tr("Upside down"));
+    m_weaponScaleSpin = new QDoubleSpinBox(m_weaponGroup);
+    m_weaponScaleSpin->setRange(0.0, 20.0);
+    m_weaponScaleSpin->setDecimals(2);
+    m_weaponScaleSpin->setSingleStep(0.05);
+    m_weaponScaleSpin->setValue(0.0);
+    m_weaponScaleSpin->setSpecialValueText(tr("Auto"));
+    m_weaponScaleSpin->setToolTip(tr("Size of the P/W model relative to the V model. Auto works it out from the size of the V model's hands; "
+                                     "the log shows the value it used, which is a good starting point for setting it by hand."));
+    weaponForm->addRow(tr("Scale:"), m_weaponScaleSpin);
+
+    m_weaponMirrorCombo = new QComboBox(m_weaponGroup);
+    m_weaponMirrorCombo->addItem(tr("Auto"), -1);
+    m_weaponMirrorCombo->addItem(tr("Yes"), 1);
+    m_weaponMirrorCombo->addItem(tr("No"), 0);
+    m_weaponMirrorCombo->setToolTip(tr("V models are usually built left handed and flipped by the engine, so the P/W model has to be the mirror image. "
+                                       "Auto mirrors when the weapon stands on the left of the view."));
+    weaponForm->addRow(tr("Mirror:"), m_weaponMirrorCombo);
+
+    m_weaponUpsideDownCheck = new QCheckBox(tr("Upside down"), m_weaponGroup);
     m_weaponUpsideDownCheck->setToolTip(tr("Turns the weapon end for end in the hand. For a grenade or knife that came out the wrong way up."));
+    weaponForm->addRow(m_weaponUpsideDownCheck);
+    propertiesLayout->addWidget(m_weaponGroup);
 
-    auto* weaponLayout = new QHBoxLayout();
-    for (QWidget* w : { static_cast<QWidget*>(m_gameDirLabel), static_cast<QWidget*>(m_gameDirCombo),
-                        static_cast<QWidget*>(m_weaponTypeLabel), static_cast<QWidget*>(m_weaponTypeCombo),
-                        static_cast<QWidget*>(m_weaponReferenceEdit), static_cast<QWidget*>(m_weaponReferenceBrowse),
-                        static_cast<QWidget*>(m_weaponUpsideDownCheck),
-                        static_cast<QWidget*>(m_weaponScaleLabel), static_cast<QWidget*>(m_weaponScaleSpin),
-                        static_cast<QWidget*>(m_weaponMirrorLabel), static_cast<QWidget*>(m_weaponMirrorCombo) })
-    {
-        w->setVisible(false);
-        weaponLayout->addWidget(w, w == m_weaponReferenceEdit ? 1 : 0);
-    }
-    weaponLayout->addStretch();
-    
-    runLayout->addStretch();
-    
-    //runLayout->addStretch();
-    
-    
-    m_runButton = new QPushButton(tr("Convert")); 
+    // GR2 animations
+    m_gr2AnimGroup = new QGroupBox(tr("GR2 Animation Files"), properties);
+    auto* animLayout = new QVBoxLayout(m_gr2AnimGroup);
+    auto* animHint = new QLabel(tr("Animations (will be exported to {filename}_anims folder):\nDrag and drop animation files here or use the browse button."), m_gr2AnimGroup);
+    animHint->setWordWrap(true);
+    animLayout->addWidget(animHint);
+    m_animationListWidget = new QListWidget(m_gr2AnimGroup);
+    m_animationListWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    m_animationListWidget->setAcceptDrops(true);
+    m_animationListWidget->setDragDropMode(QAbstractItemView::DropOnly);
+    m_animationListWidget->viewport()->setAcceptDrops(true);
+    m_animationListWidget->viewport()->installEventFilter(this);
+    m_animationListWidget->setMinimumHeight(90);
+    animLayout->addWidget(m_animationListWidget);
+    auto* browseAnimButton = new QPushButton(tr("Browse Animation Files..."), m_gr2AnimGroup);
+    animLayout->addWidget(browseAnimButton, 0, Qt::AlignLeft);
+    connect(browseAnimButton, &QPushButton::clicked, this, [this]() {
+        const QStringList files = QFileDialog::getOpenFileNames(this, tr("Select Animation Files"), QString(),
+                                                                tr("Animation files (*.smd *.gr2);;All files (*.*)"));
+        for (const QString& file : files)
+        {
+            const QString fileName = QFileInfo(file).fileName();
+            bool found = false;
+            for (int i = 0; i < m_animationListWidget->count() && !found; ++i)
+            {
+                QListWidgetItem* existingItem = m_animationListWidget->item(i);
+                found = existingItem->text() == fileName || existingItem->data(Qt::UserRole).toString() == file;
+            }
+            if (!found)
+                gr2AddAnimationItem(fileName, file);
+        }
+    });
+    // When you export the GR2 to Smd or another format, the texture UV Y axis is flipped.
+    // Generally you need this option enabled for correct texture orientation.
+    m_mirrorUVYCheck = new QCheckBox(tr("Mirror UV Y-axis"), m_gr2AnimGroup);
+    m_mirrorUVYCheck->setToolTip(tr("Mirror UV Y-axis for GR2 to SMD conversion (fixes texture orientation)"));
+    m_mirrorUVYCheck->setChecked(SettingsDialog::getMirrorUVY());
+    connect(m_mirrorUVYCheck, &QCheckBox::toggled, this, [](bool checked) {
+        SettingsDialog::setMirrorUVY(checked);
+    });
+    animLayout->addWidget(m_mirrorUVYCheck);
+    propertiesLayout->addWidget(m_gr2AnimGroup);
 
-    m_runButton->setText(tr("Run")); 
-    runLayout->addWidget(m_runButton);
+    // Model output
+    m_modelGroup = new QGroupBox(tr("Model"), properties);
+    auto* modelLayout = new QVBoxLayout(m_modelGroup);
+    m_writeQCCheck = new QCheckBox(tr("Write QC"), m_modelGroup);
+    m_writeQCCheck->setToolTip(tr("Generate QC file for studiomdl compilation"));
+    modelLayout->addWidget(m_writeQCCheck);
+    // Shown with Write QC; there is nothing to compile without a QC
+    m_compileModelCheck = new QCheckBox(tr("Compile model"), m_modelGroup);
+    m_compileModelCheck->setToolTip(tr("Run studiomdl on the QC to produce the .mdl. Set the location of studiomdl in Settings."));
+    m_compileModelCheck->setEnabled(false);
+    connect(m_writeQCCheck, &QCheckBox::toggled, m_compileModelCheck, &QCheckBox::setEnabled);
+    modelLayout->addWidget(m_compileModelCheck);
+    m_ignoreMeshesCheck = new QCheckBox(tr("Ignore meshes"), m_modelGroup);
+    m_ignoreAnimsCheck = new QCheckBox(tr("Ignore animations"), m_modelGroup);
+    modelLayout->addWidget(m_ignoreMeshesCheck);
+    modelLayout->addWidget(m_ignoreAnimsCheck);
+    propertiesLayout->addWidget(m_modelGroup);
+
+    m_archiveGroup = new QGroupBox(tr("Extract"), properties);
+    auto* archiveLayout = new QVBoxLayout(m_archiveGroup);
+    m_separateFoldersCheck = new QCheckBox(tr("Extract multiple file to separate folders"), m_archiveGroup);
+    m_separateFoldersCheck->setToolTip(tr("When extracting REZ/PAK/XFS files, create a separate folder for each file"));
+    archiveLayout->addWidget(m_separateFoldersCheck);
+    propertiesLayout->addWidget(m_archiveGroup);
+
+    m_unityGroup = new QGroupBox(tr("Unity"), properties);
+    auto* unityLayout = new QVBoxLayout(m_unityGroup);
+    m_unityBmpCheck = new QCheckBox(tr("Convert textures to BMP (8-bit)"), m_unityGroup);
+    m_unityBmpCheck->setChecked(true);
+    m_unityBmpCheck->setToolTip(tr("When unchecked, Unity textures are exported as 32-bit PNG with alpha channel"));
+    unityLayout->addWidget(m_unityBmpCheck);
+    propertiesLayout->addWidget(m_unityGroup);
+
+    m_textureGroup = new QGroupBox(tr("Texture"), properties);
+    auto* textureLayout = new QVBoxLayout(m_textureGroup);
+    auto* textureNote = new QLabel(tr("Written as an 8-bit BMP of at most 512 x 512. The alpha channel is a gloss mask in DTX textures and is left out."), m_textureGroup);
+    textureNote->setWordWrap(true);
+    textureLayout->addWidget(textureNote);
+    propertiesLayout->addWidget(m_textureGroup);
+
+    propertiesLayout->addStretch();
+
+    auto* propertiesScroll = new QScrollArea(this);
+    propertiesScroll->setWidgetResizable(true);
+    propertiesScroll->setFrameShape(QFrame::NoFrame);
+    propertiesScroll->setWidget(properties);
+
+    m_propertiesDock = new QDockWidget(tr("Properties"), this);
+    m_propertiesDock->setObjectName("PropertiesDock");
+    m_propertiesDock->setWidget(propertiesScroll);
+    addDockWidget(Qt::RightDockWidgetArea, m_propertiesDock);
 
     // Log with filtering and export
-    auto* logGroup = new QGroupBox(tr("Log"));
-    auto* logLayout = new QVBoxLayout();
-    
-    // Log toolbar
+    auto* logPanel = new QWidget(this);
+    auto* logLayout = new QVBoxLayout(logPanel);
+    logLayout->setContentsMargins(4, 4, 4, 4);
     auto* logToolbarLayout = new QHBoxLayout();
-    logToolbarLayout->addWidget(new QLabel(tr("Filter:")));
-    m_logFilterCombo = new QComboBox();
+    logToolbarLayout->addWidget(new QLabel(tr("Filter:"), logPanel));
+    m_logFilterCombo = new QComboBox(logPanel);
     m_logFilterCombo->addItem(tr("All"), static_cast<int>(VortigauntLog::LogLevel::Info));
     m_logFilterCombo->addItem(tr("Info"), static_cast<int>(VortigauntLog::LogLevel::Info));
     m_logFilterCombo->addItem(tr("Warning"), static_cast<int>(VortigauntLog::LogLevel::Warning));
     m_logFilterCombo->addItem(tr("Error"), static_cast<int>(VortigauntLog::LogLevel::Error));
     logToolbarLayout->addWidget(m_logFilterCombo);
     logToolbarLayout->addStretch();
-    
-    m_clearLogButton = new QPushButton(tr("Clear Log"));
-    m_saveLogButton = new QPushButton(tr("Export Log..."));
+    m_clearLogButton = new QPushButton(tr("Clear Log"), logPanel);
+    m_saveLogButton = new QPushButton(tr("Export Log..."), logPanel);
     logToolbarLayout->addWidget(m_clearLogButton);
     logToolbarLayout->addWidget(m_saveLogButton);
-    
-    m_logEdit = new QPlainTextEdit();
-    m_logEdit->setReadOnly(true);
-    m_logEdit->setFont(QFont("Consolas", 9)); 
-    
-    VortigauntLog::addLogWidget(m_logEdit);
-    
     logLayout->addLayout(logToolbarLayout);
-    logLayout->addWidget(m_logEdit);
-    logGroup->setLayout(logLayout);
 
-    mainLayout->addWidget(inputGroup);
-    mainLayout->addWidget(outputGroup);
-    mainLayout->addWidget(optionsGroup);
-    mainLayout->addWidget(m_gr2AnimGroup);
-    mainLayout->addLayout(weaponLayout);
-    mainLayout->addLayout(runLayout);
-    mainLayout->addWidget(logGroup, 1);
+    m_logEdit = new QPlainTextEdit(logPanel);
+    m_logEdit->setReadOnly(true);
+    m_logEdit->setAcceptDrops(false);
+    m_logEdit->setFont(QFont("Consolas", 9));
+    VortigauntLog::addLogWidget(m_logEdit);
+    logLayout->addWidget(m_logEdit, 1);
 
-    central->setLayout(mainLayout);
-    setCentralWidget(central);
-
-
-
-    connect(m_browseInputButton, &QPushButton::clicked, this, &MainWindow::onBrowseInput);
-    connect(m_browseOutputButton, &QPushButton::clicked, this, &MainWindow::onBrowseOutput);
-    connect(m_runButton, &QPushButton::clicked, this, &MainWindow::onRun);
     connect(m_logFilterCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onLogFilterChanged);
     connect(m_saveLogButton, &QPushButton::clicked, this, &MainWindow::onExportLog);
     connect(m_clearLogButton, &QPushButton::clicked, this, &MainWindow::onClearLog);
-    
-    // Browse animation files button
-    connect(browseAnimButton, &QPushButton::clicked, this, [this]() {
-        QStringList files = QFileDialog::getOpenFileNames(this,
-                                                          tr("Select Animation Files"),
-                                                          QString(),
-                                                          tr("Animation files (*.smd *.gr2);;All files (*.*)"));
-       for (const QString& file : files)
-        {
-            QFileInfo fileInfo(file);
-            QString fileName = fileInfo.fileName();
-            // Check if already in list
-            bool found = false;
-            for (int i = 0; i < m_animationListWidget->count(); ++i)
-            {
-                QListWidgetItem* existingItem = m_animationListWidget->item(i);
-                QString existingPath = existingItem->data(Qt::UserRole).toString();
-                if (existingItem->text() == fileName || existingPath == file)
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)
-            {
-                gr2AddAnimationItem(fileName, file);
-            }
-        }
-    });
-    
-    // Update operation combo when input path changes
-    connect(m_inputPathEdit, &QLineEdit::textChanged, this, [this](const QString& text) {
-        updateOperationComboForFile(text);
-    });
-    
-    // Show/hide GR2 animation group and update output format based on operation selection
-    connect(m_operationCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
-        QString currentText = m_operationCombo->itemText(index);
-        bool isGr2 = currentText.contains("GR2", Qt::CaseInsensitive);
-        bool isLtb = currentText.contains("LTB", Qt::CaseInsensitive);
-        bool isFbxGlb = currentText.contains("FBX", Qt::CaseInsensitive);
-        bool isWeaponModel = currentText.contains("P/W", Qt::CaseInsensitive);
-        bool isArchiveFile = currentText.contains("REZ", Qt::CaseInsensitive) ||
-			currentText.contains("PAK", Qt::CaseInsensitive) ||
-			currentText.contains("VPK", Qt::CaseInsensitive);
 
-        bool isArchiveOperation = isArchiveFile || currentText.contains("XFS", Qt::CaseInsensitive) || currentText.contains("Smart Batch", Qt::CaseInsensitive);
-        bool isUnity = currentText.contains("Unity", Qt::CaseInsensitive);
-        bool showOutputFormat = isGr2 || isLtb;
+    m_logDock = new QDockWidget(tr("Log"), this);
+    m_logDock->setObjectName("LogDock");
+    m_logDock->setWidget(logPanel);
+    addDockWidget(Qt::BottomDockWidgetArea, m_logDock);
 
-        m_unityBmpCheck->setVisible(isUnity); // Show BMP conversion checkbox only for Unity mode
-        m_gr2AnimGroup->setVisible(isGr2);
-        m_mirrorUVYCheck->setVisible(isGr2); // Show Mirror UV Y checkbox only for GR2
-        m_writeQCCheck->setVisible(isGr2 || isLtb || isFbxGlb || isWeaponModel); // Show Write QC checkbox  for GR2, Ltb & FBX/GLB
-        m_compileModelCheck->setVisible(isGr2 || isLtb || isFbxGlb || isWeaponModel);
-        updateWeaponModelControls();
-
-
-        m_ignoreMeshesCheck->setVisible(isLtb);
-        m_ignoreAnimsCheck->setVisible(isLtb);
-
-
-		m_separateFoldersCheck->setVisible(isArchiveOperation);
-        
-        // Hide output format for archive files as it's not applicable
-        if (m_outputFormatLabel) m_outputFormatLabel->setVisible(showOutputFormat);
-        if (m_outputFormatCombo) m_outputFormatCombo->setVisible(showOutputFormat);
-        
-        // Update output format combo
-        if (m_outputFormatCombo) {
-            m_outputFormatCombo->clear();
-            m_outputFormatCombo->addItem(tr("SMD (GoldSource)"), QStringLiteral("smd"));
-            m_outputFormatCombo->setCurrentIndex(0);
-        }
-        
-        if (isGr2) {
-            // Load animations from GR2 file if available from special folders
-            loadGr2Animations();
-        }
-    });
-    
-    // Load Mirror UV Y setting and connect to save on change
-    m_mirrorUVYCheck->setChecked(SettingsDialog::getMirrorUVY());
-    connect(m_mirrorUVYCheck, &QCheckBox::toggled, this, [](bool checked) {
-        SettingsDialog::setMirrorUVY(checked);
-    });
-    
-    // Initial update (if there's already text in the input field)
-    updateOperationComboForFile(m_inputPathEdit->text());
-    
-    // Initial output format update
-    QString initialText = m_operationCombo->currentText();
-    bool initialGr2 = initialText.contains("GR2", Qt::CaseInsensitive);
-    bool initialLtb = initialText.contains("LTB", Qt::CaseInsensitive);
-    bool isModelOp = initialGr2 || initialLtb;
-    
-    m_mirrorUVYCheck->setVisible(initialGr2);
-    m_writeQCCheck->setVisible(initialGr2 || initialLtb || initialText.contains("FBX", Qt::CaseInsensitive) ||
-                               initialText.contains("P/W", Qt::CaseInsensitive));
-    m_compileModelCheck->setVisible(m_writeQCCheck->isVisibleTo(this));
-    updateWeaponModelControls();
-    m_unityBmpCheck->setVisible(initialText.contains("Unity", Qt::CaseInsensitive));
-    
-    if (m_outputFormatLabel) m_outputFormatLabel->setVisible(isModelOp);
-    if (m_outputFormatCombo) {
-        m_outputFormatCombo->setVisible(isModelOp);
-        m_outputFormatCombo->clear();
-        m_outputFormatCombo->addItem(tr("SMD (GoldSource)"), QStringLiteral("smd"));
-        m_outputFormatCombo->setCurrentIndex(0);
-    }
-    
-    setupStatusBar();
-    
-    setupKeyboardShortcuts();
-
-    m_inputPathEdit->setAcceptDrops(true);
-    
-    m_processingEvents = false;
-    
-
-    
-    // Check for updates on startup (with a short delay to let the UI load first)
-    QTimer::singleShot(2000, this, [this]() {
-        if (!m_updateChecker)
-        {
-            m_updateChecker = new VortigauntUpdateCheck(this);
-
-        }
-        
-        m_updateChecker->checkForUpdates(true);
-    });
-
+    resizeDocks({ m_filesDock, m_propertiesDock }, { 360, 320 }, Qt::Horizontal);
+    resizeDocks({ m_logDock }, { 190 }, Qt::Vertical);
 }
 
+void MainWindow::setupPreview()
+{
+    m_preview = new QStackedWidget(this);
 
+    m_previewHint = new QLabel(tr("Drop files or folders here\n\nThe operation is picked from the file type."), m_preview);
+    m_previewHint->setAlignment(Qt::AlignCenter);
+    m_previewHint->setForegroundRole(QPalette::PlaceholderText);
+    QFont hintFont = m_previewHint->font();
+    hintFont.setPointSizeF(hintFont.pointSizeF() + 3.0);
+    m_previewHint->setFont(hintFont);
+    m_preview->addWidget(m_previewHint);
+
+    m_modelPreview = new GLBViewer(m_preview);
+    // its loading steps are only of use when developing
+    m_modelPreview->setLogCallback([](const QString& message) {
+        VortigauntLog::Vortigaunt_Printf(QStringLiteral("DEBUG: [Preview] %1").arg(message));
+    });
+    m_preview->addWidget(m_modelPreview);
+    connect(m_modelPreview, &GLBViewer::modelLoaded, this, [this](bool ok) {
+        if (ok || m_preview->currentWidget() != m_modelPreview)
+            return;
+        m_previewInfo->setText(QStringLiteral("<b>%1</b><br><br>%2")
+                                   .arg(QFileInfo(m_previewPath).fileName().toHtmlEscaped(), tr("This model could not be previewed.")));
+        m_preview->setCurrentIndex(3);
+    });
+
+    m_imagePreview = new QLabel(m_preview);
+    m_imagePreview->setAlignment(Qt::AlignCenter);
+    m_imagePreview->setBackgroundRole(QPalette::Base);
+    m_imagePreview->setAutoFillBackground(true);
+    m_preview->addWidget(m_imagePreview);
+
+    auto* infoPage = new QWidget(m_preview);
+    auto* infoLayout = new QVBoxLayout(infoPage);
+    infoLayout->addStretch();
+    m_previewInfo = new QLabel(infoPage);
+    m_previewInfo->setAlignment(Qt::AlignCenter);
+    m_previewInfo->setWordWrap(true);
+    infoLayout->addWidget(m_previewInfo);
+    m_previewOpenButton = new QPushButton(infoPage);
+    infoLayout->addWidget(m_previewOpenButton, 0, Qt::AlignCenter);
+    infoLayout->addStretch();
+    m_preview->addWidget(infoPage);
+
+    m_workspaces = new QTabWidget(this);
+    m_workspaces->setDocumentMode(true);
+    m_workspaces->setTabsClosable(true);
+    m_workspaces->setMovable(true);
+    m_workspaces->addTab(m_preview, tr("Convert"));
+    m_workspaces->tabBar()->setTabButton(0, QTabBar::RightSide, nullptr);
+    m_workspaces->tabBar()->setTabButton(0, QTabBar::LeftSide, nullptr);
+    connect(m_workspaces, &QTabWidget::tabCloseRequested, this, [this](int index) { closeToolTab(m_workspaces->widget(index)); });
+    connect(m_workspaces, &QTabWidget::currentChanged, this, &MainWindow::onWorkspaceChanged);
+    setCentralWidget(m_workspaces);
+
+    m_archiveWorkspace = new ArchiveWorkspace([this]() { return outputDir(); }, this);
+    m_archiveWorkspace->hide();
+    connect(m_archiveWorkspace, &ArchiveWorkspace::addToConvert, this, [this](const QStringList& files) {
+        addPaths(files);
+        m_workspaces->setCurrentIndex(0);
+    });
+    connect(m_archiveWorkspace, &ArchiveWorkspace::openTexture, this, [this](const QString& name, const QByteArray& data) {
+        showWorkspace(m_textureWorkspace);
+        m_textureWorkspace->addFromMemory(name, data);
+    });
+    connect(m_archiveWorkspace, &ArchiveWorkspace::openSprite, this, &MainWindow::openSprite);
+
+    m_textureWorkspace = new TextureWorkspace([this]() { return outputDir(); }, this);
+    m_textureWorkspace->hide();
+    m_spriteWorkspace = new SpriteViewerWindow(this);
+    m_spriteWorkspace->hide();
+    m_wadWorkspace = new WadMakerDialog(this);
+    m_wadWorkspace->hide();
+}
+
+void MainWindow::openToolTab(QWidget* tool, const QString& title)
+{
+    if (!tool->property("vortigauntTool").toBool() && qobject_cast<QDialog*>(tool))
+    {
+        tool->setWindowFlags(Qt::Widget);
+        // Escape and Enter would close a dialog that now lives in a tab
+        tool->installEventFilter(this);
+        tool->setProperty("vortigauntTool", true);
+        for (QPushButton* button : tool->findChildren<QPushButton*>())
+        {
+            button->setAutoDefault(false);
+            button->setDefault(false);
+        }
+        connect(qobject_cast<QDialog*>(tool), &QDialog::finished, this, [this, tool]() { closeToolTab(tool); });
+    }
+    int index = m_workspaces->indexOf(tool);
+    if (index < 0)
+        index = m_workspaces->addTab(tool, title);
+    m_workspaces->setCurrentIndex(index);
+    tool->show();
+}
+
+void MainWindow::closeToolTab(QWidget* tool)
+{
+    const int index = m_workspaces->indexOf(tool);
+    if (index <= 0)
+        return;
+    if ((tool == m_archiveWorkspace && m_archiveWorkspace->isBusy()) || (tool == m_textureWorkspace && m_textureWorkspace->isBusy()))
+        return;
+    m_workspaces->removeTab(index);
+    // a workspace keeps what is open in it for the next time
+    if (workspaceOf(tool))
+        tool->hide();
+    else
+        tool->deleteLater();
+}
+
+void MainWindow::openToolOnce(const char* key, const QString& title, const std::function<QWidget*()>& create)
+{
+    for (int i = 1; i < m_workspaces->count(); ++i)
+    {
+        if (m_workspaces->widget(i)->property("vortigauntToolKey").toByteArray() == key)
+        {
+            m_workspaces->setCurrentIndex(i);
+            return;
+        }
+    }
+    QWidget* tool = create();
+    tool->setProperty("vortigauntToolKey", QByteArray(key));
+    openToolTab(tool, title);
+}
+
+const MainWindow::Workspace* MainWindow::workspaceOf(QWidget* widget) const
+{
+    for (const Workspace& workspace : m_persistentWorkspaces)
+    {
+        if (workspace.widget == widget)
+            return &workspace;
+    }
+    return nullptr;
+}
+
+void MainWindow::showWorkspace(QWidget* widget)
+{
+    if (const Workspace* workspace = workspaceOf(widget))
+        openToolTab(widget, workspace->title);
+}
+
+void MainWindow::openArchive(const QString& path)
+{
+    showWorkspace(m_archiveWorkspace);
+    m_archiveWorkspace->openArchive(path);
+}
+
+void MainWindow::openTextures(const QStringList& paths)
+{
+    showWorkspace(m_textureWorkspace);
+    m_textureWorkspace->addFiles(paths);
+}
+
+void MainWindow::openSprite(const QString& path)
+{
+    showWorkspace(m_spriteWorkspace);
+    m_spriteWorkspace->setMode(SpriteViewerWindow::Mode::View);
+    m_spriteWorkspace->openSprite(path);
+}
+
+void MainWindow::openWad(const QString& path)
+{
+    showWorkspace(m_wadWorkspace);
+    m_wadWorkspace->loadWad(path);
+}
+
+void MainWindow::onWorkspaceChanged(int index)
+{
+    // the file list and its settings belong to Convert
+    const bool convert = index == 0;
+    if (!convert && m_convertDocksShown)
+    {
+        m_filesDockWasVisible = m_filesDock->isVisible();
+        m_propertiesDockWasVisible = m_propertiesDock->isVisible();
+        m_filesDock->hide();
+        m_propertiesDock->hide();
+        m_convertDocksShown = false;
+    }
+    else if (convert && !m_convertDocksShown)
+    {
+        m_filesDock->setVisible(m_filesDockWasVisible);
+        m_propertiesDock->setVisible(m_propertiesDockWasVisible);
+        m_convertDocksShown = true;
+    }
+
+    if (convert)
+        m_ribbon->setCurrentTab(0);
+    else if (const Workspace* workspace = workspaceOf(m_workspaces->widget(index)))
+        m_ribbon->setCurrentTab(workspace->ribbonTab);
+}
+
+MainWindow::FileOp MainWindow::detectFileOp(const QString& path)
+{
+    const QString ext = QFileInfo(path).suffix().toLower();
+    if (ext == "ltb") return FileOp::Ltb;
+    if (ext == "gr2") return FileOp::Gr2;
+    if (ext == "fbx" || ext == "glb" || ext == "gltf" || ext == "obj") return FileOp::Mesh;
+    if (ext == "mdl") return WeaponModelConverter::IsViewModelFile(path.toStdString()) ? FileOp::Weapon : FileOp::None;
+    if (ext == "dtx") return FileOp::Dtx;
+    if (ext == "rez") return FileOp::Rez;
+    if (ext == "pak") return FileOp::Pak;
+    if (ext == "xfs") return FileOp::Xfs;
+    if (ext == "vpk" || ext == "gma") return FileOp::Vpk;
+    if (ext == "unity3d" || ext == "bundle" || ext == "assets") return FileOp::Unity;
+    return FileOp::None;
+}
+
+QString MainWindow::fileOpName(FileOp op)
+{
+    switch (op)
+    {
+    case FileOp::Ltb: return tr("LTB to SMD");
+    case FileOp::Gr2: return tr("GR2 to SMD");
+    case FileOp::Mesh: return tr("FBX/GLB/OBJ to SMD");
+    case FileOp::Weapon: return tr("v_ to p_ / w_ model");
+    case FileOp::Dtx: return tr("DTX to BMP");
+    case FileOp::Rez: return tr("Extract REZ");
+    case FileOp::Pak: return tr("Extract PAK (CSO)");
+    case FileOp::Xfs: return tr("Extract XFS");
+    case FileOp::Vpk: return tr("Extract VPK / GMA");
+    case FileOp::Unity: return tr("Extract Unity assets");
+    case FileOp::None: break;
+    }
+    return tr("Nothing to do");
+}
+
+void MainWindow::addPaths(const QStringList& paths)
+{
+    if (m_isProcessing)
+        return;
+
+    QSet<QString> listed;
+    for (int i = 0; i < m_fileList->topLevelItemCount(); ++i)
+        listed.insert(m_fileList->topLevelItem(i)->data(0, kPathRole).toString());
+
+    const int before = m_fileList->topLevelItemCount();
+    for (const QString& path : paths)
+    {
+        const QFileInfo info(path);
+        if (info.isDir())
+        {
+            // sub-folders are kept in the output
+            const QDir root(info.absoluteFilePath());
+            int found = 0;
+            QDirIterator it(root.absolutePath(), QDir::Files, QDirIterator::Subdirectories);
+            while (it.hasNext())
+            {
+                const QString file = it.next();
+                if (detectFileOp(file) == FileOp::None || listed.contains(file))
+                    continue;
+                QString sub = root.relativeFilePath(QFileInfo(file).absolutePath());
+                if (sub == ".")
+                    sub.clear();
+                addFileRow(file, sub);
+                listed.insert(file);
+                found++;
+            }
+            if (found == 0)
+                VortigauntLog::Vortigaunt_Printf(QStringLiteral("^3Nothing Vortigaunt can convert was found in '%1'.").arg(path));
+        }
+        else if (info.isFile() && !listed.contains(info.absoluteFilePath()))
+        {
+            addFileRow(info.absoluteFilePath(), QString());
+            listed.insert(info.absoluteFilePath());
+        }
+    }
+
+    if (m_fileList->selectedItems().isEmpty() && m_fileList->topLevelItemCount() > before)
+        m_fileList->setCurrentItem(m_fileList->topLevelItem(before));
+    onFileSelectionChanged();
+}
+
+void MainWindow::addFileRow(const QString& path, const QString& outputSubfolder)
+{
+    const FileOp op = detectFileOp(path);
+    auto* item = new QTreeWidgetItem(m_fileList);
+    item->setText(0, QFileInfo(path).fileName());
+    item->setToolTip(0, QDir::toNativeSeparators(path));
+    item->setText(1, fileOpName(op));
+    item->setData(0, kPathRole, path);
+    item->setData(0, kOpRole, static_cast<int>(op));
+    item->setData(0, kSubfolderRole, outputSubfolder);
+    setRowStatus(item, op == FileOp::None ? tr("Pick an operation") : tr("Waiting"), statusColor(StatusKind::Waiting));
+}
+
+void MainWindow::setRowStatus(QTreeWidgetItem* item, const QString& status, const QColor& color)
+{
+    item->setText(2, status);
+    item->setForeground(2, color);
+}
+
+void MainWindow::setRowStatusLater(QTreeWidgetItem* item, const QString& status, const QColor& color)
+{
+    QMetaObject::invokeMethod(this, [this, item, status, color]() { setRowStatus(item, status, color); }, Qt::QueuedConnection);
+}
+
+QString MainWindow::outputDir() const
+{
+    return m_outputDir.isEmpty() ? SettingsDialog::getDefaultOutputDir() : m_outputDir;
+}
+
+void MainWindow::onFileSelectionChanged()
+{
+    const int count = m_fileList->topLevelItemCount();
+    m_fileCountLabel->setText(count == 0 ? tr("Drag files or folders here, or use Add files.")
+                                         : tr("%n file(s)", "", count));
+
+    const QList<QTreeWidgetItem*> selected = m_fileList->selectedItems();
+    QTreeWidgetItem* item = selected.isEmpty() ? nullptr : selected.first();
+    m_noSelectionLabel->setVisible(!item);
+    m_fileOpCombo->setEnabled(item && !m_isProcessing);
+    if (!item)
+    {
+        m_selectedNameLabel->setText(tr("No file selected"));
+        updatePropertiesFor(FileOp::None);
+        showPreview(QString(), FileOp::None);
+        return;
+    }
+
+    const QString path = item->data(0, kPathRole).toString();
+    const FileOp op = static_cast<FileOp>(item->data(0, kOpRole).toInt());
+    m_selectedNameLabel->setText(selected.size() > 1 ? tr("%1 files selected").arg(selected.size()) : QFileInfo(path).fileName());
+    m_fileOpCombo->setCurrentIndex(m_fileOpCombo->findData(static_cast<int>(op)));
+    updatePropertiesFor(op);
+    showPreview(path, op);
+    if (op == FileOp::Gr2 && path != m_animationListOwner)
+        loadGr2Animations(path);
+}
+
+void MainWindow::updatePropertiesFor(FileOp op)
+{
+    const bool model = op == FileOp::Ltb || op == FileOp::Gr2 || op == FileOp::Mesh || op == FileOp::Weapon;
+    m_weaponGroup->setVisible(op == FileOp::Weapon);
+    m_gr2AnimGroup->setVisible(op == FileOp::Gr2);
+    m_modelGroup->setVisible(model);
+    m_ignoreMeshesCheck->setVisible(op == FileOp::Ltb || op == FileOp::Gr2);
+    m_ignoreAnimsCheck->setVisible(op == FileOp::Ltb || op == FileOp::Gr2);
+    m_archiveGroup->setVisible(op == FileOp::Rez || op == FileOp::Pak || op == FileOp::Xfs || op == FileOp::Vpk);
+    m_unityGroup->setVisible(op == FileOp::Unity);
+    m_textureGroup->setVisible(op == FileOp::Dtx);
+    updateWeaponModelControls();
+}
+
+void MainWindow::showPreview(const QString& path, FileOp op)
+{
+    if (path == m_previewPath && !path.isEmpty())
+        return;
+    m_previewPath = path;
+    m_previewOpenButton->disconnect();
+    m_previewOpenButton->hide();
+
+    if (path.isEmpty())
+    {
+        m_preview->setCurrentWidget(m_previewHint);
+        return;
+    }
+
+    const QFileInfo info(path);
+    const QString ext = info.suffix().toLower();
+    auto showInfo = [this, &info](const QString& text) {
+        m_previewInfo->setText(QStringLiteral("<b>%1</b><br><br>%2<br><br>%3")
+                                   .arg(info.fileName().toHtmlEscaped(), UiUtils::formatSize(info.size()), text));
+        m_preview->setCurrentIndex(3);
+    };
+
+    if (op == FileOp::Mesh)
+    {
+        if (info.size() > kMaxPreviewBytes)
+        {
+            showInfo(tr("Too large to preview."));
+            return;
+        }
+        // the viewer loads on its first paint, so it has to be on screen first
+        m_preview->setCurrentWidget(m_modelPreview);
+        m_modelPreview->loadGLB(path);
+        return;
+    }
+
+    QImage image;
+    if (op == FileOp::Dtx)
+    {
+        DtxConverter decoder;
+        std::vector<unsigned int> pixels;
+        int width = 0, height = 0;
+        if (decoder.DecodeDTXToRGBA(path.toStdString(), pixels, width, height) && !pixels.empty())
+        {
+            image = QImage(reinterpret_cast<const uchar*>(pixels.data()), width, height, QImage::Format_ARGB32).copy();
+        }
+    }
+    else if (op == FileOp::None && (ext == "png" || ext == "tga" || ext == "bmp" || ext == "jpg" || ext == "jpeg" || ext == "dds" || ext == "vtf"))
+    {
+        image = ImageUtils::loadImage(path);
+    }
+    if (!image.isNull())
+    {
+        const QSize room = m_preview->size() - QSize(24, 24);
+        QPixmap pixmap = QPixmap::fromImage(image.convertToFormat(QImage::Format_RGB32));
+        if (pixmap.width() > room.width() || pixmap.height() > room.height())
+            pixmap = pixmap.scaled(room, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        m_imagePreview->setPixmap(pixmap);
+        m_imagePreview->setToolTip(tr("%1 x %2").arg(image.width()).arg(image.height()));
+        m_preview->setCurrentWidget(m_imagePreview);
+        return;
+    }
+
+    auto openWith = [this](const QString& label, const std::function<void()>& open) {
+        m_previewOpenButton->setText(label);
+        connect(m_previewOpenButton, &QPushButton::clicked, this, open);
+        m_previewOpenButton->show();
+    };
+    auto browseArchive = [this, path]() { openArchive(path); };
+    switch (op)
+    {
+    case FileOp::Rez:
+        showInfo(tr("REZ archive. Convert extracts it to the output folder."));
+        openWith(tr("Browse in Archives"), browseArchive);
+        break;
+    case FileOp::Pak:
+        showInfo(tr("Counter-Strike Online PAK archive. Convert extracts it to the output folder."));
+        openWith(tr("Browse in Archives"), browseArchive);
+        break;
+    case FileOp::Xfs:
+        showInfo(tr("XFS archive. Convert extracts it to the output folder."));
+        openWith(tr("Browse in Archives"), browseArchive);
+        break;
+    case FileOp::Vpk:
+        showInfo(tr("Source engine archive. Convert extracts it to the output folder."));
+        openWith(tr("Browse in Archives"), browseArchive);
+        break;
+    case FileOp::Weapon:
+        showInfo(tr("GoldSrc view model. Convert makes the p_ and w_ models from it."));
+        break;
+    case FileOp::Gr2:
+    case FileOp::Ltb:
+        showInfo(tr("There is no 3D preview for this format yet."));
+        break;
+    case FileOp::Unity:
+        showInfo(tr("Unity assets. Convert extracts meshes, textures and animation clips."));
+        break;
+    default:
+        showInfo(tr("Vortigaunt does not know what to do with this file. Pick an operation in Properties."));
+        break;
+    }
+}
+
+void MainWindow::onAddFiles()
+{
+    const QString filter = tr("Supported files (%1);;All files (*.*)")
+        .arg("*.ltb *.gr2 *.fbx *.glb *.gltf *.obj *.mdl *.dtx *.rez *.pak *.xfs *.vpk *.gma *.unity3d *.bundle *.assets");
+    addPaths(QFileDialog::getOpenFileNames(this, tr("Add Files"), QString(), filter));
+}
+
+void MainWindow::onAddFolder()
+{
+    const QString folder = QFileDialog::getExistingDirectory(this, tr("Add Folder"));
+    if (!folder.isEmpty())
+        addPaths({ folder });
+}
+
+void MainWindow::onBrowseOutput()
+{
+    const QString path = QFileDialog::getExistingDirectory(this, tr("Select Output Folder"), outputDir());
+    if (path.isEmpty())
+        return;
+    setOutputDir(path);
+}
+
+void MainWindow::setOutputDir(const QString& folder)
+{
+    m_outputDir = folder;
+    m_outputButton->setText(tr("Output: %1").arg(QDir::toNativeSeparators(outputDir())));
+}
+
+void MainWindow::onOpenOutputFolder()
+{
+    QDir().mkpath(outputDir());
+    QDesktopServices::openUrl(QUrl::fromLocalFile(outputDir()));
+}
+
+void MainWindow::onStop()
+{
+    m_cancelRequested = true;
+    m_stopAction->setEnabled(false);
+    VortigauntLog::Vortigaunt_Printf(QStringLiteral("^3Stopping after the file being converted...^7"));
+}
 
 void MainWindow::gr2AddAnimationItem(const QString& fileName, const QString& filePath)
 {
@@ -734,13 +1342,13 @@ void MainWindow::gr2AddAnimationItem(const QString& fileName, const QString& fil
     });
 }
 
-void MainWindow::loadGr2Animations()
+void MainWindow::loadGr2Animations(const QString& gr2Path)
 {
     // Clear previous animations when loading a new file
     m_animationListWidget->clear();
+    m_animationListOwner = gr2Path;
 
-    
-    QString inputPath = m_inputPathEdit->text().trimmed();
+    const QString inputPath = gr2Path;
     if (inputPath.isEmpty() || !QFileInfo(inputPath).exists())
         return;
     
@@ -754,7 +1362,7 @@ void MainWindow::loadGr2Animations()
     QString pathLower = inputDir.toLower().replace("\\", "/");
     bool isAutoAnimDirectory = false;
     
-    // Here is the stupid things.
+    // Here is the stupid story.
     // The developer of Metin2 (Ymir) They forcibly placed all the models maps effect etc. in drive D.
     // Otherwise, the textures of the models are not visible in Granny Viewer. So I didn't want to be the one to mess up the layout.
 	// And yes you need windows for this to work. Granny SDK does not support Linux.
@@ -775,8 +1383,8 @@ void MainWindow::loadGr2Animations()
     
 #ifdef ENABLE_GRANNY2
     // First, try to load animations from the GR2 file
-    std::string gr2Path = inputPath.toStdString();
-    granny_file* grannyFile = GrannyReadEntireFile(gr2Path.c_str());
+    std::string grannyPath = inputPath.toStdString();
+    granny_file* grannyFile = GrannyReadEntireFile(grannyPath.c_str());
     
     if (grannyFile)
     {
@@ -851,246 +1459,39 @@ void MainWindow::loadGr2Animations()
 #endif // ENABLE_GRANNY2
 }
 
-void MainWindow::updateOperationComboForFile(const QString& filePath)
-{
-    int currentIndex = m_operationCombo->currentIndex();
-    m_operationCombo->clear();
-
-#ifdef ENABLE_LITHTECH
-    m_operationCombo->addItem(tr("Convert LTB "));
-#endif
-#ifdef ENABLE_GRANNY2
-    m_operationCombo->addItem(tr("Convert GR2 "));
-#endif
-    m_operationCombo->addItem(tr("Convert FBX/GLB/OBJ"));
-    m_operationCombo->addItem(tr("Convert V model to P/W model"));
-    m_operationCombo->addItem(tr("Extract REZ File"));
-    m_operationCombo->addItem(tr("Extract PAK File (Counter Strike Online)"));
-    m_operationCombo->addItem(tr("Extract XFS File (Xenesis)"));
-    m_operationCombo->addItem(tr("Extract UnityFS / Assets"));
-    m_operationCombo->addItem(tr("Extract VPK / GMA (Source Engine)"));
-
-    QFileInfo fileInfo(filePath);
-    if (filePath.isEmpty() || fileInfo.isDir())
-    {
-        // Restore selection if valid
-        if (currentIndex >= 0 && currentIndex < m_operationCombo->count())
-            m_operationCombo->setCurrentIndex(currentIndex);
-        return;
-    }
-
-    QString ext = grabFileExt(filePath).toLower();
-    int selectIndex = -1;
-
-    for (int i = 0; i < m_operationCombo->count(); ++i)
-    {
-		// we should optimize this because in the future we will add more formats. But for now, this is okay.
-        QString itemText = m_operationCombo->itemText(i).toLower();
-        if (ext == "ltb" && itemText.contains("ltb")) {
-            selectIndex = i;
-            break;
-        }
-        else if (ext == "gr2" && itemText.contains("gr2")) {
-            selectIndex = i;
-            break;
-        }
-        else if ((ext == "fbx" || ext == "glb" || ext == "gltf" || ext == "obj") && itemText.contains("fbx")) {
-            selectIndex = i;
-            break;
-        }
-        else if (ext == "mdl" && itemText.contains("p/w")) {
-            selectIndex = i;
-            break;
-        }
-        else if (ext == "rez" && itemText.contains("rez")) {
-            selectIndex = i;
-            break;
-        }
-        else if (ext == "pak" && itemText.contains("pak")) {
-            selectIndex = i;
-            break;
-        }
-        else if (ext == "xfs" && itemText.contains("xfs")) {
-            selectIndex = i;
-            break;
-        }
-        else if ((ext == "unity3d" || ext == "bundle" || ext == "assets") && itemText.contains("unity")) {
-            selectIndex = i;
-            break;
-        }
-        else if ((ext == "vpk" || ext == "gma") && itemText.contains("vpk")) {
-            selectIndex = i;
-            break;
-        }
-    }
-
-    if (selectIndex != -1)
-    {
-        m_operationCombo->setCurrentIndex(selectIndex);
-    }
-}
-
-void MainWindow::onBrowseInput()
-{
-    QString current = m_inputPathEdit->text();
-    QString modeText = m_operationCombo->currentText();
-    QString filterStr;
-
-    bool isUnityMode = modeText.contains("Unity", Qt::CaseInsensitive) || modeText.contains("Extract UnityFS", Qt::CaseInsensitive);
-
-    if (isUnityMode)
-    {
-        filterStr = tr("All files (*.*)");
-    }
-    else
-    {
-        QString baseExtensions = "*.ltb *.gr2 *.fbx *.glb *.gltf *.obj *.mdl *.rez *.pak *.mse *.xfs *.unity3d *.bundle *.assets *.vpk *.gma";
-        filterStr = tr("Supported files (%1);;All files (*.*)").arg(baseExtensions);
-    }
-
-    QStringList files = QFileDialog::getOpenFileNames(this, tr("Select Input File(s)"), current, filterStr);
-    
-    if (!files.isEmpty())
-    {
-        if (isUnityMode)
-        {
-            QStringList rejectedFiles;
-            QStringList acceptedFiles;
-            for (const QString& f : files)
-            {
-                QFileInfo fi(f);
-                QString ext = fi.suffix().toLower();
-                if (ext == "pak" || ext == "rez" || ext == "xfs" || ext == "gr2" || ext == "ltb")
-                {
-                    rejectedFiles << fi.fileName();
-                }
-                else
-                {
-                    acceptedFiles << f;
-                }
-            }
-
-            if (!rejectedFiles.isEmpty())
-            {
-                QString warnMsg = tr("The following files you selected cannot be used in Unity mode because they belong to this project's other formats (PAK, REZ, XFS, GR2, LTB):\n\n");
-                for (const QString& name : rejectedFiles)
-                {
-                    warnMsg += QStringLiteral("  - %1\n").arg(name);
-                }
-                QMessageBox::warning(this, tr("Incompatible File Selection"), warnMsg);
-                files = acceptedFiles;
-            }
-        }
-
-        if (files.isEmpty())
-        {
-            return;
-        }
-
-        m_selectedInputFiles = files;
-        
-        if (files.size() == 1)
-        {
-            // Single 
-            m_inputPathEdit->setText(files.first());
-            updateOperationComboForFile(files.first());
-        }
-        else
-        {
-            // Multi
-            m_inputPathEdit->setText(tr("%1 files selected").arg(files.size()));
-            updateOperationComboForFile(files.first());
-        }
-    }
-}
-
-void MainWindow::onBrowseOutput()
-{
-    QString current = m_outputPathEdit->text();
-    QString path = QFileDialog::getExistingDirectory(this, tr("Select Output Folder"), current);
-    if (!path.isEmpty())
-        m_outputPathEdit->setText(path);
-}
-
 void MainWindow::onRun()
 {
-    m_logEdit->clear();
+    if (m_isProcessing)
+        return;
 
-
-    const QString inputPath = m_inputPathEdit->text().trimmed();
-    if (inputPath.isEmpty())
+    std::vector<FileJob> jobs;
+    bool anyModel = false, anyWeapon = false;
+    int gr2Count = 0;
+    for (int i = 0; i < m_fileList->topLevelItemCount(); ++i)
     {
-        QMessageBox::warning(this, tr("Input required"),
-                             tr("Please select an input file or folder."));
+        QTreeWidgetItem* item = m_fileList->topLevelItem(i);
+        const FileOp op = static_cast<FileOp>(item->data(0, kOpRole).toInt());
+        if (op == FileOp::None)
+        {
+            setRowStatus(item, tr("Skipped"), statusColor(StatusKind::Waiting));
+            continue;
+        }
+        const QString sub = item->data(0, kSubfolderRole).toString();
+        jobs.push_back({ item, item->data(0, kPathRole).toString(), op, sub.isEmpty() ? outputDir() : QDir(outputDir()).filePath(sub) });
+        anyModel |= op == FileOp::Ltb || op == FileOp::Gr2 || op == FileOp::Mesh || op == FileOp::Weapon;
+        anyWeapon |= op == FileOp::Weapon;
+        gr2Count += op == FileOp::Gr2 ? 1 : 0;
+    }
+
+    if (jobs.empty())
+    {
+        QMessageBox::information(this, tr("Nothing to convert"),
+                                 tr("Add files Vortigaunt knows, or pick an operation for them in Properties."));
         return;
     }
 
-    QString outputDir = m_outputPathEdit->text().trimmed();
-    if (outputDir.isEmpty())
-		outputDir = SettingsDialog::getDefaultOutputDir();
-   
-    std::error_code ec;
-    std::filesystem::create_directories(outputDir.toStdWString(), ec);
-
-    VortigauntLog::Vortigaunt_Printf(QStringLiteral("Output folder: %1").arg(outputDir));
-    
-    // Capture UI state before spawning thread
-    QString modeText = m_operationCombo->currentText();
-    QStringList selectedFiles = m_selectedInputFiles;
-    if (selectedFiles.isEmpty()) selectedFiles << inputPath;
-
-    // Check if Unity mode is selected but some files belong to other supported formats
-    if (modeText.contains("Unity", Qt::CaseInsensitive))
-    {
-        QStringList ignoredFiles;
-        QStringList filteredFiles;
-        for (const QString& f : selectedFiles)
-        {
-            QFileInfo fi(f);
-            if (fi.isFile())
-            {
-                QString ext = fi.suffix().toLower();
-                if (ext == "pak" || ext == "rez" || ext == "xfs" || ext == "gr2" || ext == "ltb")
-                {
-                    ignoredFiles << fi.fileName();
-                    continue;
-                }
-            }
-            filteredFiles << f;
-        }
-
-        if (!ignoredFiles.isEmpty())
-        {
-            QString warnMsg = tr("The following files were ignored because they belong to other formats supported by this project (e.g. PAK, REZ, XFS, GR2, LTB):\n\n");
-            for (const QString& name : ignoredFiles)
-            {
-                warnMsg += QStringLiteral("  - %1\n").arg(name);
-            }
-            QMessageBox::warning(this, tr("Unsupported Formats Ignored for Unity Mode"), warnMsg);
-            
-            selectedFiles = filteredFiles;
-            if (selectedFiles.isEmpty())
-            {
-                VortigauntLog::Vortigaunt_Printf(QStringLiteral("^1Error:^7 All input files were ignored as they are incompatible with Unity mode."));
-                return;
-            }
-        }
-    }
-    
-    // Capture settings for LTB converter
-    ltbConverterSetting ltbEncSettings;
-
-    if (m_ignoreMeshesCheck) ltbEncSettings.IgnoreMeshes = m_ignoreMeshesCheck->isChecked();
-    if (m_ignoreAnimsCheck) ltbEncSettings.IgnoreAnimations = m_ignoreAnimsCheck->isChecked();
-
-    // Capture Unity texture output format on the UI thread
-    bool unityTexturesToBmp = !m_unityBmpCheck || m_unityBmpCheck->isChecked();
-
-    const bool fbxGlbWriteQC = !m_writeQCCheck || m_writeQCCheck->isChecked();
-    ltbEncSettings.WriteQC = fbxGlbWriteQC;
-
     // Better to hear about a missing compiler now than after the conversion.
-    if (m_compileModelCheck->isVisibleTo(this) && m_compileModelCheck->isEnabled() && m_compileModelCheck->isChecked() &&
+    if (anyModel && m_writeQCCheck->isChecked() && m_compileModelCheck->isChecked() &&
         !QFileInfo(SettingsDialog::getStudioMdlPath()).isFile())
     {
         QMessageBox::warning(this, tr("studiomdl not set"),
@@ -1099,120 +1500,123 @@ void MainWindow::onRun()
     }
 
     WeaponModelOptions weaponOptions;
-    weaponOptions.writeQC = fbxGlbWriteQC;
+    weaponOptions.writeQC = m_writeQCCheck->isChecked();
     weaponOptions.scale = static_cast<float>(m_weaponScaleSpin->value());
     weaponOptions.mirror = m_weaponMirrorCombo->currentData().toInt();
     weaponOptions.hold = static_cast<WeaponType>(m_weaponTypeCombo->currentData().toInt());
     weaponOptions.gameDir = static_cast<GameDir>(m_gameDirCombo->currentData().toInt());
     weaponOptions.upsideDown = m_weaponUpsideDownCheck->isChecked();
     weaponOptions.referenceModel = m_weaponReferenceEdit->text().trimmed().toStdString();
-    if (modeText.contains("P/W", Qt::CaseInsensitive) && weaponOptions.hold == WeaponType::Reference &&
-        weaponOptions.referenceModel.empty())
+    if (anyWeapon && weaponOptions.hold == WeaponType::Reference && weaponOptions.referenceModel.empty())
     {
         QMessageBox::warning(this, tr("Reference model required"),
                              tr("Select the p_ model this weapon should be held like, or choose another weapon type."));
         return;
     }
 
-    // Start background task
-    runInBackground([this, modeText, selectedFiles, inputPath, outputDir, ltbEncSettings, unityTexturesToBmp, fbxGlbWriteQC, weaponOptions]() mutable {
-        
+    ltbConverterSetting ltbSettings;
+    ltbSettings.IgnoreMeshes = m_ignoreMeshesCheck->isChecked();
+    ltbSettings.IgnoreAnimations = m_ignoreAnimsCheck->isChecked();
+    ltbSettings.WriteQC = m_writeQCCheck->isChecked();
+    const bool writeQC = m_writeQCCheck->isChecked();
+    const bool unityTexturesToBmp = m_unityBmpCheck->isChecked();
+    // the animation list belongs to one model
+    const bool gr2WithAnimations = gr2Count == 1;
 
+    m_logEdit->clear();
+    QDir().mkpath(outputDir());
+    VortigauntLog::Vortigaunt_Printf(QStringLiteral("Output folder: %1").arg(outputDir()));
 
-        // Helper to update progress safely
-        auto updateProgress = [this](int percent, const QString& msg = QString()) {
-            QMetaObject::invokeMethod(this, [this, percent, msg]() {
-                if(m_progressBar) {
-                    m_progressBar->setValue(percent);
-                    if(!msg.isEmpty()) m_progressBar->setFormat(msg);
-                }
-            }, Qt::QueuedConnection);
-        };
-        
-        RezExtractor::SetProgressFunc([updateProgress](int p){ updateProgress(p); });
-        PakExtractor::SetProgressFunc([updateProgress](int p){ updateProgress(p); });
-        XfsExtractor::SetProgressFunc([updateProgress](int p){ updateProgress(p); });
+    m_extractionErrors.clear();
+    m_cancelRequested = false;
+    for (const FileJob& job : jobs)
+        setRowStatus(job.item, tr("Waiting"), statusColor(StatusKind::Waiting));
 
-        // When you choose Rez pak xfs at the same time, Vortigaunt was crashing
-        // so i did this
-        if ((modeText.contains("Multi Process Mode", Qt::CaseInsensitive) || selectedFiles.size() > 1) && !modeText.contains("Unity", Qt::CaseInsensitive))
+    runInBackground([this, jobs, weaponOptions, ltbSettings, writeQC, unityTexturesToBmp, gr2WithAnimations]() {
+        const QColor running = statusColor(StatusKind::Running);
+        const QColor done = statusColor(StatusKind::Done);
+        const QColor failed = statusColor(StatusKind::Failed);
+        std::vector<bool> finished(jobs.size(), false);
+        size_t finishedCount = 0;
+
+        for (size_t i = 0; i < jobs.size(); ++i)
         {
-            QStringList ltbList, gr2List, rezList, pakList, xfsList, vpkList, fbxGlbList, mdlList;
-            
-            for (const QString& f : selectedFiles) {
-                QString ext = QFileInfo(f).suffix().toLower();
-                if (ext == "rez") rezList << f;
-                else if (ext == "pak") pakList << f;
-                else if (ext == "gr2") gr2List << f;
-                else if (ext == "ltb") ltbList << f;
-                else if (ext == "fbx" || ext == "glb" || ext == "gltf" || ext == "obj") fbxGlbList << f;
-                else if (ext == "mdl") mdlList << f;
-                else if (ext == "xfs") xfsList << f;
-                else if (ext == "vpk" || ext == "gma") vpkList << f; // VPK and GMA share the same pipeline
-            }
-            
-            if (!ltbList.isEmpty()) {
-                for (const QString& ltb : ltbList) {
-                    convertLtb(ltb, outputDir, ltbEncSettings); 
-                }
-            }
-            if (!gr2List.isEmpty()) {
-                for (const QString& gr2 : gr2List) {
-                    convertGr2(gr2, outputDir);
-                }
-            }
-            for (const QString& model : fbxGlbList) {
-                convertFbxGlb(model, outputDir, fbxGlbWriteQC);
-            }
-            for (const QString& model : mdlList) {
-                convertViewModel(model, outputDir, weaponOptions);
-            }
-            if (!rezList.isEmpty()) extractArchiveRez(rezList, outputDir);
-            if (!pakList.isEmpty()) extractArchivePak(pakList, outputDir);
-            if (!xfsList.isEmpty()) extractArchiveXfs(xfsList, outputDir);
-            if (!vpkList.isEmpty()) extractArchiveVpk(vpkList, outputDir);
-        }
-        else if (modeText.contains("LTB", Qt::CaseInsensitive))
-        {
-            convertLtb(inputPath, outputDir, ltbEncSettings);
-        }
-        else if (modeText.contains("GR2", Qt::CaseInsensitive))
-        {
-            convertGr2(inputPath, outputDir);
-        }
-        else if (modeText.contains("FBX", Qt::CaseInsensitive))
-        {
-            convertFbxGlb(inputPath, outputDir, fbxGlbWriteQC);
-        }
-        else if (modeText.contains("P/W", Qt::CaseInsensitive))
-        {
-            convertViewModel(inputPath, outputDir, weaponOptions);
-        }
-        else if (modeText.contains("Extract REZ", Qt::CaseInsensitive))
-        {
-            extractArchiveRez(QStringList{inputPath}, outputDir);
-        }
-        else if (modeText.contains("Extract PAK", Qt::CaseInsensitive))
-        {
-            extractArchivePak(QStringList{inputPath}, outputDir);
-        }
-        else if (modeText.contains("XFS", Qt::CaseInsensitive))
-        {
-            extractArchiveXfs(QStringList{inputPath}, outputDir);
-        }
-        else if (modeText.contains("Unity", Qt::CaseInsensitive) || modeText.contains("Extract UnityFS", Qt::CaseInsensitive))
-        {
-            // UnityFS extraction and processing
-            UnityPorter porter;
-            porter.SetConvertTexturesToBmp(unityTexturesToBmp);
-            for (const QString& f : selectedFiles)
+            if (finished[i])
+                continue;
+            if (m_cancelRequested)
             {
-                porter.Process(f.toStdString(), outputDir.toStdString());
+                for (size_t j = i; j < jobs.size(); ++j)
+                {
+                    if (!finished[j])
+                        setRowStatusLater(jobs[j].item, tr("Cancelled"), statusColor(StatusKind::Waiting));
+                }
+                break;
             }
-        }
-        else if (modeText.contains("VPK", Qt::CaseInsensitive))
-        {
-            extractArchiveVpk(QStringList{inputPath}, outputDir);
+
+            const FileJob& job = jobs[i];
+            const bool archive = job.op == FileOp::Rez || job.op == FileOp::Pak || job.op == FileOp::Xfs || job.op == FileOp::Vpk;
+            if (archive)
+            {
+                // archives of one kind go together, so "separate folders" means what it says
+                std::vector<size_t> group;
+                QStringList paths;
+                for (size_t j = i; j < jobs.size(); ++j)
+                {
+                    if (!finished[j] && jobs[j].op == job.op && jobs[j].outputDir == job.outputDir)
+                    {
+                        group.push_back(j);
+                        paths << jobs[j].path;
+                        setRowStatusLater(jobs[j].item, tr("Extracting..."), running);
+                    }
+                }
+                const size_t errorsBefore = m_extractionErrors.size();
+                switch (job.op)
+                {
+                case FileOp::Rez: extractArchiveRez(paths, job.outputDir); break;
+                case FileOp::Pak: extractArchivePak(paths, job.outputDir); break;
+                case FileOp::Xfs: extractArchiveXfs(paths, job.outputDir); break;
+                default: extractArchiveVpk(paths, job.outputDir); break;
+                }
+                for (size_t j : group)
+                {
+                    const QString name = QFileInfo(jobs[j].path).fileName();
+                    bool ok = true;
+                    for (size_t e = errorsBefore; e < m_extractionErrors.size(); ++e)
+                    {
+                        if (m_extractionErrors[e].filename == jobs[j].path || m_extractionErrors[e].filename == name)
+                            ok = false;
+                    }
+                    setRowStatusLater(jobs[j].item, ok ? tr("Done") : tr("Failed"), ok ? done : failed);
+                    finished[j] = true;
+                    finishedCount++;
+                }
+            }
+            else
+            {
+                setRowStatusLater(job.item, tr("Converting..."), running);
+                bool ok = false;
+                switch (job.op)
+                {
+                case FileOp::Ltb: ok = convertLtb(job.path, job.outputDir, ltbSettings); break;
+                case FileOp::Gr2: ok = convertGr2(job.path, job.outputDir, gr2WithAnimations); break;
+                case FileOp::Mesh: ok = convertFbxGlb(job.path, job.outputDir, writeQC); break;
+                case FileOp::Weapon: ok = convertViewModel(job.path, job.outputDir, weaponOptions); break;
+                case FileOp::Dtx: ok = convertDtx(job.path, job.outputDir); break;
+                case FileOp::Unity:
+                {
+                    UnityPorter porter;
+                    porter.SetConvertTexturesToBmp(unityTexturesToBmp);
+                    porter.Process(job.path.toStdString(), job.outputDir.toStdString());
+                    ok = true;
+                    break;
+                }
+                default: break;
+                }
+                setRowStatusLater(job.item, ok ? tr("Done") : tr("Failed"), ok ? done : failed);
+                finished[i] = true;
+                finishedCount++;
+            }
+            updateProgressSafe(static_cast<int>(finishedCount * 100 / jobs.size()));
         }
 
         // Cleanup callbacks
@@ -1221,7 +1625,6 @@ void MainWindow::onRun()
         XfsExtractor::SetProgressFunc(nullptr);
         VpkExtractor::SetProgressFunc(nullptr);
         GmaExtractor::SetProgressFunc(nullptr);
-        
 
         QMetaObject::invokeMethod(this, [this]() {
             if (!m_extractionErrors.empty())
@@ -1238,24 +1641,11 @@ void MainWindow::onRun()
                 {
                     errorMsg += tr("  ... and %1 more.\n").arg(m_extractionErrors.size() - 10);
                 }
-                QMessageBox::warning(this, tr("Extraction Complete with Errors"), errorMsg);
+                QMessageBox::warning(this, tr("Finished with Errors"), errorMsg);
                 m_extractionErrors.clear();
             }
         }, Qt::QueuedConnection);
-
     });
-}
-
-void MainWindow::onOpenDtxViewer()
-{
-    DtxViewerDialog dlg(this);
-    dlg.exec();
-}
-
-void MainWindow::onOpenPakViewer()
-{
-    PakViewerWindow dlg(this);
-    dlg.exec();
 }
 
 void MainWindow::onOpenSettings()
@@ -1264,115 +1654,33 @@ void MainWindow::onOpenSettings()
     dlg.exec();
 }
 
-void MainWindow::onOpenRezViewer()
-{
-    RezViewerWindow dlg(this);
-    dlg.exec();
-
-}
-
-void MainWindow::onOpenXfsViewer()
-{
-    XfsViewerWindow dlg(this);
-    dlg.exec();
-}
-
-void MainWindow::onOpenSpriteViewer()
-{
-    SpriteViewerWindow dlg(this);
-    dlg.exec();
-}
-
-void MainWindow::onOpenLithtechSpriteViewer()
-{
-    auto* sprViewer = new SpriteViewerWindow(this);
-    sprViewer->setAttribute(Qt::WA_DeleteOnClose);
-    sprViewer->show();
-}
-
 void MainWindow::onOpenLoLModelDownloader()
 {
-    LoLModelDownloadDialog* qtDialog = new LoLModelDownloadDialog(nullptr);
-    qtDialog->setAttribute(Qt::WA_DeleteOnClose, true);
-    qtDialog->setModal(false); // other windows stay open cuz non-modal
-    qtDialog->show();
-    qtDialog->raise();
-    qtDialog->activateWindow();
+    openToolOnce("lol", tr("LoL Models"), []() { return new LoLModelDownloadDialog(nullptr); });
 }
 
 void MainWindow::onOpenSteamWorkshopDownloader()
 {
-    auto* qtDialog = new SteamWorkshopDownloaderDialog(nullptr);
-    qtDialog->setAttribute(Qt::WA_DeleteOnClose, true);
-    qtDialog->setModal(false);
-    qtDialog->show();
-    qtDialog->raise();
-    qtDialog->activateWindow();
+    openToolOnce("workshop", tr("Steam Workshop"), []() { return new SteamWorkshopDownloaderDialog(nullptr); });
 }
-#ifdef METIN2_SCRIPT_EFFECT
 
+#ifdef METIN2_SCRIPT_EFFECT
 void MainWindow::onOpenMseViewer()
 {
-    MseViewerWindow* qtWindow = new MseViewerWindow(this);
-    qtWindow->setAttribute(Qt::WA_DeleteOnClose, true);
-    qtWindow->setModal(false);
-    qtWindow->show();
-    qtWindow->raise();
-    qtWindow->activateWindow();
-
+    openToolTab(new MseViewerWindow(), tr("MSE Viewer"));
 }
 #endif
 
 #ifdef ENABLE_AUTORIG
 void MainWindow::onOpenAutoRigDialog()
 {
-    AutoRigDialog* qtDialog = new AutoRigDialog(this);
-    qtDialog->setAttribute(Qt::WA_DeleteOnClose, true);
-    qtDialog->setModal(false);
-    qtDialog->show();
-    qtDialog->raise();
-    qtDialog->activateWindow();
+    openToolOnce("autorig", tr("Auto-Rig"), []() { return new AutoRigDialog(); });
 }
 #endif
 
-void MainWindow::onOpenVpkViewer()
-{
-    VpkViewerWindow* qtDialog = new VpkViewerWindow(this);
-    qtDialog->setAttribute(Qt::WA_DeleteOnClose, true);
-    qtDialog->setModal(false);
-    qtDialog->show();
-    qtDialog->raise();
-    qtDialog->activateWindow();
-}
-
-void MainWindow::onOpenVtfViewer()
-{
-    VtfViewerDialog* qtDialog = new VtfViewerDialog(this);
-    qtDialog->setAttribute(Qt::WA_DeleteOnClose, true);
-    qtDialog->setModal(false);
-    qtDialog->show();
-    qtDialog->raise();
-    qtDialog->activateWindow();
-}
-
-void MainWindow::onOpenWadMaker()
-{
-    WadMakerDialog* qtDialog = new WadMakerDialog(this);
-    qtDialog->setAttribute(Qt::WA_DeleteOnClose, true);
-    qtDialog->setModal(false);
-    qtDialog->show();
-    qtDialog->raise();
-    qtDialog->activateWindow();
-}
-
 void MainWindow::onOpenAudioConverter()
 {
-    AudioConvertDialog* qtDialog = new AudioConvertDialog(this);
-    qtDialog->setAttribute(Qt::WA_DeleteOnClose, true);
-    qtDialog->setModal(false);
-    qtDialog->show();
-    qtDialog->raise();
-    qtDialog->activateWindow();
+    openToolOnce("audio", tr("WAV Converter"), []() { return new AudioConvertDialog(); });
 }
 
 ConvertAssets MainWindow::runConverter(IConverter& converter, const QString& inputPath, const QString& outputDir,
@@ -1385,7 +1693,7 @@ ConvertAssets MainWindow::runConverter(IConverter& converter, const QString& inp
             if (afterFile)
                 afterFile(result);
             updateProgressSafe((index + 1) * 100 / total);
-            return true;
+            return !m_cancelRequested;
         });
 
     if (summary.total == 0)
@@ -1403,13 +1711,21 @@ ConvertAssets MainWindow::runConverter(IConverter& converter, const QString& inp
     return summary;
 }
 
-void MainWindow::convertFbxGlb(const QString& inputPath, const QString& outputDir, bool writeQC)
+bool MainWindow::convertFbxGlb(const QString& inputPath, const QString& outputDir, bool writeQC)
 {
     FbxGlbConvertOptions options;
     options.writeQC = writeQC;
     FbxGlbConverter converter;
     converter.SetOptions(options);
-    runConverter(converter, inputPath, outputDir);
+    const ConvertAssets summary = runConverter(converter, inputPath, outputDir);
+    return summary.total > 0 && summary.failed.empty();
+}
+
+bool MainWindow::convertDtx(const QString& inputPath, const QString& outputDir)
+{
+    DtxConverter converter;
+    const ConvertAssets summary = runConverter(converter, inputPath, outputDir);
+    return summary.total > 0 && summary.failed.empty();
 }
 
 void MainWindow::compileModelIfWanted(const QString& qcPath)
@@ -1431,38 +1747,27 @@ void MainWindow::compileModelIfWanted(const QString& qcPath)
 
 void MainWindow::updateWeaponModelControls()
 {
-    if (!m_weaponTypeCombo || !m_operationCombo)
+    if (!m_weaponTypeCombo)
         return;
 
-    const bool weaponMode = m_operationCombo->currentText().contains("P/W", Qt::CaseInsensitive);
-    const bool needsReference = weaponMode &&
-        static_cast<WeaponType>(m_weaponTypeCombo->currentData().toInt()) == WeaponType::Reference;
-
-    m_gameDirLabel->setVisible(weaponMode);
-    m_gameDirCombo->setVisible(weaponMode);
-    m_weaponTypeLabel->setVisible(weaponMode);
-    m_weaponTypeCombo->setVisible(weaponMode);
-    m_weaponReferenceEdit->setVisible(needsReference);
-    m_weaponReferenceBrowse->setVisible(needsReference);
-    m_weaponUpsideDownCheck->setVisible(weaponMode);
-    m_weaponScaleLabel->setVisible(weaponMode);
-    m_weaponScaleSpin->setVisible(weaponMode);
-    m_weaponMirrorLabel->setVisible(weaponMode);
-    m_weaponMirrorCombo->setVisible(weaponMode);
+    const bool needsReference = static_cast<WeaponType>(m_weaponTypeCombo->currentData().toInt()) == WeaponType::Reference;
+    m_weaponReferenceEdit->parentWidget()->setVisible(needsReference);
 }
 
-void MainWindow::convertViewModel(const QString& inputPath, const QString& outputDir, const WeaponModelOptions& options)
+bool MainWindow::convertViewModel(const QString& inputPath, const QString& outputDir, const WeaponModelOptions& options)
 {
     WeaponModelConverter converter;
     converter.SetOptions(options);
-    runConverter(converter, inputPath, outputDir);
+    const ConvertAssets summary = runConverter(converter, inputPath, outputDir);
+    return summary.total > 0 && summary.failed.empty();
 }
 
-void MainWindow::convertLtb(const QString& inputPath, const QString& outputDir, const ltbConverterSetting& settings)
+bool MainWindow::convertLtb(const QString& inputPath, const QString& outputDir, const ltbConverterSetting& settings)
 {
     ltbConverter converter;
     converter.SetConvertSetting(settings);
-    runConverter(converter, inputPath, outputDir);
+    const ConvertAssets summary = runConverter(converter, inputPath, outputDir);
+    return summary.total > 0 && summary.failed.empty();
 }
 
 void MainWindow::extractArchiveRez(const QStringList& paths, const QString& outputDir)
@@ -1473,8 +1778,6 @@ void MainWindow::extractArchiveRez(const QStringList& paths, const QString& outp
         return;
     }
 
-    // Clear previous errors
-    m_extractionErrors.clear();
 
     // Boost process priority for faster extraction (Windows only)
     Platform::setHighPriority();
@@ -1823,7 +2126,7 @@ void MainWindow::extractArchiveVpk(const QStringList& paths, const QString& outp
 
 
 
-void MainWindow::convertGr2(const QString& inputPath, const QString& outputDir)
+bool MainWindow::convertGr2(const QString& inputPath, const QString& outputDir, bool withAnimations)
 {
     Gr2ConverterSettings settings;
     settings.ExportMeshes = !m_ignoreMeshesCheck->isChecked();
@@ -1837,11 +2140,12 @@ void MainWindow::convertGr2(const QString& inputPath, const QString& outputDir)
 
     // the animation list belongs to a single model
     const std::filesystem::path start = std::filesystem::path(inputPath.toStdWString());
-    const bool isSingleFile = std::filesystem::is_regular_file(start) && m_gr2AnimGroup->isVisible();
-    runConverter(gr2Converter, inputPath, outputDir, [&](const ConvertResult& result) {
+    const bool isSingleFile = std::filesystem::is_regular_file(start) && withAnimations;
+    const ConvertAssets summary = runConverter(gr2Converter, inputPath, outputDir, [&](const ConvertResult& result) {
         if (isSingleFile && result.ok)
             exportGr2Animations(gr2Converter, start, FileIO::toPath(result.outputFolder));
     });
+    return summary.total > 0 && summary.failed.empty();
 }
 
 void MainWindow::exportGr2Animations(Gr2Converter& gr2Converter, const std::filesystem::path& gr2File, const std::filesystem::path& outFolder)
@@ -1889,7 +2193,7 @@ void MainWindow::exportGr2Animations(Gr2Converter& gr2Converter, const std::file
     {
         // Selected items are animation names from GR2, but we need to find the actual GR2 files
         // The animation names might correspond to GR2 files in the same directory
-        QString inputDir = QFileInfo(m_inputPathEdit->text()).absolutePath();
+        QString inputDir = QFileInfo(QString::fromStdWString(gr2File.wstring())).absolutePath();
         for (QListWidgetItem* item : selectedItems)
         {
             QString animName = item->text();
@@ -1968,7 +2272,7 @@ void MainWindow::exportGr2Animations(Gr2Converter& gr2Converter, const std::file
 
                     
                     // Pass main GR2 file path as skeleton source
-                    QString mainGr2Path = m_inputPathEdit->text();
+                    QString mainGr2Path = QString::fromStdWString(gr2File.wstring());
                     
                     // Find the correct animation index for this animation name
                     int animIndex = 0;
@@ -2164,32 +2468,42 @@ void MainWindow::dragEnterEvent(QDragEnterEvent* event)
 void MainWindow::dropEvent(QDropEvent* event)
 {
     const QMimeData* mimeData = event->mimeData();
-    if (mimeData->hasUrls())
+    if (!mimeData->hasUrls())
+        return;
+    QStringList paths;
+    for (const QUrl& url : mimeData->urls())
     {
-        QList<QUrl> urlList = mimeData->urls();
-        handleDroppedFiles(urlList);
-        event->acceptProposedAction();
+        if (url.isLocalFile())
+            paths << url.toLocalFile();
     }
-}
-
-void MainWindow::handleDroppedFiles(const QList<QUrl>& urls)
-{
-    if (urls.isEmpty())
-        return;
-    
-    // Take the first file/folder
-    QString localPath = urls.first().toLocalFile();
-    if (localPath.isEmpty())
-        return;
-    
-    QFileInfo fileInfo(localPath);
-    
-    // Set input path
-    m_inputPathEdit->setText(localPath);
-    
-    // Auto-update operation combo
-    updateOperationComboForFile(localPath);
-    
+    if (m_workspaces->currentWidget() == m_archiveWorkspace)
+    {
+        QStringList others;
+        for (const QString& p : paths)
+        {
+            if (ArchiveSource::isArchive(p))
+                m_archiveWorkspace->openArchive(p);
+            else
+                others << p;
+        }
+        paths = others;
+        if (!paths.isEmpty())
+            m_workspaces->setCurrentIndex(0);
+    }
+    else if (m_workspaces->currentWidget() == m_textureWorkspace)
+    {
+        // textures and folders stay here, anything else goes to Convert
+        QStringList textures;
+        QStringList others;
+        for (const QString& p : paths)
+            (QFileInfo(p).isDir() || TextureWorkspace::isTexture(p) ? textures : others) << p;
+        m_textureWorkspace->addFiles(textures);
+        paths = others;
+        if (!paths.isEmpty())
+            m_workspaces->setCurrentIndex(0);
+    }
+    addPaths(paths);
+    event->acceptProposedAction();
 }
 
 // Status bar
@@ -2198,6 +2512,14 @@ void MainWindow::setupStatusBar()
     m_statusLabel = new QLabel(QString("Version: %1").arg(VORTIGAUNT_VERSION_STRING));
     m_statusLabel->setStyleSheet("QLabel { padding: 0 6px; font-size: 11px; }");
     statusBar()->addWidget(m_statusLabel);
+
+    m_outputButton = new QPushButton(tr("Output: %1").arg(QDir::toNativeSeparators(outputDir())));
+    m_outputButton->setFlat(true);
+    m_outputButton->setCursor(Qt::PointingHandCursor);
+    m_outputButton->setToolTip(tr("Open the output folder"));
+    m_outputButton->setStyleSheet("QPushButton { padding: 0 6px; font-size: 11px; border: none; text-align: left; }");
+    connect(m_outputButton, &QPushButton::clicked, this, &MainWindow::onOpenOutputFolder);
+    statusBar()->addWidget(m_outputButton, 1);
     
     // Progress bar
     m_progressBar = new QProgressBar();
@@ -2221,7 +2543,7 @@ void MainWindow::setupKeyboardShortcuts()
 {
     // Ctrl+O: Browse Input
     m_shortcutBrowseInput = new QShortcut(QKeySequence("Ctrl+O"), this);
-    connect(m_shortcutBrowseInput, &QShortcut::activated, this, &MainWindow::onBrowseInput);
+    connect(m_shortcutBrowseInput, &QShortcut::activated, this, &MainWindow::onAddFiles);
     
     // Ctrl+Shift+O: Browse Output
     m_shortcutBrowseOutput = new QShortcut(QKeySequence("Ctrl+Shift+O"), this);
@@ -2308,6 +2630,13 @@ void MainWindow::onClearLog()
 
 bool MainWindow::eventFilter(QObject* watched, QEvent* event)
 {
+    if (event->type() == QEvent::KeyPress && watched->property("vortigauntTool").toBool())
+    {
+        const int key = static_cast<QKeyEvent*>(event)->key();
+        if (key == Qt::Key_Escape)
+            return true;
+    }
+
     // Handle drag-drop on animation list widget
     if (watched == m_animationListWidget->viewport())
     {
@@ -2400,31 +2729,22 @@ void MainWindow::updateProgressSafe(int percent)
 void MainWindow::setUiProcessing(bool processing)
 {
     m_isProcessing = processing;
-    
-    if (processing)
+
+    if (processing && m_progressBar)
     {
-        // Operation started: Disable Run
-        if(m_runButton) m_runButton->setDisabled(true);
-        
-        if (m_progressBar) {
-             m_progressBar->setVisible(true);
-             m_progressBar->setValue(0);
-        }
-    }
-    else
-    {
-        // Operation finished: Enable Run
-        if(m_runButton) {
-            m_runButton->setDisabled(false);
-        }
+        m_progressBar->setVisible(true);
+        m_progressBar->setValue(0);
     }
 
-    // Disable/Enable other inputs to prevent re-entrancy
-    if(m_browseInputButton) m_browseInputButton->setDisabled(processing);
-    if(m_browseOutputButton) m_browseOutputButton->setDisabled(processing);
-    if(m_inputPathEdit) m_inputPathEdit->setDisabled(processing);
-    if(m_outputPathEdit) m_outputPathEdit->setDisabled(processing);
-    if(m_settingsAction) m_settingsAction->setDisabled(processing);
+    // nothing that changes the list while it is worked through
+    m_runAction->setEnabled(!processing);
+    m_stopAction->setEnabled(processing);
+    m_addFilesAction->setEnabled(!processing);
+    m_addFolderAction->setEnabled(!processing);
+    m_clearListAction->setEnabled(!processing);
+    m_outputFolderAction->setEnabled(!processing);
+    m_fileOpCombo->setEnabled(!processing && !m_fileList->selectedItems().isEmpty());
+    if (m_settingsAction) m_settingsAction->setDisabled(processing);
 }
 
 void MainWindow::runInBackground(std::function<void()> task)

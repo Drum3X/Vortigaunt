@@ -37,7 +37,18 @@ bool VpkFile::Load(const std::string& filePath)
         return false;
     }
 
-    return ParseHeader();
+    if (!ParseHeader())
+        return false;
+
+    // single file VPKs keep all their data after the tree; it is read when an entry is extracted
+    const size_t treeEnd = static_cast<size_t>(m_headerSize) + m_treeSize;
+    if (treeEnd < m_buffer.size())
+    {
+        m_buffer.resize(treeEnd);
+        m_buffer.shrink_to_fit();
+        m_dirDataInFile = true;
+    }
+    return true;
 }
 
 bool VpkFile::LoadFromBuffer(std::vector<uint8_t> buffer, const std::string& filePath)
@@ -51,6 +62,7 @@ bool VpkFile::LoadFromBuffer(std::vector<uint8_t> buffer, const std::string& fil
 void VpkFile::Clear()
 {
     m_buffer.clear();
+    m_dirDataInFile = false;
     m_entries.clear();
     m_archiveStreams.clear();
     m_filePath.clear();
@@ -305,21 +317,28 @@ std::vector<uint8_t> VpkFile::ReadFromArchive(uint16_t archiveIndex, uint32_t of
     // If data is in _dir.vpk itself
     // In V1: header + tree + inline data. entryOffset is relative to after tree.
     // In V2: header + tree + inline data (fileDataSize) + footer. Same addressing.
+    std::string chunkFilename;
+    uint64_t readOffset = offset;
     if (archiveIndex == VPK_DIR_ARCHIVE_INDEX)
     {
-        uint32_t absoluteOffset = m_headerSize + m_treeSize + offset;
+        const uint64_t absoluteOffset = static_cast<uint64_t>(m_headerSize) + m_treeSize + offset;
         if (absoluteOffset + length <= m_buffer.size())
         {
             return std::vector<uint8_t>(m_buffer.begin() + absoluteOffset,
                                         m_buffer.begin() + absoluteOffset + length);
         }
-        return {};
+        if (!m_dirDataInFile)
+            return {};
+        chunkFilename = m_filePath;
+        readOffset = absoluteOffset;
     }
-
-    // Data is in numbered chunk file pak01_NNN.vpk
-    std::string chunkFilename = m_dirPrefix + "_" +
-        (archiveIndex < 10 ? "00" : (archiveIndex < 100 ? "0" : "")) +
-        std::to_string(archiveIndex) + ".vpk";
+    else
+    {
+        // Data is in numbered chunk file pak01_NNN.vpk
+        chunkFilename = m_dirPrefix + "_" +
+            (archiveIndex < 10 ? "00" : (archiveIndex < 100 ? "0" : "")) +
+            std::to_string(archiveIndex) + ".vpk";
+    }
 
     // Check cache first
     auto it = m_archiveStreams.find(archiveIndex);
@@ -335,15 +354,11 @@ std::vector<uint8_t> VpkFile::ReadFromArchive(uint16_t archiveIndex, uint32_t of
     }
 
     std::ifstream& chunkStream = *it->second;
-    chunkStream.seekg(offset, std::ios::beg);
+    // a short read before leaves the stream failed
+    chunkStream.clear();
+    chunkStream.seekg(static_cast<std::streamoff>(readOffset), std::ios::beg);
     if (!chunkStream)
-    {
-        // Might be at end, try seeking to beginning
-        chunkStream.clear();
-        chunkStream.seekg(offset, std::ios::beg);
-        if (!chunkStream)
-            return {};
-    }
+        return {};
 
     std::vector<uint8_t> data(length);
     if (!chunkStream.read(reinterpret_cast<char*>(data.data()), length))

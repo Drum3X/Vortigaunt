@@ -169,8 +169,7 @@ bool PakExtractor::ExtractSingle(const std::string& pakPath, const std::string& 
 
         const auto& entry = entries[i];
         std::string utf8Path = String_UTF16toUTF8(entry.FilePath);
-        fs::path relPath = fs::path(std::u16string(entry.FilePath));
-        fs::path outPath = baseOutPath / relPath;
+        fs::path outPath = baseOutPath / FileIO::safeRelativePath(utf8Path);
 
         VortigauntLog::LogF("  ^7[%zu/%zu] %s ^3(%s)^7\n", i + 1, entries.size(), utf8Path.c_str(), FormatSize(entry.RealSize).c_str());
 

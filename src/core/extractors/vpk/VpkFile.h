@@ -81,6 +81,7 @@ private:
                    const std::string& extension, const std::string& directory, const std::string& fileName);
 
     std::vector<uint8_t> m_buffer;
+    bool m_dirDataInFile = false;
     std::string m_filePath;
 
     uint32_t m_version = 0;

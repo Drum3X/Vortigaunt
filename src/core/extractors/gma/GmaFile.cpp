@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <streambuf>
 #include <cstring>
+#include <atomic>
 #include <limits>
 
 #include "Precomp.h"
@@ -145,12 +146,12 @@ bool GmaFile::Load(const std::string& filePath)
     if (std::memcmp(ident, GMA_IDENT, 4) == 0)
     {
         stream->seekg(0, std::ios::beg);
-        m_stream = std::move(stream);
-        if (!Parse(*m_stream))
+        if (!Parse(*stream))
         {
             Clear();
             return false;
         }
+        m_dataPath = filePath;
         return true;
     }
 
@@ -168,22 +169,42 @@ bool GmaFile::Load(const std::string& filePath)
     }
     stream.reset();
 
-    if (!decompressLzma(compressed, m_memory) ||
-        m_memory.size() < 4 || std::memcmp(m_memory.data(), GMA_IDENT, 4) != 0)
+    std::vector<uint8_t> decompressed;
+    if (!decompressLzma(compressed, decompressed) ||
+        decompressed.size() < 4 || std::memcmp(decompressed.data(), GMA_IDENT, 4) != 0)
     {
         VortigauntLog::LogF("GMA: Not a valid GMA file (bad ident, not LZMA-compressed either): %s", filePath.c_str());
         Clear();
         return false;
     }
+    compressed = {};
 
-    VortigauntLog::LogF("GMA: LZMA-compressed addon detected, decompressed %zu bytes.", m_memory.size());
+    VortigauntLog::LogF("GMA: LZMA-compressed addon detected, decompressed %zu bytes.", decompressed.size());
 
-    m_stream = std::make_unique<MemoryIStream>(m_memory.data(), m_memory.size());
-    if (!Parse(*m_stream))
+    MemoryIStream memory(decompressed.data(), decompressed.size());
+    if (!Parse(memory))
     {
         Clear();
         return false;
     }
+
+    // kept on disk rather than in memory, so many open addons do not add up
+    static std::atomic<unsigned> counter{ 0 };
+    const std::filesystem::path temp = std::filesystem::temp_directory_path() /
+        ("vortigaunt_gma_" + std::to_string(reinterpret_cast<std::uintptr_t>(this)) + "_" + std::to_string(counter++) + ".gma");
+    std::ofstream out(temp, std::ios::binary);
+    out.write(reinterpret_cast<const char*>(decompressed.data()), static_cast<std::streamsize>(decompressed.size()));
+    if (!out.good())
+    {
+        VortigauntLog::LogF("GMA: Could not write the decompressed addon to %s", FileIO::fromPath(temp).c_str());
+        out.close();
+        std::error_code ec;
+        std::filesystem::remove(temp, ec);
+        Clear();
+        return false;
+    }
+    m_dataPath = FileIO::fromPath(temp);
+    m_ownsDataFile = true;
     return true;
 }
 
@@ -275,17 +296,17 @@ std::vector<uint8_t> GmaFile::ExtractEntry(const GmaEntry& entry) const
 {
     std::vector<uint8_t> data;
 
-    if (!m_stream || entry.size == 0)
+    if (m_dataPath.empty() || entry.size == 0)
         return data;
 
-    m_stream->clear();
-    m_stream->seekg(static_cast<std::streamoff>(m_fileBlockOffset + entry.offset), std::ios::beg);
-    if (!m_stream->good())
+    std::ifstream in(FileIO::toPath(m_dataPath), std::ios::binary);
+    in.seekg(static_cast<std::streamoff>(m_fileBlockOffset + entry.offset), std::ios::beg);
+    if (!in.good())
         return data;
 
     data.resize(static_cast<size_t>(entry.size));
-    m_stream->read(reinterpret_cast<char*>(data.data()), static_cast<std::streamsize>(entry.size));
-    if (!m_stream->good())
+    in.read(reinterpret_cast<char*>(data.data()), static_cast<std::streamsize>(entry.size));
+    if (!in.good())
     {
         data.clear();
         return data;
@@ -329,9 +350,13 @@ std::string GmaFile::GetBaseName() const
 
 void GmaFile::Clear()
 {
-    m_stream.reset();
-    m_memory.clear();
-    m_memory.shrink_to_fit();
+    if (m_ownsDataFile)
+    {
+        std::error_code ec;
+        std::filesystem::remove(FileIO::toPath(m_dataPath), ec);
+    }
+    m_dataPath.clear();
+    m_ownsDataFile = false;
     m_formatVersion = 0;
     m_steamId = 0;
     m_timestamp = 0;

@@ -51,9 +51,6 @@ set(VORTIGAUNT_CORE_HEADERS
 
 set(VORTIGAUNT_GUI_HEADERS
 
-    ui/dialogs/DtxViewerDialog.h
-    ui/dialogs/VtfViewerDialog.h
-    ui/dialogs/ImageViewerDialog.h
     ui/dialogs/SpriteFixDialog.h
     ui/dialogs/SettingsDialog.h
     ui/dialogs/LoLModelDownloadDialog.h
@@ -64,15 +61,15 @@ set(VORTIGAUNT_GUI_HEADERS
     
     ui/dialogs/AudioConvertDialog.h
 
-    ui/windows/PakViewerWindow.h
-    ui/windows/RezViewerWindow.h
+    ui/workspaces/ArchiveSource.h
+    ui/workspaces/ArchiveWorkspace.h
+    ui/workspaces/TextureWorkspace.h
     ui/windows/SpriteViewerWindow.h
-    ui/windows/XfsViewerWindow.h
-    ui/windows/VpkViewerWindow.h
 
 
     ui/widgets/LoLModelDownloader.h
     ui/widgets/GLBViewer.h
+    ui/widgets/RibbonBar.h
 
 
     ui/ThemeManager.h
@@ -151,9 +148,6 @@ set(VORTIGAUNT_GUI
     ui/ThemeManager.cpp
     ui/UiUtils.cpp
 
-    ui/dialogs/DtxViewerDialog.cpp
-    ui/dialogs/VtfViewerDialog.cpp
-    ui/dialogs/ImageViewerDialog.cpp
     ui/dialogs/SpriteFixDialog.cpp
     ui/dialogs/SettingsDialog.cpp
     ui/dialogs/LoLModelDownloadDialog.cpp
@@ -164,15 +158,15 @@ set(VORTIGAUNT_GUI
     
     ui/dialogs/AudioConvertDialog.cpp
 
-    ui/windows/PakViewerWindow.cpp
-    ui/windows/RezViewerWindow.cpp
+    ui/workspaces/ArchiveSource.cpp
+    ui/workspaces/ArchiveWorkspace.cpp
+    ui/workspaces/TextureWorkspace.cpp
     ui/windows/SpriteViewerWindow.cpp
-    ui/windows/XfsViewerWindow.cpp
-    ui/windows/VpkViewerWindow.cpp
 
 
     ui/widgets/LoLModelDownloader.cpp
     ui/widgets/GLBViewer.cpp
+    ui/widgets/RibbonBar.cpp
 
 
     core/LanguageManager.cpp

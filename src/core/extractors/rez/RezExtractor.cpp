@@ -332,19 +332,7 @@ bool RezExtractor::ExtractAll(const std::string& outputDir) const
             continue;
 
         // Build sanitized path
-        std::filesystem::path relPath = FileIO::toPath(e.filename);
-        std::filesystem::path safeRelPath;
-        for (const auto& part : relPath)
-        {
-            std::string s = part.string();
-            if (s == "." || s == ".." || s.empty())
-                continue;
-            safeRelPath /= FileIO::sanitizePathComponent(s);
-        }
-        if (safeRelPath.empty())
-        {
-            safeRelPath = FileIO::sanitizePathComponent(e.filename);
-        }
+        const std::filesystem::path safeRelPath = FileIO::safeRelativePath(e.filename);
 
         std::filesystem::path outPath = FileIO::toPath(outputDir) / safeRelPath;
         std::filesystem::path parentDir = outPath.parent_path();
@@ -507,19 +495,7 @@ bool RezExtractor::ExtractSelectedEntries(const std::vector<size_t>& indices, co
         if (e.size > MAX_ENTRY_SIZE)
             continue;
 
-        std::filesystem::path relPath = FileIO::toPath(e.filename);
-        std::filesystem::path safeRelPath;
-        for (const auto& part : relPath)
-        {
-            std::string s = part.string();
-            if (s == "." || s == ".." || s.empty())
-                continue;
-            safeRelPath /= FileIO::sanitizePathComponent(s);
-        }
-        if (safeRelPath.empty())
-        {
-            safeRelPath = FileIO::sanitizePathComponent(e.filename);
-        }
+        const std::filesystem::path safeRelPath = FileIO::safeRelativePath(e.filename);
 
         std::filesystem::path outPath = FileIO::toPath(outputDir) / safeRelPath;
         std::filesystem::path parentDir = outPath.parent_path();
@@ -620,8 +596,11 @@ bool RezExtractor::ExtractEntryToMemory(const RezEntry& entry, std::vector<char>
 {
     outData.clear();
 
-    if (m_rezFilePath.empty() || entry.size == 0)
+    if (m_rezFilePath.empty())
         return false;
+    // empty entries (DIRTYPESPRITES, .OBJ.REF) are real files with nothing in them
+    if (entry.size == 0)
+        return true;
 
     std::ifstream in(FileIO::toPath(m_rezFilePath), std::ios::binary);
     if (!in)

@@ -5,8 +5,8 @@
 #include <QString>
 #include <QStringList>
 
+class QAction;
 class QLineEdit;
-class QPushButton;
 class QLabel;
 class QSplitter;
 class WadArchive;
@@ -31,6 +31,16 @@ public:
     
     // Load WAD file directly (for command-line file association)
     bool loadWad(const QString& filePath);
+
+    // the commands, for the ribbon; enabled while they can be used
+    QAction* newAction() const { return m_newAction; }
+    QAction* openAction() const { return m_openAction; }
+    QAction* saveAction() const { return m_saveAction; }
+    QAction* saveAsAction() const { return m_saveAsAction; }
+    QAction* addImagesAction() const { return m_addAction; }
+    QAction* removeAction() const { return m_removeAction; }
+    QAction* extractAction() const { return m_extractAction; }
+    QAction* renameAction() const { return m_renameAction; }
 
 private slots:
     // File operations
@@ -65,17 +75,15 @@ private:
     QLabel* m_statusLabel;
     QLineEdit* m_filterEdit;
     
-    // Toolbar buttons
-    QPushButton* m_newButton;
-    QPushButton* m_openButton;
-    QPushButton* m_saveButton;
-    QPushButton* m_saveAsButton;
-    
-    // Texture buttons
-    QPushButton* m_addButton;
-    QPushButton* m_removeButton;
-    QPushButton* m_extractButton;
-    QPushButton* m_renameButton;
+    // Commands, shown in the ribbon
+    QAction* m_newAction = nullptr;
+    QAction* m_openAction = nullptr;
+    QAction* m_saveAction = nullptr;
+    QAction* m_saveAsAction = nullptr;
+    QAction* m_addAction = nullptr;
+    QAction* m_removeAction = nullptr;
+    QAction* m_extractAction = nullptr;
+    QAction* m_renameAction = nullptr;
     
     // WAD data
     WadArchive* m_wadMaker;

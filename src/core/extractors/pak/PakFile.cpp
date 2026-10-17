@@ -25,7 +25,7 @@ bool IsPakHeaderValid(const PakHeader& header)
            (header.PakVersion + header.NumEntries == header.Checksum);
 }
 
-inline PakHeader GetPakHeader(const std::span<uint8_t> pkgData,
+inline PakHeader GetPakHeader(const std::span<const uint8_t> pkgData,
                               const uint8_t* key)
 {
     PakHeader header;
@@ -113,10 +113,17 @@ inline size_t GetSpecialSumOfChars(std::basic_string_view<CHAR_TYPE> str)
 }
 
 PakFile::PakFile(std::vector<uint8_t>&& buffer, std::u16string&& filename)
-    : m_Buffer(buffer), m_Filename(filename), m_HeaderStartOffset(0),
+    : m_Filename(std::move(filename)), m_HeaderStartOffset(0), m_EntriesStartOffset(0)
+{
+    auto owned = std::make_shared<const std::vector<uint8_t>>(std::move(buffer));
+    this->m_Data = { owned->data(), owned->size() };
+    this->m_Owner = std::move(owned);
+}
+
+PakFile::PakFile(std::span<const uint8_t> data, std::shared_ptr<const void> owner, std::u16string&& filename)
+    : m_Owner(std::move(owner)), m_Data(data), m_Filename(std::move(filename)), m_HeaderStartOffset(0),
       m_EntriesStartOffset(0)
 {
-    this->m_BackupBuffer = this->m_Buffer;
 }
 
 bool PakFile::ParseHeader()
@@ -127,8 +134,8 @@ bool PakFile::ParseHeader()
     this->m_HeaderStartOffset = sumOfChars % 312 + 30;
 
     this->m_Header =
-        GetPakHeader({ this->m_Buffer.data() + this->m_HeaderStartOffset,
-                       this->m_Buffer.size() - this->m_HeaderStartOffset },
+        GetPakHeader({ this->m_Data.data() + this->m_HeaderStartOffset,
+                       this->m_Data.size() - this->m_HeaderStartOffset },
                      generatedKey.data());
 
     std::cout << "csopak header: offset=" << m_HeaderStartOffset
@@ -151,8 +158,8 @@ bool PakFile::ParseEntries()
               << " numEntries=" << m_Header.NumEntries << std::endl;
 
     PakView<SnowCipher, 4> view(
-        { this->m_Buffer.data() + this->m_EntriesStartOffset,
-          this->m_Buffer.size() - this->m_EntriesStartOffset },
+        { this->m_Data.data() + this->m_EntriesStartOffset,
+          this->m_Data.size() - this->m_EntriesStartOffset },
         entriesKey);
 
     this->m_Entries.reserve(this->m_Header.NumEntries);
@@ -233,8 +240,8 @@ bool PakFile::IsEntryComplete(const PakEntry_t& entry) const
                               ? GetAlignedLength<4>(entry.RealSize)
                               : entry.RealSize;
 
-    return startOffset <= this->m_BackupBuffer.size() &&
-           needed <= this->m_BackupBuffer.size() - startOffset;
+    return startOffset <= this->m_Data.size() &&
+           needed <= this->m_Data.size() - startOffset;
 }
 
 [[nodiscard]] std::pair<bool, std::vector<uint8_t>> PakFile::UnpackEntry(
@@ -251,7 +258,7 @@ bool PakFile::IsEntryComplete(const PakEntry_t& entry) const
     auto startOffset = this->m_DataStartOffset + (entry.FileOffset << 10);
 
     // Bounds check: ensure we can read from the backup buffer
-    if (startOffset >= this->m_BackupBuffer.size())
+    if (startOffset >= this->m_Data.size())
     {
         return { false, {} };
     }
@@ -259,19 +266,19 @@ bool PakFile::IsEntryComplete(const PakEntry_t& entry) const
     // Always copy raw data first — without this, unencrypted entries
     // would return an all-zero buffer since no decryption branch fills it.
     {
-        const auto availableBytes = this->m_BackupBuffer.size() - startOffset;
+        const auto availableBytes = this->m_Data.size() - startOffset;
         const auto copyLen = std::min<size_t>(entry.RealSize, availableBytes);
-        std::copy(this->m_BackupBuffer.data() + startOffset,
-                  this->m_BackupBuffer.data() + startOffset + copyLen,
+        std::copy(this->m_Data.data() + startOffset,
+                  this->m_Data.data() + startOffset + copyLen,
                   res.begin());
     }
 
     if (entry.Type & PAK_TYPE_ENCRYPTED_AGAIN)
     {
-        const auto availableBytes = this->m_BackupBuffer.size() - startOffset;
+        const auto availableBytes = this->m_Data.size() - startOffset;
         
         PakView<SnowCipher, 4> view(
-            { this->m_BackupBuffer.data() + startOffset, availableBytes },
+            { this->m_Data.data() + startOffset, availableBytes },
             dataKey);
 
         auto buff = view.ReadBytes(entry.RealSize, true);

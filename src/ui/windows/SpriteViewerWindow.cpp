@@ -3,6 +3,9 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGroupBox>
+#include <QGridLayout>
+#include <QActionGroup>
+#include <QAction>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDir>
@@ -410,25 +413,73 @@ void SpriteViewerWindow::openSprite(const QString& filePath)
 void SpriteViewerWindow::setupUI()
 {
     setWindowTitle(tr("Sprite Viewer"));
-    
+    createActions();
+
     auto* mainLayout = new QHBoxLayout(this);
-    
-    // Left side: File browser
-    auto* fileBrowserWidget = createFileBrowserWidget();
-    
-    // Right side: Tab widget
-    m_tabWidget = new QTabWidget(this);
-    m_tabWidget->addTab(createFileTabWidget(), tr("File"));
-    m_createTabIndex = m_tabWidget->addTab(createCreateTabWidget(), tr("Create"));
-    m_fixTabIndex = m_tabWidget->addTab(createFixTabWidget(), tr("Fix"));
-    
-    // Splitter to make file browser resizable
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+
     auto* splitter = new QSplitter(Qt::Horizontal, this);
-    splitter->addWidget(fileBrowserWidget);
-    splitter->addWidget(m_tabWidget);
-    splitter->setSizes({250, 1150}); // File browser 250px, rest for tabs
-    
-    mainLayout->addWidget(splitter);
+    splitter->addWidget(createFileBrowserWidget());
+    splitter->addWidget(createFileTabWidget());
+    splitter->setStretchFactor(0, 1);
+    splitter->setStretchFactor(1, 4);
+    splitter->setSizes({ 260, 1100 });
+
+    m_modeStack = new QStackedWidget(this);
+    m_modeStack->addWidget(splitter);
+    m_modeStack->addWidget(createCreateTabWidget());
+    m_modeStack->addWidget(createFixTabWidget());
+    mainLayout->addWidget(m_modeStack);
+}
+
+void SpriteViewerWindow::createActions()
+{
+    auto action = [this](const QString& text, const QString& tip) {
+        auto* created = new QAction(text, this);
+        created->setToolTip(tip);
+        addAction(created);
+        return created;
+    };
+    m_openAction = action(tr("Open sprite"), tr("Open a GoldSrc, CSO or LithTech sprite"));
+    m_saveAction = action(tr("Save"), tr("Save the palette and properties to the sprite (Ctrl+S)"));
+    m_saveAction->setShortcut(QKeySequence::Save);
+    m_saveAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+    m_saveAsAction = action(tr("Save as"), tr("Save the sprite to a new file"));
+    m_extractFrameAction = action(tr("Extract frame"), tr("Save the frame shown as an image"));
+    m_extractAllFramesAction = action(tr("Extract all"), tr("Save every frame as an image"));
+    m_previousAction = action(tr("Previous"), tr("Open the previous sprite in the folder (Up)"));
+    m_nextAction = action(tr("Next"), tr("Open the next sprite in the folder (Down)"));
+    for (QAction* disabled : { m_saveAction, m_saveAsAction, m_extractFrameAction, m_extractAllFramesAction, m_previousAction, m_nextAction })
+        disabled->setEnabled(false);
+
+    m_viewModeAction = action(tr("View"), tr("Look at a sprite and edit its palette"));
+    m_createModeAction = action(tr("Create"), tr("Make a sprite from images"));
+    m_fixModeAction = action(tr("Fix"), tr("Turn CSO (V3) sprites into GoldSrc (V2) ones in a batch"));
+    auto* modes = new QActionGroup(this);
+    for (QAction* mode : { m_viewModeAction, m_createModeAction, m_fixModeAction })
+    {
+        mode->setCheckable(true);
+        modes->addAction(mode);
+    }
+    m_viewModeAction->setChecked(true);
+
+    connect(m_openAction, &QAction::triggered, this, &SpriteViewerWindow::onOpenSprite);
+    connect(m_saveAction, &QAction::triggered, this, &SpriteViewerWindow::onQuickSave);
+    connect(m_saveAsAction, &QAction::triggered, this, &SpriteViewerWindow::onSaveAsSprite);
+    connect(m_extractFrameAction, &QAction::triggered, this, &SpriteViewerWindow::onExtractFrame);
+    connect(m_extractAllFramesAction, &QAction::triggered, this, &SpriteViewerWindow::onExtractAllFrames);
+    connect(m_previousAction, &QAction::triggered, this, &SpriteViewerWindow::onPrevSprite);
+    connect(m_nextAction, &QAction::triggered, this, &SpriteViewerWindow::onNextSprite);
+    connect(m_viewModeAction, &QAction::triggered, this, [this]() { setMode(Mode::View); });
+    connect(m_createModeAction, &QAction::triggered, this, [this]() { setMode(Mode::Create); });
+    connect(m_fixModeAction, &QAction::triggered, this, [this]() { setMode(Mode::Fix); });
+}
+
+void SpriteViewerWindow::setMode(Mode mode)
+{
+    m_modeStack->setCurrentIndex(static_cast<int>(mode));
+    QAction* checked = mode == Mode::Create ? m_createModeAction : mode == Mode::Fix ? m_fixModeAction : m_viewModeAction;
+    checked->setChecked(true);
 }
 
 QWidget* SpriteViewerWindow::createFileBrowserWidget()
@@ -493,38 +544,33 @@ QWidget* SpriteViewerWindow::createFileBrowserWidget()
 
 QWidget* SpriteViewerWindow::createFileTabWidget()
 {
-    auto* widget = new QWidget(this);
-    auto* mainLayout = new QVBoxLayout(widget);
-    
-    // Top section: Horizontal layout with preview on left, controls on right
-    auto* topLayout = new QHBoxLayout();
-    
-    // Left side: Frame Preview with zoom
-    auto* previewGroup = new QGroupBox(tr("Frame Preview (Scroll=Zoom, RightClick=Background, LeftDrag=Select)"));
-    auto* previewLayout = new QVBoxLayout();
-    
+    auto* splitter = new QSplitter(Qt::Horizontal, this);
+
+    // centre: the frame, how it is shown, the animation and the frames
+    auto* centre = new QWidget(splitter);
+    auto* centreLayout = new QVBoxLayout(centre);
+    centreLayout->setContentsMargins(4, 4, 4, 4);
+
     m_previewWidget = new ZoomablePreviewWidget();
+    m_previewWidget->setToolTip(tr("Wheel: zoom. Right click: background. Drag: select a region."));
     m_fileFrameScrollArea = new QScrollArea();
     m_fileFrameScrollArea->setWidgetResizable(true);
     m_fileFrameScrollArea->setWidget(m_previewWidget);
-    m_fileFrameScrollArea->setMinimumSize(400, 400);
-    
-    // Zoom and background info
+    m_fileFrameScrollArea->setMinimumSize(320, 240);
+    centreLayout->addWidget(m_fileFrameScrollArea, 1);
+
     auto* previewInfoLayout = new QHBoxLayout();
     m_zoomLabel = new QLabel(tr("Zoom: 100%"));
     m_resetZoomButton = new QPushButton(tr("Reset Zoom"));
-    m_resetZoomButton->setFixedWidth(80);
     m_bgLabel = new QLabel(tr("Background: Checkered"));
     m_coordLabel = new QLabel(tr("X: - Y: -"));
     m_coordLabel->setMinimumWidth(100);
     m_coordLabel->setStyleSheet("font-family: monospace; font-weight: bold;");
-    
-    // Selection info for 640hud coordinates
+    // for 640hud sprite coordinates
     m_selectionLabel = new QLabel(tr("Selection: -"));
     m_selectionLabel->setMinimumWidth(200);
     m_selectionLabel->setStyleSheet("font-family: monospace; font-weight: bold; color: #00C8FF;");
     m_selectionLabel->setToolTip(tr("Drag to select region. Format: X, Y, Width, Height\nUse for 640hud sprite coordinates."));
-    
     previewInfoLayout->addWidget(m_zoomLabel);
     previewInfoLayout->addWidget(m_resetZoomButton);
     previewInfoLayout->addStretch();
@@ -533,203 +579,186 @@ QWidget* SpriteViewerWindow::createFileTabWidget()
     previewInfoLayout->addWidget(m_coordLabel);
     previewInfoLayout->addSpacing(15);
     previewInfoLayout->addWidget(m_bgLabel);
-    
-    connect(m_resetZoomButton, &QPushButton::clicked, m_previewWidget, &ZoomablePreviewWidget::resetZoom);
-    
-    previewLayout->addWidget(m_fileFrameScrollArea);
-    previewLayout->addLayout(previewInfoLayout);
-    previewGroup->setLayout(previewLayout);
-    
-    // Connect preview signals
-    connect(m_previewWidget, &ZoomablePreviewWidget::zoomChanged, this, &SpriteViewerWindow::onZoomChanged);
-    connect(m_previewWidget, &ZoomablePreviewWidget::backgroundChanged, this, &SpriteViewerWindow::onBackgroundChanged);
-    connect(m_previewWidget, &ZoomablePreviewWidget::coordinatesChanged, this, &SpriteViewerWindow::onCoordinatesChanged);
-    connect(m_previewWidget, &ZoomablePreviewWidget::selectionChanged, this, &SpriteViewerWindow::onSelectionChanged);
-    
-    // Right side: Controls, frame list, and palette
-    auto* rightLayout = new QVBoxLayout();
-    
-    // Sprite file selection
-    auto* fileGroup = new QGroupBox(tr("Sprite File"));
-    auto* fileLayout = new QHBoxLayout();
-    
+    centreLayout->addLayout(previewInfoLayout);
+
+    auto* animLayout = new QHBoxLayout();
+    m_filePlayButton = new QPushButton(tr("Play"));
+    m_filePlayButton->setEnabled(false);
+    m_fileStopButton = new QPushButton(tr("Stop"));
+    m_fileStopButton->setEnabled(false);
+    animLayout->addWidget(m_filePlayButton);
+    animLayout->addWidget(m_fileStopButton);
+    animLayout->addSpacing(12);
+    animLayout->addWidget(new QLabel(tr("Speed (ms):")));
+    m_fileAnimationSpeedSpin = new QSpinBox();
+    m_fileAnimationSpeedSpin->setRange(10, 1000);
+    m_fileAnimationSpeedSpin->setValue(100);
+    animLayout->addWidget(m_fileAnimationSpeedSpin);
+    animLayout->addStretch();
+    centreLayout->addLayout(animLayout);
+
+    // the frames side by side; Up and Down go to the other sprites of the folder
+    m_fileFrameListWidget = new QListWidget();
+    m_fileFrameListWidget->setViewMode(QListView::IconMode);
+    m_fileFrameListWidget->setFlow(QListView::LeftToRight);
+    m_fileFrameListWidget->setWrapping(false);
+    m_fileFrameListWidget->setIconSize(QSize(56, 56));
+    m_fileFrameListWidget->setGridSize(QSize(72, 82));
+    m_fileFrameListWidget->setFixedHeight(104);
+    m_fileFrameListWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    m_fileFrameListWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_fileFrameListWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_fileFrameListWidget->setMovement(QListView::Static);
+    m_fileFrameListWidget->installEventFilter(this);
+    centreLayout->addWidget(m_fileFrameListWidget);
+
+    // right: the sprite, its properties and its palette
+    auto* rightScroll = new QScrollArea(splitter);
+    rightScroll->setWidgetResizable(true);
+    rightScroll->setFrameShape(QFrame::NoFrame);
+    rightScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    rightScroll->setMinimumWidth(340);
+    auto* right = new QWidget();
+    rightScroll->setWidget(right);
+    auto* rightLayout = new QVBoxLayout(right);
+    rightLayout->setContentsMargins(4, 4, 4, 4);
+
+    m_fileNameLabel = new QLabel(tr("No sprite loaded."));
+    m_fileNameLabel->setStyleSheet("font-weight: bold;");
+    m_fileNameLabel->setWordWrap(true);
     m_fileSpritePathEdit = new QLineEdit();
     m_fileSpritePathEdit->setReadOnly(true);
-    m_fileOpenButton = new QPushButton(tr("Open Sprite..."));
-    
-    fileLayout->addWidget(m_fileSpritePathEdit, 1);
-    fileLayout->addWidget(m_fileOpenButton);
-    fileGroup->setLayout(fileLayout);
-    
-    // Info label
-    m_fileInfoLabel = new QLabel(tr("No sprite loaded."));
-    
-    // Buttons
-    auto* buttonLayout = new QHBoxLayout();
-    m_extractFrameButton = new QPushButton(tr("Extract Frame..."));
-    m_extractFrameButton->setEnabled(false);
-    m_extractAllFramesButton = new QPushButton(tr("Extract All Frames..."));
-    m_extractAllFramesButton->setEnabled(false);
-    m_saveButton = new QPushButton(tr("Save (Ctrl+S)"));
-    m_saveButton->setEnabled(false);
-    m_saveButton->setShortcut(QKeySequence::Save);
-    m_saveAsButton = new QPushButton(tr("Save As..."));
-    m_saveAsButton->setEnabled(false);
-    m_fixSpriteButton = new QPushButton(tr("Fix Sprite"));
+    m_fileSpritePathEdit->setPlaceholderText(tr("Open a sprite from the ribbon or the folder on the left."));
+    m_fileInfoLabel = new QLabel();
+    m_fileInfoLabel->setWordWrap(true);
+    m_fixSpriteButton = new QPushButton(tr("Fix Sprite (V3 to V2)"));
+    m_fixSpriteButton->setToolTip(tr("Turn this CSO sprite into a GoldSrc one"));
     m_fixSpriteButton->setEnabled(false);
     m_fixSpriteButton->setVisible(false);
-    
-    buttonLayout->addWidget(m_extractFrameButton);
-    buttonLayout->addWidget(m_extractAllFramesButton);
-    buttonLayout->addWidget(m_saveButton);
-    buttonLayout->addWidget(m_saveAsButton);
-    buttonLayout->addWidget(m_fixSpriteButton);
-    buttonLayout->addStretch();
-    
-    connect(m_saveButton, &QPushButton::clicked, this, &SpriteViewerWindow::onQuickSave);
-    connect(m_saveAsButton, &QPushButton::clicked, this, &SpriteViewerWindow::onSaveAsSprite);
-    
-    // Lithtech-specific panel (hidden by default)
-    m_lithtechPanel = new QWidget();
+    rightLayout->addWidget(m_fileNameLabel);
+    rightLayout->addWidget(m_fileSpritePathEdit);
+    rightLayout->addWidget(m_fileInfoLabel);
+    rightLayout->addWidget(m_fixSpriteButton);
+
+    // LithTech sprites point at DTX textures in a folder of their own
+    m_lithtechPanel = new QGroupBox(tr("Lithtech Texture Directory"));
     auto* lithtechLayout = new QVBoxLayout(m_lithtechPanel);
-    lithtechLayout->setContentsMargins(0, 0, 0, 0);
-    
-    auto* texDirGroup = new QGroupBox(tr("Lithtech Texture Directory"));
-    auto* texDirLayout = new QHBoxLayout();
     m_lithtechTextureDirEdit = new QLineEdit();
     m_lithtechTextureDirEdit->setPlaceholderText(tr("Browse for DTX texture directory..."));
     m_lithtechBrowseDirButton = new QPushButton(tr("Browse..."));
     m_lithtechLoadTexturesButton = new QPushButton(tr("Load Textures"));
+    auto* texDirLayout = new QHBoxLayout();
     texDirLayout->addWidget(m_lithtechTextureDirEdit, 1);
     texDirLayout->addWidget(m_lithtechBrowseDirButton);
-    texDirLayout->addWidget(m_lithtechLoadTexturesButton);
-    texDirGroup->setLayout(texDirLayout);
-    
-    auto* lithtechExportLayout = new QHBoxLayout();
+    lithtechLayout->addLayout(texDirLayout);
+    lithtechLayout->addWidget(m_lithtechLoadTexturesButton);
     m_lithtechExportGoldSrcButton = new QPushButton(tr("Export to GoldSrc SPR"));
     m_lithtechExportGoldSrcButton->setEnabled(false);
     m_lithtechExportFramesButton = new QPushButton(tr("Export Frames as BMP"));
     m_lithtechExportFramesButton->setEnabled(false);
-    lithtechExportLayout->addWidget(m_lithtechExportGoldSrcButton);
-    lithtechExportLayout->addWidget(m_lithtechExportFramesButton);
-    lithtechExportLayout->addStretch();
-    
-    lithtechLayout->addWidget(texDirGroup);
-    lithtechLayout->addLayout(lithtechExportLayout);
+    lithtechLayout->addWidget(m_lithtechExportGoldSrcButton);
+    lithtechLayout->addWidget(m_lithtechExportFramesButton);
     m_lithtechPanel->setVisible(false);
-    
-    connect(m_lithtechBrowseDirButton, &QPushButton::clicked, this, &SpriteViewerWindow::onBrowseLithtechTextureDir);
-    connect(m_lithtechLoadTexturesButton, &QPushButton::clicked, this, &SpriteViewerWindow::onLoadLithtechTextures);
-    connect(m_lithtechExportGoldSrcButton, &QPushButton::clicked, this, &SpriteViewerWindow::onExportLithtechToGoldSrc);
-    connect(m_lithtechExportFramesButton, &QPushButton::clicked, this, &SpriteViewerWindow::onExportLithtechFrames);
-    
-    // Frame list
-    auto* frameListGroup = new QGroupBox(tr("Frames"));
-    auto* frameListLayout = new QVBoxLayout();
-    
-    m_fileFrameListWidget = new QListWidget();
-    m_fileFrameListWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-    m_fileFrameListWidget->setMovement(QListView::Static);
-    m_fileFrameListWidget->installEventFilter(this);
-    
-    frameListLayout->addWidget(m_fileFrameListWidget);
-    frameListGroup->setLayout(frameListLayout);
-    
-    // Color Palette
+    rightLayout->addWidget(m_lithtechPanel);
+
+    auto* propsGroup = new QGroupBox(tr("Sprite Properties"));
+    auto* propsLayout = new QGridLayout(propsGroup);
+    m_spriteTypeEditCombo = new QComboBox();
+    m_spriteTypeEditCombo->addItem("VP_PARALLEL_UPRIGHT", 0);
+    m_spriteTypeEditCombo->addItem("FACING_UPRIGHT", 1);
+    m_spriteTypeEditCombo->addItem("VP_PARALLEL", 2);
+    m_spriteTypeEditCombo->addItem("ORIENTED", 3);
+    m_spriteTypeEditCombo->addItem("VP_PARALLEL_ORIENTED", 4);
+    m_spriteTypeLabel = new QLabel();
+    m_textureFormatEditCombo = new QComboBox();
+    m_textureFormatEditCombo->addItem(tr("Normal"), 0);
+    m_textureFormatEditCombo->addItem(tr("Additive"), 1);
+    m_textureFormatEditCombo->addItem(tr("IndexAlpha"), 2);
+    m_textureFormatEditCombo->addItem(tr("AlphaTest"), 3);
+    m_textureFormatLabel = new QLabel();
+    m_spriteTypeLabel->setForegroundRole(QPalette::PlaceholderText);
+    m_textureFormatLabel->setForegroundRole(QPalette::PlaceholderText);
+    propsLayout->addWidget(new QLabel(tr("Type:")), 0, 0);
+    propsLayout->addWidget(m_spriteTypeEditCombo, 0, 1);
+    propsLayout->addWidget(m_spriteTypeLabel, 1, 1);
+    propsLayout->addWidget(new QLabel(tr("Format:")), 2, 0);
+    propsLayout->addWidget(m_textureFormatEditCombo, 2, 1);
+    propsLayout->addWidget(m_textureFormatLabel, 3, 1);
+    propsLayout->setColumnStretch(1, 1);
+    rightLayout->addWidget(propsGroup);
+
     auto* paletteGroup = new QGroupBox(tr("Color Palette"));
-    auto* paletteLayout = new QVBoxLayout();
-    
-    m_paletteWidget = new PaletteWidget();
-    m_paletteInfoLabel = new QLabel(tr("Click a color to see RGB values"));
-    
-    // Palette manipulation toolbar
-    auto* paletteToolbar = new QHBoxLayout();
+    m_paletteGroup = paletteGroup;
+    auto* paletteLayout = new QVBoxLayout(paletteGroup);
     m_paletteBrightnessUp = new QPushButton(tr("B+"));
     m_paletteBrightnessDown = new QPushButton(tr("B-"));
     m_paletteGrayscale = new QPushButton(tr("Grayscale"));
     m_paletteSepia = new QPushButton(tr("Sepia"));
     m_paletteContrast = new QPushButton(tr("Contrast"));
     m_paletteInvert = new QPushButton(tr("Invert"));
-    
-    // Swap button with dropdown menu
     m_paletteSwap = new QPushButton(tr("Swap"));
     m_swapMenu = new QMenu(this);
     m_swapMenu->addAction(tr("R <-> B"), this, &SpriteViewerWindow::onPaletteSwapRB);
     m_swapMenu->addAction(tr("R <-> G"), this, &SpriteViewerWindow::onPaletteSwapRG);
     m_swapMenu->addAction(tr("B <-> G"), this, &SpriteViewerWindow::onPaletteSwapBG);
     m_paletteSwap->setMenu(m_swapMenu);
-    
-    // Set small fixed widths for compact buttons
-    m_paletteBrightnessUp->setFixedWidth(30);
-    m_paletteBrightnessDown->setFixedWidth(30);
-    m_paletteGrayscale->setFixedWidth(65);
-    m_paletteSepia->setFixedWidth(45);
-    m_paletteContrast->setFixedWidth(65);
-    m_paletteInvert->setFixedWidth(50);
-    m_paletteSwap->setFixedWidth(55);
-    
-    paletteToolbar->addWidget(m_paletteBrightnessUp);
-    paletteToolbar->addWidget(m_paletteBrightnessDown);
-    paletteToolbar->addWidget(m_paletteGrayscale);
-    paletteToolbar->addWidget(m_paletteSepia);
-    paletteToolbar->addWidget(m_paletteContrast);
-    paletteToolbar->addWidget(m_paletteInvert);
-    paletteToolbar->addWidget(m_paletteSwap);
-    paletteToolbar->addStretch();
-    
-    // Palette widget with undo/redo/reset buttons on the right
-    auto* paletteContentLayout = new QHBoxLayout();
-    paletteContentLayout->addWidget(m_paletteWidget);
-    
-    auto* undoRedoLayout = new QVBoxLayout();
-    m_paletteUndo = new QPushButton(tr("↩"));
-    m_paletteRedo = new QPushButton(tr("↪"));
-    m_paletteReset = new QPushButton(tr("⟲"));
-    m_paletteUndo->setFixedSize(30, 30);
-    m_paletteRedo->setFixedSize(30, 30);
-    m_paletteReset->setFixedSize(30, 30);
+    m_paletteUndo = new QPushButton(tr("Undo"));
+    m_paletteRedo = new QPushButton(tr("Redo"));
+    m_paletteReset = new QPushButton(tr("Reset"));
     m_paletteUndo->setToolTip(tr("Undo (Ctrl+Z)"));
     m_paletteRedo->setToolTip(tr("Redo (Ctrl+Y)"));
     m_paletteReset->setToolTip(tr("Reset to original"));
-    m_paletteUndo->setShortcut(QKeySequence::Undo); // Ctrl+Z
-    m_paletteRedo->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Y)); // Ctrl+Y
+    m_paletteUndo->setShortcut(QKeySequence::Undo);
+    m_paletteRedo->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Y));
     m_paletteUndo->setEnabled(false);
     m_paletteRedo->setEnabled(false);
     m_paletteReset->setEnabled(false);
-    undoRedoLayout->addWidget(m_paletteUndo);
-    undoRedoLayout->addWidget(m_paletteRedo);
-    undoRedoLayout->addWidget(m_paletteReset);
-    undoRedoLayout->addStretch();
-    paletteContentLayout->addLayout(undoRedoLayout);
-    
-    // Hue/Saturation sliders
-    auto* hsLayout = new QHBoxLayout();
+    auto* paletteTools = new QGridLayout();
+    const QList<QPushButton*> tools = { m_paletteBrightnessUp, m_paletteBrightnessDown, m_paletteGrayscale, m_paletteSepia, m_paletteContrast,
+                                        m_paletteInvert, m_paletteSwap, m_paletteUndo, m_paletteRedo, m_paletteReset };
+    for (int i = 0; i < tools.size(); ++i)
+        paletteTools->addWidget(tools[i], i / 3, i % 3);
+    paletteLayout->addLayout(paletteTools);
+
+    m_paletteWidget = new PaletteWidget();
+    paletteLayout->addWidget(m_paletteWidget, 0, Qt::AlignHCenter);
+
+    auto* hsLayout = new QGridLayout();
     m_hueLabel = new QLabel(tr("H: 0"));
-    m_hueLabel->setMinimumWidth(20);
     m_hueSlider = new QSlider(Qt::Horizontal);
     m_hueSlider->setRange(-180, 180);
     m_hueSlider->setValue(0);
-    m_hueSlider->setFixedWidth(100);
     m_satLabel = new QLabel(tr("S: 0"));
-    m_satLabel->setMinimumWidth(20);
     m_saturationSlider = new QSlider(Qt::Horizontal);
     m_saturationSlider->setRange(-100, 100);
     m_saturationSlider->setValue(0);
-    m_saturationSlider->setFixedWidth(100);
-
-    hsLayout->addWidget(m_hueLabel);
-    hsLayout->addWidget(m_hueSlider);
-    hsLayout->addWidget(m_satLabel);
-    hsLayout->addWidget(m_saturationSlider);
-
-    hsLayout->addStretch();
-    
-    paletteLayout->addLayout(paletteToolbar);
-    paletteLayout->addLayout(paletteContentLayout);
+    hsLayout->addWidget(m_hueLabel, 0, 0);
+    hsLayout->addWidget(m_hueSlider, 0, 1);
+    hsLayout->addWidget(m_satLabel, 1, 0);
+    hsLayout->addWidget(m_saturationSlider, 1, 1);
+    hsLayout->setColumnMinimumWidth(0, 50);
     paletteLayout->addLayout(hsLayout);
+    m_paletteInfoLabel = new QLabel(tr("Click a color to see RGB values"));
+    m_paletteInfoLabel->setWordWrap(true);
     paletteLayout->addWidget(m_paletteInfoLabel);
-    paletteGroup->setLayout(paletteLayout);
-    
+    rightLayout->addWidget(paletteGroup);
+    rightLayout->addStretch();
+
+    splitter->addWidget(centre);
+    splitter->addWidget(rightScroll);
+    splitter->setStretchFactor(0, 3);
+    splitter->setStretchFactor(1, 1);
+    splitter->setSizes({ 760, 340 });
+
+    connect(m_resetZoomButton, &QPushButton::clicked, m_previewWidget, &ZoomablePreviewWidget::resetZoom);
+    connect(m_previewWidget, &ZoomablePreviewWidget::zoomChanged, this, &SpriteViewerWindow::onZoomChanged);
+    connect(m_previewWidget, &ZoomablePreviewWidget::backgroundChanged, this, &SpriteViewerWindow::onBackgroundChanged);
+    connect(m_previewWidget, &ZoomablePreviewWidget::coordinatesChanged, this, &SpriteViewerWindow::onCoordinatesChanged);
+    connect(m_previewWidget, &ZoomablePreviewWidget::selectionChanged, this, &SpriteViewerWindow::onSelectionChanged);
+    connect(m_lithtechBrowseDirButton, &QPushButton::clicked, this, &SpriteViewerWindow::onBrowseLithtechTextureDir);
+    connect(m_lithtechLoadTexturesButton, &QPushButton::clicked, this, &SpriteViewerWindow::onLoadLithtechTextures);
+    connect(m_lithtechExportGoldSrcButton, &QPushButton::clicked, this, &SpriteViewerWindow::onExportLithtechToGoldSrc);
+    connect(m_lithtechExportFramesButton, &QPushButton::clicked, this, &SpriteViewerWindow::onExportLithtechFrames);
     connect(m_paletteWidget, &PaletteWidget::colorClicked, this, &SpriteViewerWindow::onPaletteColorClicked);
     connect(m_paletteWidget, &PaletteWidget::colorDoubleClicked, this, &SpriteViewerWindow::onPaletteColorDoubleClicked);
     connect(m_paletteBrightnessUp, &QPushButton::clicked, this, &SpriteViewerWindow::onPaletteBrightnessUp);
@@ -743,109 +772,14 @@ QWidget* SpriteViewerWindow::createFileTabWidget()
     connect(m_paletteReset, &QPushButton::clicked, this, &SpriteViewerWindow::onPaletteReset);
     connect(m_hueSlider, &QSlider::valueChanged, this, &SpriteViewerWindow::onHueChanged);
     connect(m_saturationSlider, &QSlider::valueChanged, this, &SpriteViewerWindow::onSaturationChanged);
-    
-    rightLayout->addWidget(fileGroup);
-    rightLayout->addWidget(m_fileInfoLabel);
-    rightLayout->addLayout(buttonLayout);
-    rightLayout->addWidget(m_lithtechPanel);
-    rightLayout->addWidget(frameListGroup, 1);
-    rightLayout->addWidget(paletteGroup);
-    
-    topLayout->addWidget(previewGroup, 2);
-    topLayout->addLayout(rightLayout, 1);
-    
-    // Bottom section: Animation controls and sprite properties
-    auto* bottomLayout = new QHBoxLayout();
-    
-    // Left: Animation controls
-    auto* animGroup = new QGroupBox(tr("Animation"));
-    auto* animLayout = new QHBoxLayout();
-    
-    m_filePlayButton = new QPushButton(tr("Play"));
-    m_filePlayButton->setEnabled(false);
-    m_fileStopButton = new QPushButton(tr("Stop"));
-    m_fileStopButton->setEnabled(false);
-    
-    animLayout->addWidget(m_filePlayButton);
-    animLayout->addWidget(m_fileStopButton);
-    animLayout->addSpacing(20);
-    
-    animLayout->addWidget(new QLabel(tr("Speed (ms):")));
-    m_fileAnimationSpeedSpin = new QSpinBox();
-    m_fileAnimationSpeedSpin->setRange(10, 1000);
-    m_fileAnimationSpeedSpin->setValue(100);
-    animLayout->addWidget(m_fileAnimationSpeedSpin);
-    animLayout->addStretch();
-    
-    animGroup->setLayout(animLayout);
-    
-    // Middle: Sprite properties
-    auto* propsGroup = new QGroupBox(tr("Sprite Properties"));
-    auto* propsLayout = new QVBoxLayout();
-    
-    auto* typeLayout = new QHBoxLayout();
-    typeLayout->addWidget(new QLabel(tr("Type:")));
-    m_spriteTypeEditCombo = new QComboBox();
-    m_spriteTypeEditCombo->addItem("VP_PARALLEL_UPRIGHT", 0);
-    m_spriteTypeEditCombo->addItem("FACING_UPRIGHT", 1);
-    m_spriteTypeEditCombo->addItem("VP_PARALLEL", 2);
-    m_spriteTypeEditCombo->addItem("ORIENTED", 3);
-    m_spriteTypeEditCombo->addItem("VP_PARALLEL_ORIENTED", 4);
-    m_spriteTypeLabel = new QLabel();
-    typeLayout->addWidget(m_spriteTypeEditCombo);
-    typeLayout->addWidget(m_spriteTypeLabel);
-    typeLayout->addStretch();
-    
-    auto* formatLayout = new QHBoxLayout();
-    formatLayout->addWidget(new QLabel(tr("Format:")));
-    m_textureFormatEditCombo = new QComboBox();
-    m_textureFormatEditCombo->addItem(tr("Normal"), 0);
-    m_textureFormatEditCombo->addItem(tr("Additive"), 1);
-    m_textureFormatEditCombo->addItem(tr("IndexAlpha"), 2);
-    m_textureFormatEditCombo->addItem(tr("AlphaTest"), 3);
-    m_textureFormatLabel = new QLabel();
-    formatLayout->addWidget(m_textureFormatEditCombo);
-    formatLayout->addWidget(m_textureFormatLabel);
-    formatLayout->addStretch();
-    
-    propsLayout->addLayout(typeLayout);
-    propsLayout->addLayout(formatLayout);
-    propsGroup->setLayout(propsLayout);
-    
-    // Right: Next/Prev sprite
-    auto* navGroup = new QGroupBox(tr("Navigate Sprites"));
-    auto* navLayout = new QHBoxLayout();
-    
-    m_prevSpriteButton = new QPushButton(tr("Previous"));
-    m_nextSpriteButton = new QPushButton(tr("Next"));
-    m_prevSpriteButton->setEnabled(false);
-    m_nextSpriteButton->setEnabled(false);
-    
-    navLayout->addWidget(m_prevSpriteButton);
-    navLayout->addWidget(m_nextSpriteButton);
-    navGroup->setLayout(navLayout);
-    navGroup->hide();
-    
-    bottomLayout->addWidget(animGroup);
-    bottomLayout->addWidget(propsGroup);
-    bottomLayout->addWidget(navGroup);
-    
-    mainLayout->addLayout(topLayout, 1);
-    mainLayout->addLayout(bottomLayout);
-    
-    connect(m_fileOpenButton, &QPushButton::clicked, this, &SpriteViewerWindow::onOpenSprite);
-    connect(m_extractFrameButton, &QPushButton::clicked, this, &SpriteViewerWindow::onExtractFrame);
-    connect(m_extractAllFramesButton, &QPushButton::clicked, this, &SpriteViewerWindow::onExtractAllFrames);
     connect(m_fixSpriteButton, &QPushButton::clicked, this, &SpriteViewerWindow::onFixSprite);
     connect(m_fileFrameListWidget, &QListWidget::itemSelectionChanged, this, &SpriteViewerWindow::onFileFrameListSelectionChanged);
     connect(m_filePlayButton, &QPushButton::clicked, this, &SpriteViewerWindow::onFilePlayAnimation);
     connect(m_fileStopButton, &QPushButton::clicked, this, &SpriteViewerWindow::onFileStopAnimation);
-    connect(m_prevSpriteButton, &QPushButton::clicked, this, &SpriteViewerWindow::onPrevSprite);
-    connect(m_nextSpriteButton, &QPushButton::clicked, this, &SpriteViewerWindow::onNextSprite);
     connect(m_spriteTypeEditCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SpriteViewerWindow::onSpriteTypeChanged);
     connect(m_textureFormatEditCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SpriteViewerWindow::onTextureFormatChanged);
-    
-    return widget;
+
+    return splitter;
 }
 
 QWidget* SpriteViewerWindow::createCreateTabWidget()
@@ -1223,14 +1157,13 @@ void SpriteViewerWindow::dropEvent(QDropEvent* event)
     // we just switch to the list that received something.
     if (!frameImages.isEmpty()) {
         addFramesToCreateList(frameImages, false);
-        if (m_tabWidget && m_createTabIndex >= 0)
-            m_tabWidget->setCurrentIndex(m_createTabIndex);
+        setMode(Mode::Create);
     }
     
     if (!sprFiles.isEmpty()) {
         addSpritesToFixList(sprFiles);
-        if (frameImages.isEmpty() && m_tabWidget && m_fixTabIndex >= 0)
-            m_tabWidget->setCurrentIndex(m_fixTabIndex);
+        if (frameImages.isEmpty())
+            setMode(Mode::Fix);
     }
     
     event->acceptProposedAction();
@@ -1447,6 +1380,8 @@ void SpriteViewerWindow::updatePaletteDisplay()
     const auto& header = m_spriteLoader.getHeader();
     const auto& palette = m_spriteLoader.getPalette();
     
+    // V3 and LithTech sprites have no palette to edit
+    m_paletteGroup->setVisible(header.version == SpriteVersion::GOLDSRC && !palette.empty());
     if (header.version != SpriteVersion::GOLDSRC || palette.empty()) {
         m_paletteWidget->clearPalette();
         if (header.version == SpriteVersion::LITHTECH)
@@ -1588,7 +1523,8 @@ void SpriteViewerWindow::loadSprite(const QString& filePath)
     }
 
     m_currentSpritePath = filePath;
-    m_fileSpritePathEdit->setText(filePath);
+    m_fileSpritePathEdit->setText(QDir::toNativeSeparators(filePath));
+    m_fileNameLabel->setText(QFileInfo(filePath).fileName());
     setModified(false);
     
     // Clear undo/redo stacks for new sprite
@@ -1632,10 +1568,10 @@ void SpriteViewerWindow::loadSprite(const QString& filePath)
     updatePaletteDisplay();
     updateUndoRedoButtons();
     
-    m_extractFrameButton->setEnabled(!isLithtech);
-    m_extractAllFramesButton->setEnabled(!isLithtech);
-    m_saveButton->setEnabled(isVersion2);
-    m_saveAsButton->setEnabled(isVersion2);
+    m_extractFrameAction->setEnabled(!isLithtech);
+    m_extractAllFramesAction->setEnabled(!isLithtech);
+    m_saveAction->setEnabled(isVersion2);
+    m_saveAsAction->setEnabled(isVersion2);
     
     // Show/hide Lithtech panel
     if (m_lithtechPanel) {
@@ -1688,8 +1624,8 @@ void SpriteViewerWindow::loadSprite(const QString& filePath)
     }
     
     // Enable navigation buttons
-    m_prevSpriteButton->setEnabled(true);
-    m_nextSpriteButton->setEnabled(true);
+    m_previousAction->setEnabled(true);
+    m_nextAction->setEnabled(true);
     
     // Show Fix Sprite button only for V3 sprites
     m_fixSpriteButton->setVisible(isVersion3);
@@ -1709,8 +1645,8 @@ void SpriteViewerWindow::loadSprite(const QString& filePath)
         if (loaded) {
             if (m_lithtechExportGoldSrcButton) m_lithtechExportGoldSrcButton->setEnabled(true);
             if (m_lithtechExportFramesButton) m_lithtechExportFramesButton->setEnabled(true);
-            m_extractFrameButton->setEnabled(true);
-            m_extractAllFramesButton->setEnabled(true);
+            m_extractFrameAction->setEnabled(true);
+            m_extractAllFramesAction->setEnabled(true);
         }
         updateFileInfo();
     }
@@ -2203,11 +2139,18 @@ void SpriteViewerWindow::updateFileFrameList()
     const auto& frames = m_spriteLoader.getFrames();
     bool isLithtech = m_spriteLoader.isLithtech();
     
+    const QSize iconSize = m_fileFrameListWidget->iconSize();
     for (size_t i = 0; i < frames.size(); i++) {
-        if (isLithtech && !frames[i].dtxPath.empty()) {
-            m_fileFrameListWidget->addItem(QString("#%1: %2").arg(i).arg(QString::fromStdString(frames[i].dtxPath)));
-        } else {
-            m_fileFrameListWidget->addItem(tr("Frame #%1").arg(i));
+        auto* item = new QListWidgetItem(QString::number(i), m_fileFrameListWidget);
+        if (isLithtech && !frames[i].dtxPath.empty())
+            item->setToolTip(QString::fromStdString(frames[i].dtxPath));
+        else
+            item->setToolTip(tr("Frame #%1").arg(i));
+        if (!frames[i].image.isNull()) {
+            // small frames keep their pixels sharp
+            const bool sharp = frames[i].image.width() < iconSize.width() && frames[i].image.height() < iconSize.height();
+            item->setIcon(QPixmap::fromImage(frames[i].image.scaled(iconSize, Qt::KeepAspectRatio,
+                sharp ? Qt::FastTransformation : Qt::SmoothTransformation)));
         }
     }
 }
@@ -2985,8 +2928,8 @@ void SpriteViewerWindow::onLoadLithtechTextures()
         
         if (m_lithtechExportGoldSrcButton) m_lithtechExportGoldSrcButton->setEnabled(true);
         if (m_lithtechExportFramesButton) m_lithtechExportFramesButton->setEnabled(true);
-        m_extractFrameButton->setEnabled(true);
-        m_extractAllFramesButton->setEnabled(true);
+        m_extractFrameAction->setEnabled(true);
+        m_extractAllFramesAction->setEnabled(true);
         
         QMessageBox::information(this, tr("Success"), 
             tr("Textures loaded successfully. You can now preview frames and export."));

@@ -34,7 +34,10 @@ class GmaFile
 {
 public:
     GmaFile() = default;
-    ~GmaFile() = default;
+    ~GmaFile() { Clear(); }
+    // a decompressed addon lives in a temp file this object deletes
+    GmaFile(const GmaFile&) = delete;
+    GmaFile& operator=(const GmaFile&) = delete;
 
     bool Load(const std::string& filePath);
 
@@ -65,10 +68,10 @@ private:
 
     std::string m_filePath;
 
-    // Plain .gma files are streamed from disk; LZMA-compressed ones are
-    // decompressed into memory first.
-    mutable std::unique_ptr<std::istream> m_stream;
-    std::vector<uint8_t> m_memory; // backing storage for the LZMA case
+    // entries are read from here, opened for each read: the .gma itself, or for an
+    // LZMA-compressed addon its decompressed copy in the temp folder
+    std::string m_dataPath;
+    bool m_ownsDataFile = false;
 
     uint8_t m_formatVersion = 0;
     uint64_t m_steamId = 0;

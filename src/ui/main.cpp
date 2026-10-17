@@ -22,18 +22,11 @@
 #endif
 
 #include "MainWindow.h"
+#include "workspaces/ArchiveSource.h"
 
-#include "windows/SpriteViewerWindow.h"
-#include "windows/RezViewerWindow.h"
-#include "windows/XfsViewerWindow.h"
 #ifdef METIN2_SCRIPT_EFFECT
 #include "windows/MseViewerWindow.h"
 #endif
-#include "windows/PakViewerWindow.h"
-#include "windows/VpkViewerWindow.h"
-#include "dialogs/DtxViewerDialog.h"
-#include "dialogs/VtfViewerDialog.h"
-#include "dialogs/WadMakerDialog.h"
 #include "dialogs/SettingsDialog.h"
 
 #include "LanguageManager.h"
@@ -134,52 +127,7 @@ int main(int argc, char* argv[])
         if (fi.exists()) {
             QString ext = fi.suffix().toLower();
             
-
-           // These are the you can open directly through File Explorer without manually opening  Vortigaunt.
-		   // you cant see the main window of the vortigaunt if you open these file types, it will just open the viewer directly. 
-   
-
-            // Goldsrc Sprite Viewer 
-            // TODO: Detect Lithtech Sprite. (DONE)
-            
-            if (ext == "spr") {
-                SpriteViewerWindow* spriteViewer = new SpriteViewerWindow();
-                spriteViewer->setAttribute(Qt::WA_DeleteOnClose);
-                spriteViewer->show();
-                
-                QMetaObject::invokeMethod(spriteViewer, [spriteViewer, filePath]() {
-                    spriteViewer->openSprite(filePath);
-                }, Qt::QueuedConnection);
-                
-                return app.exec();
-            }
-            
-            //  REZ Viewer
-            if (ext == "rez") {
-                RezViewerWindow* rezViewer = new RezViewerWindow();
-                rezViewer->setAttribute(Qt::WA_DeleteOnClose);
-                rezViewer->show();
-                
-                QMetaObject::invokeMethod(rezViewer, [rezViewer, filePath]() {
-                    rezViewer->loadRez(filePath);
-                }, Qt::QueuedConnection);
-                
-                return app.exec();
-            }
-            
-            // Xenesis File Viewer
-            if (ext == "xfs") {
-                XfsViewerWindow* xfsViewer = new XfsViewerWindow();
-                xfsViewer->setAttribute(Qt::WA_DeleteOnClose);
-                xfsViewer->show();
-                
-                QMetaObject::invokeMethod(xfsViewer, [xfsViewer, filePath]() {
-                    xfsViewer->loadXfs(filePath);
-                }, Qt::QueuedConnection);
-                
-                return app.exec();
-            }
-            
+            // a Metin2 effect opens in its viewer alone, without the main window
 #ifdef METIN2_SCRIPT_EFFECT
             // Metin2 Script Effect Viewer
             if (ext == "mse") {
@@ -195,70 +143,7 @@ int main(int argc, char* argv[])
             }
 #endif
             
-            // DTX Viewer
-            if (ext == "dtx") {
-                DtxViewerDialog* dtxViewer = new DtxViewerDialog();
-                dtxViewer->setAttribute(Qt::WA_DeleteOnClose);
-                dtxViewer->show();
-                
-                QMetaObject::invokeMethod(dtxViewer, [dtxViewer, filePath]() {
-                    dtxViewer->loadDtxFile(filePath);
-                }, Qt::QueuedConnection);
-                
-                return app.exec();
-            }
             
-            // VTF Viewer (Source Engine texture)
-            if (ext == "vtf") {
-                VtfViewerDialog* vtfViewer = new VtfViewerDialog();
-                vtfViewer->setAttribute(Qt::WA_DeleteOnClose);
-                vtfViewer->show();
-
-                QMetaObject::invokeMethod(vtfViewer, [vtfViewer, filePath]() {
-                    vtfViewer->loadVtfFile(filePath);
-                }, Qt::QueuedConnection);
-
-                return app.exec();
-            }
-
-            // WAD Maker
-            if (ext == "wad") {
-                WadMakerDialog* wadMaker = new WadMakerDialog();
-                wadMaker->setAttribute(Qt::WA_DeleteOnClose);
-                wadMaker->show();
-                
-                QMetaObject::invokeMethod(wadMaker, [wadMaker, filePath]() {
-                    wadMaker->loadWad(filePath);
-                }, Qt::QueuedConnection);
-                
-                return app.exec();
-            }
-            
-            // PAK Viewer
-            if (ext == "pak") {
-                PakViewerWindow* pakViewer = new PakViewerWindow();
-                pakViewer->setAttribute(Qt::WA_DeleteOnClose);
-                pakViewer->show();
-
-                QMetaObject::invokeMethod(pakViewer, [pakViewer, filePath]() {
-                    pakViewer->loadPak(filePath);
-                }, Qt::QueuedConnection);
-
-                return app.exec();
-            }
-
-            // VPK / GMA Viewer (Source Engine)
-            if (ext == "vpk" || ext == "gma") {
-                VpkViewerWindow* vpkViewer = new VpkViewerWindow();
-                vpkViewer->setAttribute(Qt::WA_DeleteOnClose);
-                vpkViewer->show();
-
-                QMetaObject::invokeMethod(vpkViewer, [vpkViewer, filePath]() {
-                    vpkViewer->loadVpk(filePath);
-                }, Qt::QueuedConnection);
-
-                return app.exec();
-            }
         }
     }
 
@@ -268,6 +153,21 @@ int main(int argc, char* argv[])
 
     MainWindow wndw;
     wndw.show();
+    // archives, textures, sprites and WADs open in their tabs, anything else goes in the file list
+    if (args.size() > 1)
+    {
+        const QString ext = QFileInfo(args.at(1)).suffix().toLower();
+        if (ArchiveSource::isArchive(args.at(1)))
+            wndw.openArchive(args.at(1));
+        else if (ext == "dtx" || ext == "vtf")
+            wndw.openTextures(args.mid(1));
+        else if (ext == "spr")
+            wndw.openSprite(args.at(1));
+        else if (ext == "wad")
+            wndw.openWad(args.at(1));
+        else
+            wndw.addPaths(args.mid(1));
+    }
 
     return app.exec();
 }

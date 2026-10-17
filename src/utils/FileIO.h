@@ -141,4 +141,25 @@ inline std::string sanitizePathComponent(const std::string& name)
     return out;
 }
 
+
+inline std::filesystem::path safeRelativePath(const std::string& utf8Path)
+{
+    std::filesystem::path out;
+    std::string part;
+    auto flush = [&]() {
+        if (!part.empty() && part != "." && part != "..")
+            out /= toPath(sanitizePathComponent(part));
+        part.clear();
+    };
+    for (char c : utf8Path)
+    {
+        if (c == '/' || c == '\\')
+            flush();
+        else
+            part += c;
+    }
+    flush();
+    return out.empty() ? std::filesystem::path("_") : out;
+}
+
 } // namespace FileIO

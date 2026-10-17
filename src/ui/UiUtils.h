@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QIcon>
 #include <QString>
 
 class QTableWidget;
@@ -24,4 +25,8 @@ namespace UiUtils
 
     // Select all rows that are currently visible (i.e. survived the filter).
     void selectVisibleRows(QTableWidget* table);
+
+    // A line icon drawn from SVG path data on a 24x24 grid (M, L, H, V, Z, absolute or relative),
+    // in the palette's button text colour
+    QIcon lineIcon(const QString& pathData, int size = 26);
 }

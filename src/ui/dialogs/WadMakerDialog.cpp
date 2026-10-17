@@ -8,7 +8,7 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QLineEdit>
-#include <QPushButton>
+#include <QAction>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QFileInfo>
@@ -19,6 +19,7 @@
 #include <QToolBar>
 #include <QStatusBar>
 #include <QFrame>
+#include <QPainter>
 
 WadMakerDialog::WadMakerDialog(QWidget* parent)
     : QDialog(parent)
@@ -46,32 +47,25 @@ void WadMakerDialog::setupUi()
     mainLayout->setSpacing(8);
     mainLayout->setContentsMargins(8, 8, 8, 8);
     
-    // === Toolbar ===
-    auto* toolbarLayout = new QHBoxLayout();
-    
-    m_newButton = new QPushButton(tr("New"));
-    m_newButton->setToolTip(tr("Create new WAD"));
-    m_openButton = new QPushButton(tr("Open WAD..."));
-    m_openButton->setToolTip(tr("Open existing WAD file"));
-    m_saveButton = new QPushButton(tr("Save"));
-    m_saveButton->setToolTip(tr("Save WAD file"));
-    m_saveButton->setEnabled(false);
-    m_saveAsButton = new QPushButton(tr("Save As..."));
-    m_saveAsButton->setToolTip(tr("Save WAD to new file"));
-    
-    toolbarLayout->addWidget(m_newButton);
-    toolbarLayout->addWidget(m_openButton);
-    toolbarLayout->addWidget(m_saveButton);
-    toolbarLayout->addWidget(m_saveAsButton);
-    toolbarLayout->addStretch();
-    
-    // Status label
-    m_statusLabel = new QLabel(tr("Textures: 0 / %1").arg(MAX_TEXTURES));
-    m_statusLabel->setStyleSheet("font-weight: bold; padding: 4px;");
-    toolbarLayout->addWidget(m_statusLabel);
-    
-    mainLayout->addLayout(toolbarLayout);
-    
+    auto action = [this](const QString& text, const QString& tip) {
+        auto* created = new QAction(text, this);
+        created->setToolTip(tip);
+        addAction(created);
+        return created;
+    };
+    m_newAction = action(tr("New"), tr("Create new WAD"));
+    m_openAction = action(tr("Open WAD"), tr("Open existing WAD file"));
+    m_saveAction = action(tr("Save"), tr("Save WAD file"));
+    m_saveAction->setEnabled(false);
+    m_saveAsAction = action(tr("Save As"), tr("Save WAD to new file"));
+    m_addAction = action(tr("Add images"), tr("Add images as textures; they are fitted into 512 x 512 and 256 colors"));
+    m_removeAction = action(tr("Remove"), tr("Remove the selected textures"));
+    m_extractAction = action(tr("Extract"), tr("Save the selected textures as images"));
+    m_renameAction = action(tr("Rename"), tr("Rename the selected texture (double-click works too)"));
+    m_removeAction->setEnabled(false);
+    m_extractAction->setEnabled(false);
+    m_renameAction->setEnabled(false);
+
     // === Main splitter (grid + preview) ===
     auto* splitter = new QSplitter(Qt::Horizontal);
     
@@ -80,62 +74,30 @@ void WadMakerDialog::setupUi()
     auto* leftLayout = new QVBoxLayout(leftPanel);
     leftLayout->setContentsMargins(0, 0, 0, 0);
     
-    // Filter
+    // Filter, and how full the WAD is
     auto* filterLayout = new QHBoxLayout();
-    filterLayout->addWidget(new QLabel(tr("Filter:")));
     m_filterEdit = new QLineEdit();
     m_filterEdit->setPlaceholderText(tr("Type to filter textures..."));
     m_filterEdit->setClearButtonEnabled(true);
-    filterLayout->addWidget(m_filterEdit);
+    filterLayout->addWidget(m_filterEdit, 1);
+    m_statusLabel = new QLabel(tr("Textures: 0 / %1").arg(MAX_TEXTURES));
+    m_statusLabel->setStyleSheet("font-weight: bold; padding: 4px;");
+    filterLayout->addWidget(m_statusLabel);
     leftLayout->addLayout(filterLayout);
     
     // Texture grid
     m_textureGrid = new QListWidget();
     m_textureGrid->setViewMode(QListWidget::IconMode);
     m_textureGrid->setIconSize(QSize(THUMBNAIL_SIZE, THUMBNAIL_SIZE));
-    m_textureGrid->setSpacing(8);
     m_textureGrid->setResizeMode(QListWidget::Adjust);
     m_textureGrid->setSelectionMode(QAbstractItemView::ExtendedSelection);
     m_textureGrid->setMovement(QListWidget::Static);
     m_textureGrid->setWrapping(true);
     m_textureGrid->setUniformItemSizes(true);
-    m_textureGrid->setGridSize(QSize(THUMBNAIL_SIZE + 20, THUMBNAIL_SIZE + 30));
-    m_textureGrid->setStyleSheet(R"(
-        QListWidget {
-            background-color: #2d2d2d;
-            border: 1px solid #444;
-        }
-        QListWidget::item {
-            color: #fff;
-            padding: 4px;
-        }
-        QListWidget::item:selected {
-            background-color: #3d6a99;
-            border: 2px solid #5a9fd4;
-        }
-        QListWidget::item:hover {
-            background-color: #3a3a3a;
-        }
-    )");
+    m_textureGrid->setGridSize(QSize(THUMBNAIL_SIZE + 28, THUMBNAIL_SIZE + 30));
+    m_textureGrid->setTextElideMode(Qt::ElideMiddle);
+    m_textureGrid->setWordWrap(true);
     leftLayout->addWidget(m_textureGrid);
-    
-    // Texture buttons
-    auto* buttonLayout = new QHBoxLayout();
-    m_addButton = new QPushButton(tr("Add Images..."));
-    m_removeButton = new QPushButton(tr("Remove"));
-    m_extractButton = new QPushButton(tr("Extract..."));
-    m_renameButton = new QPushButton(tr("Rename"));
-    
-    m_removeButton->setEnabled(false);
-    m_extractButton->setEnabled(false);
-    m_renameButton->setEnabled(false);
-    
-    buttonLayout->addWidget(m_addButton);
-    buttonLayout->addWidget(m_removeButton);
-    buttonLayout->addWidget(m_extractButton);
-    buttonLayout->addWidget(m_renameButton);
-    buttonLayout->addStretch();
-    leftLayout->addLayout(buttonLayout);
     
     splitter->addWidget(leftPanel);
     
@@ -153,7 +115,8 @@ void WadMakerDialog::setupUi()
     m_previewLabel = new QLabel();
     m_previewLabel->setMinimumSize(256, 256);
     m_previewLabel->setAlignment(Qt::AlignCenter);
-    m_previewLabel->setStyleSheet("background-color: #1a1a1a; border: 1px solid #444;");
+    m_previewLabel->setBackgroundRole(QPalette::Base);
+    m_previewLabel->setAutoFillBackground(true);
     m_previewLabel->setText(tr("Select a texture\nto preview"));
     rightLayout->addWidget(m_previewLabel);
     
@@ -171,15 +134,15 @@ void WadMakerDialog::setupUi()
     mainLayout->addWidget(splitter, 1);
     
     // === Connections ===
-    connect(m_newButton, &QPushButton::clicked, this, &WadMakerDialog::onNewWad);
-    connect(m_openButton, &QPushButton::clicked, this, &WadMakerDialog::onOpenWad);
-    connect(m_saveButton, &QPushButton::clicked, this, &WadMakerDialog::onSaveWad);
-    connect(m_saveAsButton, &QPushButton::clicked, this, &WadMakerDialog::onSaveWadAs);
-    
-    connect(m_addButton, &QPushButton::clicked, this, &WadMakerDialog::onAddImages);
-    connect(m_removeButton, &QPushButton::clicked, this, &WadMakerDialog::onRemoveSelected);
-    connect(m_extractButton, &QPushButton::clicked, this, &WadMakerDialog::onExtractSelected);
-    connect(m_renameButton, &QPushButton::clicked, this, &WadMakerDialog::onRenameSelected);
+    connect(m_newAction, &QAction::triggered, this, &WadMakerDialog::onNewWad);
+    connect(m_openAction, &QAction::triggered, this, &WadMakerDialog::onOpenWad);
+    connect(m_saveAction, &QAction::triggered, this, &WadMakerDialog::onSaveWad);
+    connect(m_saveAsAction, &QAction::triggered, this, &WadMakerDialog::onSaveWadAs);
+
+    connect(m_addAction, &QAction::triggered, this, &WadMakerDialog::onAddImages);
+    connect(m_removeAction, &QAction::triggered, this, &WadMakerDialog::onRemoveSelected);
+    connect(m_extractAction, &QAction::triggered, this, &WadMakerDialog::onExtractSelected);
+    connect(m_renameAction, &QAction::triggered, this, &WadMakerDialog::onRenameSelected);
     
     connect(m_textureGrid, &QListWidget::itemSelectionChanged, this, &WadMakerDialog::onSelectionChanged);
     connect(m_textureGrid, &QListWidget::itemDoubleClicked, this, &WadMakerDialog::onItemDoubleClicked);
@@ -193,7 +156,7 @@ void WadMakerDialog::onNewWad()
     m_wadMaker->clear();
     m_currentFilePath.clear();
     m_modified = false;
-    m_saveButton->setEnabled(false);
+    m_saveAction->setEnabled(false);
     setWindowTitle(tr("WAD Editor - New"));
     refreshTextureList();
 }
@@ -219,7 +182,7 @@ bool WadMakerDialog::loadWad(const QString& path)
     {
         m_currentFilePath = path;
         m_modified = false;
-        m_saveButton->setEnabled(true);
+        m_saveAction->setEnabled(true);
         setWindowTitle(tr("WAD Editor - %1").arg(QFileInfo(path).fileName()));
         refreshTextureList();
         return true;
@@ -271,7 +234,7 @@ void WadMakerDialog::onSaveWadAs()
     {
         m_currentFilePath = path;
         m_modified = false;
-        m_saveButton->setEnabled(true);
+        m_saveAction->setEnabled(true);
         setWindowTitle(tr("WAD Editor - %1").arg(QFileInfo(path).fileName()));
         QMessageBox::information(this, tr("Success"),
             tr("WAD file saved successfully!\n\nTextures: %1").arg(m_wadMaker->textureCount()));
@@ -432,9 +395,9 @@ void WadMakerDialog::onSelectionChanged()
     bool hasSelection = !selected.isEmpty();
     bool singleSelection = selected.count() == 1;
     
-    m_removeButton->setEnabled(hasSelection);
-    m_extractButton->setEnabled(hasSelection);
-    m_renameButton->setEnabled(singleSelection);
+    m_removeAction->setEnabled(hasSelection);
+    m_extractAction->setEnabled(hasSelection);
+    m_renameAction->setEnabled(singleSelection);
     
     if (singleSelection)
     {
@@ -499,7 +462,13 @@ void WadMakerDialog::populateThumbnails()
         
         if (!thumbnail.isNull())
         {
-            item->setIcon(QIcon(QPixmap::fromImage(thumbnail)));
+            // centred in a square, so every item of the grid has the same size and room for its name
+            QPixmap square(THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+            square.fill(Qt::transparent);
+            QPainter painter(&square);
+            painter.drawImage((THUMBNAIL_SIZE - thumbnail.width()) / 2, (THUMBNAIL_SIZE - thumbnail.height()) / 2, thumbnail);
+            painter.end();
+            item->setIcon(QIcon(square));
         }
         
         m_textureGrid->addItem(item);

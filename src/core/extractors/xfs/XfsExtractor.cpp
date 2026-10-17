@@ -738,7 +738,7 @@ bool XfsExtractor::ExtractAll(const std::string& outputDir) const
     for (size_t idx : indices)
     {
         const XfsEntry& e = m_entries[idx];
-        std::filesystem::path outPath = FileIO::toPath(outputDir) / FileIO::toPath(e.filename);
+        std::filesystem::path outPath = FileIO::toPath(outputDir) / FileIO::safeRelativePath(e.filename);
         if (outPath.has_parent_path())
         {
             dirs.insert(outPath.parent_path());
@@ -777,7 +777,7 @@ bool XfsExtractor::ExtractAll(const std::string& outputDir) const
     {
         const XfsEntry& e = m_entries[indices[i]];
         
-        std::filesystem::path outPath = FileIO::toPath(outputDir) / FileIO::toPath(e.filename);
+        std::filesystem::path outPath = FileIO::toPath(outputDir) / FileIO::safeRelativePath(e.filename);
         
         // Inline extraction for speed (avoid function call overhead)
         bool success = false;
@@ -826,7 +826,8 @@ bool XfsExtractor::ExtractAll(const std::string& outputDir) const
                     }
                 }
                 
-                if (success && !outputData.empty())
+                
+                if (success)
                 {
                     std::ofstream out(outPath, std::ios::binary);
                     if (out)
@@ -890,7 +891,7 @@ bool XfsExtractor::ExtractSelectedEntries(const std::vector<size_t>& indices, co
     {
         if (idx >= m_entries.size()) continue;
         const XfsEntry& e = m_entries[idx];
-        std::filesystem::path outPath = FileIO::toPath(outputDir) / FileIO::toPath(e.filename);
+        std::filesystem::path outPath = FileIO::toPath(outputDir) / FileIO::safeRelativePath(e.filename);
         if (!outPath.parent_path().empty())
         {
             dirs.insert(outPath.parent_path());
@@ -910,7 +911,7 @@ bool XfsExtractor::ExtractSelectedEntries(const std::vector<size_t>& indices, co
         if (idx >= m_entries.size()) continue;
 
         const XfsEntry& e = m_entries[idx];
-        std::filesystem::path outPath = FileIO::toPath(outputDir) / FileIO::toPath(e.filename);
+        std::filesystem::path outPath = FileIO::toPath(outputDir) / FileIO::safeRelativePath(e.filename);
 
         if (ExtractEntry(e, String_UTF16toUTF8(outPath.generic_u16string())))
         {

@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cstdint>
+#include <memory>
 #include <span>
 #include <string>
 #include <utility>
@@ -42,6 +43,8 @@ class PakFile
 {
 public:
     PakFile(std::vector<uint8_t>&& buffer, std::u16string&& filename);
+    // the pak's bytes kept alive by owner, a mapped file for one: nothing is copied
+    PakFile(std::span<const uint8_t> data, std::shared_ptr<const void> owner, std::u16string&& filename);
 
     bool ParseHeader();
     bool ParseEntries();
@@ -65,8 +68,8 @@ public:
     }
 
 private:
-    std::vector<uint8_t> m_Buffer;
-    std::vector<uint8_t> m_BackupBuffer;
+    std::shared_ptr<const void> m_Owner;
+    std::span<const uint8_t> m_Data;
     std::u16string m_Filename;
 
     size_t m_HeaderStartOffset;

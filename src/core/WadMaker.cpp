@@ -57,9 +57,9 @@ std::string WadArchive::sanitizeTextureName(const std::string& name) const
     for (char c : name)
     {
         if (result.length() >= 15) break;
-        
-        // Convert to uppercase and keep only valid characters
-        if (std::isalnum(static_cast<unsigned char>(c)) || c == '_' || c == '-')
+
+        if (std::isalnum(static_cast<unsigned char>(c)) || c == '_' || c == '-' ||
+            c == '{' || c == '!' || c == '+' || c == '~')
         {
             result += static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
         }
