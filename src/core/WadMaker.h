@@ -19,6 +19,13 @@ namespace WadConstants
     constexpr uint32_t MAX_TEXTURE_SIZE = 512;    
 }
 
+// what happens to an image whose sides are not multiples of 16
+enum class WadFit
+{
+    Scale,  // resized to the nearest multiples of 16
+    Pad,    // kept as it is, a see-through border fills up to the next multiples of 16
+};
+
 // WAD3 Header structure
 #pragma pack(push, 1)
 struct WadHeader
@@ -110,11 +117,15 @@ public:
 
     /**
      * @brief Add a texture from any supported image file
-     * @param name Texture name (max 15 chars, will be uppercased)
+     * @param name Texture name (max 15 chars, will be uppercased); an image with see-through
+     *        pixels gets the { prefix, as GoldSrc only shows those of a { texture as holes
      * @param imagePath Path to image file (BMP, PNG, JPEG, TGA, DDS)
      * @return true if texture was added successfully
      */
-    bool addTextureFromImage(const std::string& name, const std::string& imagePath);
+    bool addTextureFromImage(const std::string& name, const std::string& imagePath, WadFit fit = WadFit::Scale);
+
+    // the texture at index gets the picture of another image and keeps its name
+    bool replaceTextureImage(size_t index, const std::string& imagePath, WadFit fit = WadFit::Scale);
 
     /**
      * @brief Add a texture from raw data (24-bit RGB)
@@ -175,8 +186,10 @@ public:
      * @param maxSize Maximum thumbnail size (scaled proportionally)
      * @return QImage or null image if not available
      */
+    bool addTextureFromImage(const std::string& name, const QImage& image, WadFit fit = WadFit::Scale);
     QImage textureThumbnail(size_t index, int maxSize = 64);
-    QImage textureFullImage(size_t index);
+    // one mip level (0 is full size); for a { texture palette index 255 is transparent
+    QImage textureImage(size_t index, int mip = 0) const;
 #endif
 
 private:
@@ -195,7 +208,10 @@ private:
 
     // Load various image formats
     bool loadBmp(const std::string& path, WadTexture& texture);
-    bool loadViaQImage(const std::string& path, WadTexture& texture); // PNG, JPEG, TGA, DDS
+    bool loadImageFile(const std::string& path, WadFit fit, WadTexture& texture);
+#ifdef QT_CORE_LIB
+    bool textureFromImage(const QImage& image, WadFit fit, WadTexture& texture);
+#endif
 
     // Get file extension in lowercase
     std::string getFileExtension(const std::string& path) const;

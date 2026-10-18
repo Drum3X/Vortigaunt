@@ -18,7 +18,6 @@ class QCheckBox;
 class QLabel;
 class QLineEdit;
 class QProgressBar;
-class QPlainTextEdit;
 class QComboBox;
 class QScrollArea;
 class QGridLayout;
@@ -115,7 +114,7 @@ private:
     
     // UI Elements
     QComboBox*          m_championCombo;
-    QListWidget*        m_skinListWidget;  // Fallback için tutuluyor
+    QListWidget*        m_skinListWidget; 
     QScrollArea*        m_skinScrollArea;
     QWidget*            m_skinContainer;
     QGridLayout*        m_skinGridLayout;
@@ -131,7 +130,6 @@ private:
     QCheckBox*          m_compileModelCheckbox = nullptr;
     QLineEdit*          m_outputPathEdit;
     QPushButton*        m_browseOutputButton;
-    QPlainTextEdit*          m_logEdit;
     QProgressBar*       m_progressBar;
     QLabel*             m_statusLabel;
     
@@ -156,7 +154,6 @@ private:
     QString              m_currentChampion;
     QString              m_viewedSkinId;     // Currently viewed skin ID
     bool                 m_cancelled;
-    QPlainTextEdit*      m_previousLogWidget;  // saved to restore on close
     
     // Async viewer download state
     QString              m_currentTempFile;    // Current temp file for cleanup

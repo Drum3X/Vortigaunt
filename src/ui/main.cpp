@@ -22,7 +22,6 @@
 #endif
 
 #include "MainWindow.h"
-#include "workspaces/ArchiveSource.h"
 
 #ifdef METIN2_SCRIPT_EFFECT
 #include "windows/MseViewerWindow.h"
@@ -153,21 +152,8 @@ int main(int argc, char* argv[])
 
     MainWindow wndw;
     wndw.show();
-    // archives, textures, sprites and WADs open in their tabs, anything else goes in the file list
     if (args.size() > 1)
-    {
-        const QString ext = QFileInfo(args.at(1)).suffix().toLower();
-        if (ArchiveSource::isArchive(args.at(1)))
-            wndw.openArchive(args.at(1));
-        else if (ext == "dtx" || ext == "vtf")
-            wndw.openTextures(args.mid(1));
-        else if (ext == "spr")
-            wndw.openSprite(args.at(1));
-        else if (ext == "wad")
-            wndw.openWad(args.at(1));
-        else
-            wndw.addPaths(args.mid(1));
-    }
+        wndw.openPaths(args.mid(1));
 
     return app.exec();
 }

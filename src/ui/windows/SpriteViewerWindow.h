@@ -22,6 +22,7 @@
 #include <stack>
 
 #include "SpriteLoader.h"
+#include "ui/widgets/PaletteWidget.h"
 
 class QAction;
 class QMimeData;
@@ -66,31 +67,6 @@ private:
     QPoint m_selectionStart;  // Image coordinates
     QPoint m_selectionEnd;    // Image coordinates
     QRect m_selectionRect;    // Normalized selection in image coordinates
-};
-
-// Widget for displaying color palette
-class PaletteWidget : public QWidget
-{
-    Q_OBJECT
-public:
-    explicit PaletteWidget(QWidget* parent = nullptr);
-    
-    void setPalette(const QVector<QRgb>& colors);
-    void clearPalette();
-    
-signals:
-    void colorClicked(int index, QRgb color);
-    void colorDoubleClicked(int index, QRgb color);
-    
-protected:
-    void paintEvent(QPaintEvent* event) override;
-    void mousePressEvent(QMouseEvent* event) override;
-    void mouseDoubleClickEvent(QMouseEvent* event) override;
-    
-private:
-    QVector<QRgb> m_colors;
-    int m_cellSize = 16;
-    int m_hoveredIndex = -1;
 };
 
 class SpriteViewerWindow : public QDialog

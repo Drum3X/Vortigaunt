@@ -45,6 +45,172 @@
     </message>
 </context>
 <context>
+    <name>ArchiveSource</name>
+    <message>
+        <source>REZ (LithTech)</source>
+        <translation>REZ (LithTech)</translation>
+    </message>
+    <message>
+        <source>PAK (Counter-Strike Online)</source>
+        <translation>PAK (Counter-Strike Online)</translation>
+    </message>
+    <message>
+        <source>XFS (Xenesis)</source>
+        <translation>XFS (Xenesis)</translation>
+    </message>
+    <message>
+        <source>VPK (Source)</source>
+        <translation>VPK (Source)</translation>
+    </message>
+    <message>
+        <source>GMA (Garry&apos;s Mod)</source>
+        <translation>GMA (Garry&apos;s Mod)</translation>
+    </message>
+    <message>
+        <source>This is a data part of a VPK. Open the matching _dir.vpk instead.</source>
+        <translation>Bu bir VPK&apos;nın veri parçası. Bunun yerine eşleşen _dir.vpk dosyasını açın.</translation>
+    </message>
+    <message>
+        <source>Not an archive Vortigaunt can read.</source>
+        <translation>Vortigaunt&apos;ın okuyabildiği bir arşiv değil.</translation>
+    </message>
+    <message>
+        <source>The archive could not be read. It may be damaged or of a version Vortigaunt does not know.</source>
+        <translation>Arşiv okunamadı. Hasarlı olabilir ya da Vortigaunt&apos;ın bilmediği bir sürümde olabilir.</translation>
+    </message>
+</context>
+<context>
+    <name>ArchiveWorkspace</name>
+    <message>
+        <source>Open archives</source>
+        <translation>Açık arşivler</translation>
+    </message>
+    <message>
+        <source>Folders</source>
+        <translation>Klasörler</translation>
+    </message>
+    <message>
+        <source>Search (name, or a pattern like *.dtx)</source>
+        <translation>Ara (ad veya *.dtx gibi bir kalıp)</translation>
+    </message>
+    <message>
+        <source>All types</source>
+        <translation>Tüm türler</translation>
+    </message>
+    <message>
+        <source>Textures</source>
+        <translation>Dokular</translation>
+    </message>
+    <message>
+        <source>Sprites</source>
+        <translation>Sprites</translation>
+    </message>
+    <message>
+        <source>Models</source>
+        <translation>Modeller</translation>
+    </message>
+    <message>
+        <source>Sounds</source>
+        <translation>Sesler</translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation>Metin</translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation>Diğer</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Ad</translation>
+    </message>
+    <message>
+        <source>Folder</source>
+        <translation>Klasör</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tür</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Boyut</translation>
+    </message>
+    <message>
+        <source>Open in viewer</source>
+        <translation>Görüntüleyicide aç</translation>
+    </message>
+    <message>
+        <source>Extract selected</source>
+        <translation>Seçileni çıkar</translation>
+    </message>
+    <message>
+        <source>Send to Convert list</source>
+        <translation>Dönüştür listesine gönder</translation>
+    </message>
+    <message>
+        <source>Extract the selected files to the output folder and add them to the Convert list</source>
+        <translation>Seçili dosyaları çıktı klasörüne çıkar ve Dönüştür listesine ekle</translation>
+    </message>
+    <message>
+        <source>Send to WAD</source>
+        <translation>WAD&apos;a gönder</translation>
+    </message>
+    <message>
+        <source>Add the selected textures to the WAD open in the WAD tab</source>
+        <translation>Seçili dokuları WAD sekmesinde açık olan WAD&apos;a ekle</translation>
+    </message>
+    <message>
+        <source>Cannot open archive</source>
+        <translation>Arşiv açılamıyor</translation>
+    </message>
+    <message>
+        <source>Open Archives</source>
+        <translation>Arşivleri Aç</translation>
+    </message>
+    <message>
+        <source>Archives (*.rez *.pak *.xfs *.vpk *.gma);;All files (*.*)</source>
+        <translation>Arşivler (*.rez *.pak *.xfs *.vpk *.gma);;Tüm dosyalar (*.*)</translation>
+    </message>
+    <message>
+        <source>Open an archive from the ribbon, or drop one here.</source>
+        <translation>Şeritten bir arşiv açın ya da buraya bırakın.</translation>
+    </message>
+    <message>
+        <source>%1 of %2 files</source>
+        <translation>%1 / %2 dosya</translation>
+    </message>
+    <message>
+        <source>%1 files selected</source>
+        <translation>%1 dosya seçildi</translation>
+    </message>
+    <message>
+        <source>Select a file to preview it.</source>
+        <translation>Önizlemek için bir dosya seçin.</translation>
+    </message>
+    <message>
+        <source>Open the sprite in the viewer to see its frames.</source>
+        <translation>Karelerini görmek için sprite&apos;ı görüntüleyicide açın.</translation>
+    </message>
+    <message>
+        <source>No preview for this type.</source>
+        <translation>Bu tür için önizleme yok.</translation>
+    </message>
+    <message>
+        <source>This file could not be read from the archive.</source>
+        <translation>Bu dosya arşivden okunamadı.</translation>
+    </message>
+    <message>
+        <source>This texture could not be decoded.</source>
+        <translation>Bu doku çözülemedi.</translation>
+    </message>
+    <message>
+        <source>Extracted %1 file(s) to %2</source>
+        <translation>%1 dosya %2 konumuna çıkarıldı</translation>
+    </message>
+</context>
+<context>
     <name>AudioConvertDialog</name>
     <message>
         <source>WAV Convert</source>
@@ -192,6 +358,30 @@ Başarılı: %1 / %2</translation>
         <translation>SMD Seç</translation>
     </message>
     <message>
+        <source>Reference Model (optional)</source>
+        <translation>Referans Model (isteğe bağlı)</translation>
+    </message>
+    <message>
+        <source>An already rigged SMD to copy the rigging from</source>
+        <translation>Rig&apos;i kopyalanacak, önceden riglenmiş bir SMD</translation>
+    </message>
+    <message>
+        <source>Rig by example. Every vertex takes the bone of the closest point on this model&apos;s surface, so the result inherits how the original artist rigged it: which helper bones they deformed with, where they put the seams.
+
+Bones are matched by name, so the reference can be any model whose skeleton names agree - Half-Life, Counter-Strike and CSO all use Biped names.
+
+Whatever the reference does not cover - a cape, a backpack, hair it never had - falls back to Bone Heat Diffusion. Leave empty to rig from geometry alone.
+
+The mesh has to be sitting on the skeleton already: the closer the two models overlap, the more of the rigging carries over.</source>
+        <translation>Örnekle rigleme. Her vertex, bu modelin yüzeyindeki en yakın noktanın kemiğini alır; böylece sonuç, orijinal sanatçının nasıl riglediğini devralır: hangi yardımcı kemiklerle deforme ettiğini, dikişleri nereye koyduğunu.
+
+Kemikler adlarına göre eşleşir, bu yüzden referans, iskelet adları uyan herhangi bir model olabilir - Half-Life, Counter-Strike ve CSO hepsi Biped adlarını kullanır.
+
+Referansın kapsamadığı her şey - pelerin, sırt çantası, onda hiç olmayan saç - Bone Heat Diffusion&apos;a döner. Yalnızca geometriden riglemek için boş bırakın.
+
+Mesh zaten iskeletin üzerinde olmalı: iki model ne kadar çok örtüşürse, rig&apos;in o kadar çoğu aktarılır.</translation>
+    </message>
+    <message>
         <source>Output SMD</source>
         <translation>Çıktı SMD</translation>
     </message>
@@ -208,8 +398,40 @@ Başarılı: %1 / %2</translation>
         <translation>Manuel Ölçek:</translation>
     </message>
     <message>
+        <source>Write the reference model&apos;s skeleton</source>
+        <translation>Referans modelin iskeletini yaz</translation>
+    </message>
+    <message>
+        <source>Give the output the skeleton of the reference model instead of the one the mesh came in with. This is what porting a model needs: the animations of the target game are built for the target game&apos;s skeleton, so a model carrying its old skeleton cannot play them - studiomdl refuses it with &quot;illegal parent bone replacement&quot;.
+
+Turn this off only when the mesh is already on the skeleton you want to keep and the reference is there just to improve the rigging.
+
+Has no effect without a reference model.</source>
+        <translation>Çıktıya, mesh&apos;in geldiği iskelet yerine referans modelin iskeletini ver. Model taşımak bunu gerektirir: hedef oyunun animasyonları o oyunun iskeleti için yapılmıştır, eski iskeletini taşıyan bir model onları oynatamaz - studiomdl &quot;illegal parent bone replacement&quot; hatasıyla reddeder.
+
+Bunu yalnızca mesh zaten korumak istediğiniz iskeletin üzerindeyse ve referans sadece rig&apos;i iyileştirmek için varsa kapatın.
+
+Referans model olmadan etkisi yoktur.</translation>
+    </message>
+    <message>
         <source>Enable if mesh is oriented differently (e.g., from Blender)</source>
-        <translation>Mesh farklı yönlendirilmişse etkinleştirin (örn. Blender'dan)</translation>
+        <translation>Mesh farklı yönlendirilmişse etkinleştirin (örn. Blender&apos;dan)</translation>
+    </message>
+    <message>
+        <source>Bone Heat Diffusion (recommended)</source>
+        <translation>Bone Heat Diffusion (önerilen)</translation>
+    </message>
+    <message>
+        <source>Solves smooth weights across the mesh surface and collapses them to one bone per vertex, which is what Blender does with Automatic Weights followed by Limit Total 1. It knows which bones a vertex can actually see, so weights cannot leak between limbs. Uncheck to use the older nearest-bone matching.</source>
+        <translation>Mesh yüzeyi boyunca yumuşak ağırlıkları çözer ve her vertex için tek kemiğe indirger; Blender&apos;da Automatic Weights ardından Limit Total 1 yapmakla aynıdır. Bir vertex&apos;in hangi kemikleri gerçekten görebildiğini bildiği için ağırlıklar uzuvlar arasında sızamaz. Eski en yakın kemik eşleştirmesi için işareti kaldırın.</translation>
+    </message>
+    <message>
+        <source>Snap seams to joints</source>
+        <translation>Dikişleri eklemlere hizala</translation>
+    </message>
+    <message>
+        <source>Cuts the boundary between two bones on the plane through the joint they share. GoldSrc binds every vertex to a single bone, so a crease at the joint is unavoidable; it is smallest when the cut sits on the pivot.</source>
+        <translation>İki kemik arasındaki sınırı, paylaştıkları eklemden geçen düzlemde keser. GoldSrc her vertex&apos;i tek bir kemiğe bağlar, bu yüzden eklemde bir kırışık kaçınılmazdır; kesim pivotta olduğunda en küçük olur.</translation>
     </message>
     <message>
         <source>Use Hierarchy Depth Penalty (Enable for Player Models)</source>
@@ -260,8 +482,20 @@ Başarılı: %1 / %2</translation>
         <translation>Meshinizin bu görseldeki gibi kemiğe düzgün oturduğundan emin olun. Otomatik Rig beta aşamasında olduğundan hatalar oluşabilir.</translation>
     </message>
     <message>
+        <source>Select Reference Model</source>
+        <translation>Referans Model Seç</translation>
+    </message>
+    <message>
+        <source>SMD Files (*.smd);;All Files (*)</source>
+        <translation>SMD Dosyaları (*.smd);;Tüm Dosyalar (*)</translation>
+    </message>
+    <message>
         <source>Auto-Rig Tip - Full Preview</source>
         <translation>Otomatik Rig İpucu - Tam Önizleme</translation>
+    </message>
+    <message>
+        <source>Excluded automatically: %1</source>
+        <translation>Otomatik hariç tutuldu: %1</translation>
     </message>
     <message>
         <source>%1 / %2 bones active</source>
@@ -269,7 +503,7 @@ Başarılı: %1 / %2</translation>
     </message>
     <message>
         <source>Flip Y/Z axes</source>
-        <translation>Y/Z eksenlerini cevir</translation>
+        <translation>Y/Z eksenlerini çevir</translation>
     </message>
     <message>
         <source>Rig Mesh</source>
@@ -281,127 +515,18 @@ Başarılı: %1 / %2</translation>
     </message>
 </context>
 <context>
-    <name>DtxViewerDialog</name>
-    <message>
-        <source>DTX Viewer</source>
-        <translation>DTX Goruntüleyici</translation>
-    </message>
-    <message>
-        <source>No file loaded.</source>
-        <translation>Hiçbir dosya yüklenmedi.</translation>
-    </message>
-    <message>
-        <source>Open DTX...</source>
-        <translation>DTX Ac...</translation>
-    </message>
-    <message>
-        <source>Save as 8-bit BMP...</source>
-        <translation>8-bit BMP olarak kaydet...</translation>
-    </message>
-    <message>
-        <source>DTX textures (*.dtx);;All files (*.*)</source>
-        <translation>DTX dokuları (*.dtx);;Tüm dosyalar (*.*)</translation>
-    </message>
-    <message>
-        <source>DTX error</source>
-        <translation>DTX hatası</translation>
-    </message>
-    <message>
-        <source>Failed to decode DTX texture.</source>
-        <translation>DTX dokusu çözümlenemedi.</translation>
-    </message>
-    <message>
-        <source>Failed to decode in-memory DTX texture.</source>
-        <translation>Bellekteki DTX dokusu çözümlenemedi.</translation>
-    </message>
-    <message>
-        <source>In-memory DTX</source>
-        <translation>Bellekteki DTX</translation>
-    </message>
-    <message>
-        <source>Save as 8-bit BMP</source>
-        <translation>8-bit BMP olarak kaydet</translation>
-    </message>
-    <message>
-        <source>Bitmap images (*.bmp)</source>
-        <translation>Bitmap görüntüleri (*.bmp)</translation>
-    </message>
-    <message>
-        <source>GoldSrc Size Limit</source>
-        <translation>GoldSrc Boyut Sınırı</translation>
-    </message>
-    <message>
-        <source>The image size (%1 x %2) does not fit GoldSrc texture limits (max 512 x 512).
-
-Do you want to save it resized to 512 x 512?</source>
-        <translation>Görüntü boyutu (%1 x %2) GoldSrc doku sınırlarına uymuyor (en fazla 512 x 512).
-
-512 x 512 olarak yeniden boyutlandırıp kaydetmek ister misiniz?</translation>
-    </message>
-    <message>
-        <source>Save error</source>
-        <translation>Kaydetme hatası</translation>
-    </message>
-    <message>
-        <source>Failed to save BMP file.</source>
-        <translation>BMP dosyası kaydedilemedi.</translation>
-    </message>
-    <message>
-        <source>Saved</source>
-        <translation>Kaydedildi</translation>
-    </message>
-    <message>
-        <source>Saved 8-bit BMP:
-%1</source>
-        <translation>8-bit BMP kaydedildi:
-%1</translation>
-    </message>
-    <message>
-        <source>Decoded texture is empty.</source>
-        <translation>Çözümlenen doku boş.</translation>
-    </message>
-    <message>
-        <source>Image error</source>
-        <translation>Görüntü hatası</translation>
-    </message>
-    <message>
-        <source>Failed to construct QImage from decoded data.</source>
-        <translation>Çözümlenen veriden QImage oluşturulamadı.</translation>
-    </message>
-    <message>
-        <source>%1  (%2 x %3)</source>
-        <translation>%1  (%2 x %3)</translation>
-    </message>
-    <message>
-        <source>DTX</source>
-        <translation>DTX</translation>
-    </message>
-    <message>
-        <source>Select DTX file</source>
-        <translation>DTX dosyası seç</translation>
-    </message>
-</context>
-<context>
     <name>LoLModelDownloadDialog</name>
     <message>
         <source>LoL Model Downloader</source>
-        <translation>LoL Model Indirici</translation>
+        <translation>LoL Model İndirici</translation>
     </message>
     <message>
         <source>Champion:</source>
         <translation>Sampiyon:</translation>
     </message>
     <message>
-        <source>Champion</source>
-        <translation>Sampiyon</translation>
-    </message>
-    <message>
         <source>Type champion name and press Enter...</source>
-        <translation>Şampiyon adını yazıp Enter'a basın...</translation>
-    </message>
-    <message>
-        <source>Skins</source>
-        <translation>Kostumler</translation>
+        <translation>Şampiyon adını yazıp Enter&apos;a basın...</translation>
     </message>
     <message>
         <source>Refresh Skins</source>
@@ -429,11 +554,7 @@ Do you want to save it resized to 512 x 512?</source>
     </message>
     <message>
         <source>Folder:</source>
-        <translation>Klasor:</translation>
-    </message>
-    <message>
-        <source>Output</source>
-        <translation>Çıktı</translation>
+        <translation>Klasör:</translation>
     </message>
     <message>
         <source>LoL Models by Khada ( modelviewer.lol )</source>
@@ -445,11 +566,19 @@ Do you want to save it resized to 512 x 512?</source>
     </message>
     <message>
         <source>Make Seperate SMDs as Single SMD</source>
-        <translation>Ayrı SMD'leri Tek SMD Olarak Birleştir</translation>
+        <translation>Ayrı SMD&apos;leri Tek SMD Olarak Birleştir</translation>
     </message>
     <message>
         <source>Write QC</source>
         <translation>QC Yaz</translation>
+    </message>
+    <message>
+        <source>Compile model</source>
+        <translation>Modeli derle</translation>
+    </message>
+    <message>
+        <source>Run model compiler. Set the location of the model compiler in Settings.</source>
+        <translation>Model derleyiciyi çalıştır. Model derleyicinin yerini Ayarlar&apos;dan belirtin.</translation>
     </message>
     <message>
         <source>View Character</source>
@@ -460,20 +589,8 @@ Do you want to save it resized to 512 x 512?</source>
         <translation>SMD Olarak Aktar</translation>
     </message>
     <message>
-        <source>Log</source>
-        <translation>Kayıt Tablosu</translation>
-    </message>
-    <message>
         <source>Ready</source>
-        <translation>Hazir</translation>
-    </message>
-    <message>
-        <source>Hide Log</source>
-        <translation>Kayıt Tablosunu Gizle</translation>
-    </message>
-    <message>
-        <source>Show Log</source>
-        <translation>Kayıt Tablosunu Göster</translation>
+        <translation>Hazır</translation>
     </message>
     <message>
         <source>Loading champions...</source>
@@ -573,7 +690,7 @@ Output folder: %2</source>
     </message>
     <message>
         <source>Failed to download model from CDN. Please check your internet connection.</source>
-        <translation>Model CDN'den indirilemedi. Lütfen internet bağlantınızı kontrol edin.</translation>
+        <translation>Model CDN&apos;den indirilemedi. Lütfen internet bağlantınızı kontrol edin.</translation>
     </message>
     <message>
         <source>Download failed - invalid data</source>
@@ -621,7 +738,7 @@ Output folder: %2</source>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Iptal</translation>
+        <translation>İptal</translation>
     </message>
     <message>
         <source>Select Output Folder</source>
@@ -639,44 +756,12 @@ Output folder: %2</source>
         <translation>Araçlar</translation>
     </message>
     <message>
-        <source>Lithtech</source>
-        <translation>Lithtech</translation>
-    </message>
-    <message>
-        <source>GoldSrc</source>
-        <translation>GoldSrc</translation>
-    </message>
-    <message>
-        <source>WAD Editor...</source>
-        <translation>WAD Düzenleyici...</translation>
-    </message>
-    <message>
-        <source>PAK Viewer (CSO)...</source>
-        <translation>PAK Görüntüleyici (CSO)...</translation>
-    </message>
-    <message>
-        <source>VPK / GMA Viewer (Source)...</source>
-        <translation>VPK / GMA Görüntüleyici (Source)...</translation>
-    </message>
-    <message>
-        <source>VTF Viewer (Source)...</source>
-        <translation>VTF Görüntüleyici (Source)...</translation>
-    </message>
-    <message>
         <source>Convert WAV for Goldsrc...</source>
         <translation>Goldsrc için WAV Dönüştür...</translation>
     </message>
     <message>
-        <source>Other</source>
-        <translation>Diğer</translation>
-    </message>
-    <message>
         <source>League of Legends Models...</source>
         <translation>League of Legends Modelleri...</translation>
-    </message>
-    <message>
-        <source>XFS Viewer (Xenesis File System)...</source>
-        <translation>XFS Görüntüleyici (Xenesis File System)...</translation>
     </message>
     <message>
         <source>Metin2 Script Effect Viewer...</source>
@@ -687,32 +772,12 @@ Output folder: %2</source>
         <translation>Ayarlar</translation>
     </message>
     <message>
-        <source>DTX Viewer...</source>
-        <translation>DTX Görüntüleyici...</translation>
-    </message>
-    <message>
-        <source>REZ Viewer...</source>
-        <translation>REZ Görüntüleyici...</translation>
-    </message>
-    <message>
-        <source>Sprite Viewer...</source>
-        <translation>Sprite Görüntüleyici...</translation>
-    </message>
-    <message>
-        <source>Lithtech Sprite Viewer...</source>
-        <translation>Lithtech Sprite Görüntüleyici...</translation>
-    </message>
-    <message>
         <source>Auto-Rig (Beta)</source>
         <translation>Otomatik Rig (GoldSrc)...</translation>
     </message>
     <message>
         <source>Configure...</source>
         <translation>Ayarlar...</translation>
-    </message>
-    <message>
-        <source>About</source>
-        <translation>Hakkında</translation>
     </message>
     <message>
         <source>About Vortigaunt</source>
@@ -723,10 +788,6 @@ Output folder: %2</source>
         <translation>Qt Hakkında</translation>
     </message>
     <message>
-        <source>Update</source>
-        <translation>Güncelleme</translation>
-    </message>
-    <message>
         <source>Check for Updates...</source>
         <translation>Güncellemeleri Denetle...</translation>
     </message>
@@ -735,12 +796,382 @@ Output folder: %2</source>
         <translation>Dil</translation>
     </message>
     <message>
+        <source>Add
+files</source>
+        <translation>Dosya
+ekle</translation>
+    </message>
+    <message>
+        <source>Add files (Ctrl+O)</source>
+        <translation>Dosya ekle (Ctrl+O)</translation>
+    </message>
+    <message>
+        <source>Add
+folder</source>
+        <translation>Klasör
+ekle</translation>
+    </message>
+    <message>
+        <source>Add every file in a folder that Vortigaunt can convert</source>
+        <translation>Klasördeki Vortigaunt&apos;ın dönüştürebildiği tüm dosyaları ekle</translation>
+    </message>
+    <message>
+        <source>Clear
+list</source>
+        <translation>Listeyi
+temizle</translation>
+    </message>
+    <message>
+        <source>Remove every file from the list</source>
+        <translation>Listedeki tüm dosyaları kaldır</translation>
+    </message>
+    <message>
+        <source>Convert every file in the list (F5)</source>
+        <translation>Listedeki tüm dosyaları dönüştür (F5)</translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation>Durdur</translation>
+    </message>
+    <message>
+        <source>Stop after the file being converted</source>
+        <translation>Dönüştürülen dosyadan sonra dur</translation>
+    </message>
+    <message>
+        <source>Write
+QC</source>
+        <translation>QC
+yaz</translation>
+    </message>
+    <message>
+        <source>Compile
+model</source>
+        <translation>Modeli
+derle</translation>
+    </message>
+    <message>
+        <source>Run studiomdl on the QC to produce the .mdl. Set the location of studiomdl in Settings.</source>
+        <translation>.mdl üretmek için QC üzerinde studiomdl çalıştır. studiomdl&apos;nin yerini Ayarlar&apos;dan belirtin.</translation>
+    </message>
+    <message>
+        <source>Output
+folder</source>
+        <translation>Çıktı
+klasörü</translation>
+    </message>
+    <message>
+        <source>Choose the output folder (Ctrl+Shift+O)</source>
+        <translation>Çıktı klasörünü seç (Ctrl+Shift+O)</translation>
+    </message>
+    <message>
+        <source>Open
+output</source>
+        <translation>Çıktıyı
+aç</translation>
+    </message>
+    <message>
+        <source>Open the output folder</source>
+        <translation>Çıktı klasörünü aç</translation>
+    </message>
+    <message>
+        <source>Open
+archive</source>
+        <translation>Arşiv
+aç</translation>
+    </message>
+    <message>
+        <source>Open REZ, PAK, XFS, VPK or GMA archives</source>
+        <translation>REZ, PAK, XFS, VPK veya GMA arşivlerini aç</translation>
+    </message>
+    <message>
+        <source>Close
+archive</source>
+        <translation>Arşivi
+kapat</translation>
+    </message>
+    <message>
+        <source>Close the archive shown</source>
+        <translation>Gösterilen arşivi kapat</translation>
+    </message>
+    <message>
+        <source>Extract
+selected</source>
+        <translation>Seçileni
+çıkar</translation>
+    </message>
+    <message>
+        <source>Extract the selected files to the output folder</source>
+        <translation>Seçili dosyaları çıktı klasörüne çıkar</translation>
+    </message>
+    <message>
+        <source>Extract
+all</source>
+        <translation>Tümünü
+çıkar</translation>
+    </message>
+    <message>
+        <source>Extract every file of the archive to the output folder</source>
+        <translation>Arşivdeki tüm dosyaları çıktı klasörüne çıkar</translation>
+    </message>
+    <message>
+        <source>Send to
+Convert</source>
+        <translation>Dönüştür&apos;e
+gönder</translation>
+    </message>
+    <message>
+        <source>Extract the selected files and add them to the Convert list</source>
+        <translation>Seçili dosyaları çıkar ve Dönüştür listesine ekle</translation>
+    </message>
+    <message>
+        <source>Open
+textures</source>
+        <translation>Doku
+aç</translation>
+    </message>
+    <message>
+        <source>Open DTX, VTF, DDS, TGA, BMP, PNG or JPG files</source>
+        <translation>DTX, VTF, DDS, TGA, BMP, PNG veya JPG dosyalarını aç</translation>
+    </message>
+    <message>
+        <source>Open
+folder</source>
+        <translation>Klasör
+aç</translation>
+    </message>
+    <message>
+        <source>Open every texture in a folder and its sub-folders</source>
+        <translation>Bir klasördeki ve alt klasörlerindeki tüm dokuları aç</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Kaldır</translation>
+    </message>
+    <message>
+        <source>Remove the selected textures from the list</source>
+        <translation>Seçili dokuları listeden kaldır</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation>Temizle</translation>
+    </message>
+    <message>
+        <source>Remove every texture from the list</source>
+        <translation>Listedeki tüm dokuları kaldır</translation>
+    </message>
+    <message>
+        <source>Export
+BMP</source>
+        <translation>BMP
+aktar</translation>
+    </message>
+    <message>
+        <source>Save every texture in the list, or the ones the search shows, as GoldSrc BMPs to the output folder</source>
+        <translation>Listedeki tüm dokuları ya da aramanın gösterdiklerini GoldSrc BMP olarak çıktı klasörüne kaydet</translation>
+    </message>
+    <message>
+        <source>Export
+PNG</source>
+        <translation>PNG
+aktar</translation>
+    </message>
+    <message>
+        <source>Save every texture in the list, or the ones the search shows, as PNGs to the output folder</source>
+        <translation>Listedeki tüm dokuları ya da aramanın gösterdiklerini PNG olarak çıktı klasörüne kaydet</translation>
+    </message>
+    <message>
+        <source>Open
+sprite</source>
+        <translation>Sprite
+aç</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Kaydet</translation>
+    </message>
+    <message>
+        <source>Save
+as</source>
+        <translation>Farklı
+kaydet</translation>
+    </message>
+    <message>
+        <source>Extract
+frame</source>
+        <translation>Kareyi
+çıkar</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation>Önceki</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation>Sonraki</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Görüntüle</translation>
+    </message>
+    <message>
+        <source>Create
+from images</source>
+        <translation>Resimlerden
+oluştur</translation>
+    </message>
+    <message>
+        <source>Fix
+V3 to V2</source>
+        <translation>V3&apos;ü V2&apos;ye
+düzelt</translation>
+    </message>
+    <message>
+        <source>New
+WAD</source>
+        <translation>Yeni
+WAD</translation>
+    </message>
+    <message>
+        <source>Open
+WAD</source>
+        <translation>WAD
+aç</translation>
+    </message>
+    <message>
+        <source>Add
+images</source>
+        <translation>Resim
+ekle</translation>
+    </message>
+    <message>
+        <source>Extract</source>
+        <translation>Çıkar</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>Yeniden Adlandır</translation>
+    </message>
+    <message>
+        <source>Replace
+image</source>
+        <translation>Resmi
+değiştir</translation>
+    </message>
+    <message>
+        <source>Send to
+WAD</source>
+        <translation>WAD&apos;a
+gönder</translation>
+    </message>
+    <message>
+        <source>Add the selected textures to the WAD open in the WAD tab</source>
+        <translation>Seçili dokuları WAD sekmesinde açık olan WAD&apos;a ekle</translation>
+    </message>
+    <message>
+        <source>Convert
+WAV</source>
+        <translation>WAV
+dönüştür</translation>
+    </message>
+    <message>
+        <source>LoL
+models</source>
+        <translation>LoL
+modelleri</translation>
+    </message>
+    <message>
+        <source>Steam Workshop Downloader...</source>
+        <translation>Steam Workshop İndirici...</translation>
+    </message>
+    <message>
+        <source>Steam
+Workshop</source>
+        <translation>Steam
+Workshop</translation>
+    </message>
+    <message>
+        <source>Auto-Rig
+(beta)</source>
+        <translation>Auto-Rig
+(beta)</translation>
+    </message>
+    <message>
+        <source>MSE
+viewer</source>
+        <translation>MSE
+görüntüleyici</translation>
+    </message>
+    <message>
+        <source>Files</source>
+        <translation>Dosyalar</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>Model</translation>
+    </message>
+    <message>
+        <source>Archives</source>
+        <translation>Arşivler</translation>
+    </message>
+    <message>
+        <source>Archive</source>
+        <translation>Arşiv</translation>
+    </message>
+    <message>
+        <source>Textures</source>
+        <translation>Dokular</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation>Dışa aktar</translation>
+    </message>
+    <message>
+        <source>Sprites</source>
+        <translation>Sprites</translation>
+    </message>
+    <message>
+        <source>Sprite</source>
+        <translation>Sprite</translation>
+    </message>
+    <message>
+        <source>Frames</source>
+        <translation>Kareler</translation>
+    </message>
+    <message>
+        <source>Folder</source>
+        <translation>Klasör</translation>
+    </message>
+    <message>
+        <source>Mode</source>
+        <translation>Mod</translation>
+    </message>
+    <message>
+        <source>WAD</source>
+        <translation>WAD</translation>
+    </message>
+    <message>
+        <source>Sound</source>
+        <translation>Ses</translation>
+    </message>
+    <message>
+        <source>Download</source>
+        <translation>İndir</translation>
+    </message>
+    <message>
+        <source>Experimental</source>
+        <translation>Deneysel</translation>
+    </message>
+    <message>
+        <source>Reset panel layout</source>
+        <translation>Panel düzenini sıfırla</translation>
+    </message>
+    <message>
         <source>Discord</source>
         <translation>Discord</translation>
     </message>
     <message>
         <source>Join our Discord</source>
-        <translation>Discord'umuza Katıl</translation>
+        <translation>Discord&apos;umuza Katıl</translation>
     </message>
     <message>
         <source>GitHub</source>
@@ -751,52 +1182,84 @@ Output folder: %2</source>
         <translation>Vortigaunt GitHub Deposu</translation>
     </message>
     <message>
-        <source>Input</source>
-        <translation>Girdi</translation>
+        <source>Skipped</source>
+        <translation>Atlandı</translation>
     </message>
     <message>
-        <source>Path:</source>
-        <translation>Yol:</translation>
+        <source>Nothing to convert</source>
+        <translation>Dönüştürülecek bir şey yok</translation>
     </message>
     <message>
-        <source>Browse...</source>
-        <translation>Gözat...</translation>
+        <source>Add files Vortigaunt knows, or pick an operation for them in Properties.</source>
+        <translation>Vortigaunt&apos;ın tanıdığı dosyaları ekleyin ya da Özellikler&apos;den bir işlem seçin.</translation>
+    </message>
+    <message>
+        <source>studiomdl not set</source>
+        <translation>studiomdl ayarlanmadı</translation>
+    </message>
+    <message>
+        <source>&quot;Compile model&quot; needs studiomdl. Set its location in Settings, or untick &quot;Compile model&quot;.</source>
+        <translation>&quot;Modeli derle&quot; için studiomdl gerekli. Yerini Ayarlar&apos;dan belirtin ya da &quot;Modeli derle&quot; seçeneğini kaldırın.</translation>
+    </message>
+    <message>
+        <source>Reference model required</source>
+        <translation>Referans model gerekli</translation>
+    </message>
+    <message>
+        <source>Select the p_ model this weapon should be held like, or choose another weapon type.</source>
+        <translation>Bu silahın tutulması gereken p_ modelini seçin ya da başka bir silah türü seçin.</translation>
+    </message>
+    <message>
+        <source>Cancelled</source>
+        <translation>İptal edildi</translation>
+    </message>
+    <message>
+        <source>Extracting...</source>
+        <translation>Çıkarılıyor...</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Bitti</translation>
+    </message>
+    <message>
+        <source>Failed</source>
+        <translation>Başarısız</translation>
+    </message>
+    <message>
+        <source>Converting...</source>
+        <translation>Dönüştürülüyor...</translation>
+    </message>
+    <message>
+        <source>Finished with Errors</source>
+        <translation>Hatalarla Bitti</translation>
+    </message>
+    <message>
+        <source>LoL Models</source>
+        <translation>LoL Modelleri</translation>
+    </message>
+    <message>
+        <source>Steam Workshop</source>
+        <translation>Steam Workshop</translation>
+    </message>
+    <message>
+        <source>MSE Viewer</source>
+        <translation>MSE Görüntüleyici</translation>
+    </message>
+    <message>
+        <source>Auto-Rig</source>
+        <translation>Auto-Rig</translation>
+    </message>
+    <message>
+        <source>WAV Converter</source>
+        <translation>WAV Dönüştürücü</translation>
     </message>
     <message>
         <source>Output</source>
         <translation>Çıktı</translation>
     </message>
     <message>
-        <source>Folder (optional):</source>
-        <translation>Klasör (isteğe bağlı):</translation>
-    </message>
-    <message>
-        <source>Leave empty for default output folder...</source>
-        <translation>Varsayılan çıktı klasörü için boş bırakın...</translation>
-    </message>
-    <message>
         <source>Operation</source>
         <translation>İşlem</translation>
-    </message>
-    <message>
-        <source>Mode:</source>
-        <translation>Mod:</translation>
-    </message>
-    <message>
-        <source>SMD (GoldSource)</source>
-        <translation>SMD (GoldSource)</translation>
-    </message>
-    <message>
-        <source>Convert GR2 </source>
-        <translation>GR2 Donustur (tekli dosya veya klasör)</translation>
-    </message>
-    <message>
-        <source>Convert MSE Effect (Metin2 Effect Script)</source>
-        <translation>MSE Efekt Donustur (Metin2 Efekt Scripti)</translation>
-    </message>
-    <message>
-        <source>PAK (Counter Strike Online)</source>
-        <translation>Tekli PAK çıkar (Counter Strike Online)</translation>
     </message>
     <message>
         <source>Ignore animations</source>
@@ -815,24 +1278,172 @@ Output folder: %2</source>
         <translation>UV Y-eksenini Yansit</translation>
     </message>
     <message>
-        <source>Invert Alpha</source>
-        <translation>Alfayi Ters Cevir</translation>
-    </message>
-    <message>
         <source>Run</source>
         <translation>Çalıştır</translation>
     </message>
     <message>
         <source>Log</source>
-        <translation>Gunluk</translation>
+        <translation>Günlük</translation>
     </message>
     <message>
         <source>Filter:</source>
         <translation>Filtre:</translation>
     </message>
     <message>
+        <source>File</source>
+        <translation>Dosya</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Durum</translation>
+    </message>
+    <message>
+        <source>Remove from list</source>
+        <translation>Listeden kaldır</translation>
+    </message>
+    <message>
+        <source>Operation:</source>
+        <translation>İşlem:</translation>
+    </message>
+    <message>
+        <source>Picked from the file name; change it when the guess is wrong</source>
+        <translation>Dosya adından seçildi; tahmin yanlışsa değiştirin</translation>
+    </message>
+    <message>
+        <source>Select a file in the list to see its settings.</source>
+        <translation>Ayarlarını görmek için listeden bir dosya seçin.</translation>
+    </message>
+    <message>
+        <source>Weapon</source>
+        <translation>Silah</translation>
+    </message>
+    <message>
+        <source>Counter-Strike</source>
+        <translation>Counter-Strike</translation>
+    </message>
+    <message>
+        <source>Half-Life</source>
+        <translation>Half-Life</translation>
+    </message>
+    <message>
+        <source>Sven Co-op</source>
+        <translation>Sven Co-op</translation>
+    </message>
+    <message>
+        <source>The game the P model is for. Each has its own player skeleton and hand size, and holds a weapon a little differently.</source>
+        <translation>P modelinin hangi oyun için olduğu. Her birinin kendi oyuncu iskeleti ve el boyutu var, silahı da biraz farklı tutar.</translation>
+    </message>
+    <message>
+        <source>Game:</source>
+        <translation>Oyun:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Otomatik</translation>
+    </message>
+    <message>
+        <source>Gun</source>
+        <translation>Silah</translation>
+    </message>
+    <message>
+        <source>Knife / melee</source>
+        <translation>Bıçak / yakın dövüş</translation>
+    </message>
+    <message>
+        <source>Grenade</source>
+        <translation>Bomba</translation>
+    </message>
+    <message>
+        <source>Pack (C4, mine)</source>
+        <translation>Paket (C4, mayın)</translation>
+    </message>
+    <message>
+        <source>Dual (one in each hand)</source>
+        <translation>Çift (her elde bir tane)</translation>
+    </message>
+    <message>
+        <source>Like a reference p_ model</source>
+        <translation>Referans p_ modeli gibi</translation>
+    </message>
+    <message>
+        <source>How the player holds the weapon. P models of one kind all sit in the hand the same way: a gun points along the hand, a knife stands up out of the fist, a grenade lies in the palm. For anything else, pick a p_ model that is held the way this one should be.</source>
+        <translation>Oyuncunun silahı nasıl tuttuğu. Aynı türdeki P modelleri elde aynı şekilde durur: silah el boyunca uzanır, bıçak yumruktan dik çıkar, bomba avuçta yatar. Diğerleri için, bu silahın tutulması gereken şekilde tutulan bir p_ modeli seçin.</translation>
+    </message>
+    <message>
+        <source>Weapon:</source>
+        <translation>Silah:</translation>
+    </message>
+    <message>
+        <source>Reference p_ model (.mdl)</source>
+        <translation>Referans p_ modeli (.mdl)</translation>
+    </message>
+    <message>
+        <source>...</source>
+        <translation>...</translation>
+    </message>
+    <message>
+        <source>Select a reference p_ model</source>
+        <translation>Bir referans p_ modeli seçin</translation>
+    </message>
+    <message>
+        <source>GoldSrc model (*.mdl);;All files (*.*)</source>
+        <translation>GoldSrc modeli (*.mdl);;Tüm dosyalar (*.*)</translation>
+    </message>
+    <message>
+        <source>Size of the P/W model relative to the V model. Auto works it out from the size of the V model&apos;s hands; the log shows the value it used, which is a good starting point for setting it by hand.</source>
+        <translation>P/W modelinin V modeline göre boyutu. Otomatik, bunu V modelinin ellerinin boyutundan hesaplar; günlük kullandığı değeri gösterir, elle ayarlamak için iyi bir başlangıç noktasıdır.</translation>
+    </message>
+    <message>
+        <source>Scale:</source>
+        <translation>Ölçek:</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Evet</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Hayır</translation>
+    </message>
+    <message>
+        <source>V models are usually built left handed and flipped by the engine, so the P/W model has to be the mirror image. Auto mirrors when the weapon stands on the left of the view.</source>
+        <translation>V modelleri genelde solak yapılır ve motor tarafından çevrilir, bu yüzden P/W modeli ayna görüntüsü olmalıdır. Otomatik, silah görünümün solunda duruyorsa aynalar.</translation>
+    </message>
+    <message>
+        <source>Mirror:</source>
+        <translation>Ayna:</translation>
+    </message>
+    <message>
+        <source>Upside down</source>
+        <translation>Baş aşağı</translation>
+    </message>
+    <message>
+        <source>Turns the weapon end for end in the hand. For a grenade or knife that came out the wrong way up.</source>
+        <translation>Silahı elde ters çevirir. Ters çıkan bir bomba ya da bıçak için.</translation>
+    </message>
+    <message>
+        <source>Compile model</source>
+        <translation>Modeli derle</translation>
+    </message>
+    <message>
+        <source>Unity</source>
+        <translation>Unity</translation>
+    </message>
+    <message>
+        <source>Texture</source>
+        <translation>Doku</translation>
+    </message>
+    <message>
+        <source>Written as an 8-bit BMP of at most 512 x 512. The alpha channel is a gloss mask in DTX textures and is left out.</source>
+        <translation>En fazla 512 x 512 boyutunda 8-bit BMP olarak yazılır. DTX dokularında alfa kanalı bir parlaklık maskesidir ve dışarıda bırakılır.</translation>
+    </message>
+    <message>
+        <source>Properties</source>
+        <translation>Özellikler</translation>
+    </message>
+    <message>
         <source>All</source>
-        <translation>Tumu</translation>
+        <translation>Tümü</translation>
     </message>
     <message>
         <source>Info</source>
@@ -840,39 +1451,11 @@ Output folder: %2</source>
     </message>
     <message>
         <source>Warning</source>
-        <translation>Uyari</translation>
+        <translation>Uyarı</translation>
     </message>
     <message>
         <source>Error</source>
         <translation>Hata</translation>
-    </message>
-    <message>
-        <source>Select input file or drag &amp; drop here...</source>
-        <translation>Girdi dosyası veya klasör seçin veya sürükleyip birakin...</translation>
-    </message>
-    <message>
-        <source>Convert LTB</source>
-        <translation>LTB Dönüştür</translation>
-    </message>
-    <message>
-        <source>Convert GR2</source>
-        <translation>GR2 Dönüştür</translation>
-    </message>
-    <message>
-        <source>Extract REZ file</source>
-        <translation>REZ dosyası çıkar</translation>
-    </message>
-    <message>
-        <source>Extract VPK / GMA (Source Engine)</source>
-        <translation>VPK / GMA Çıkar (Source Engine)</translation>
-    </message>
-    <message>
-        <source>Extract UnityFS / Assets</source>
-        <translation>UnityFS / Assets Çıkar</translation>
-    </message>
-    <message>
-        <source>Convert To:</source>
-        <translation>Şuna Dönüştür:</translation>
     </message>
     <message>
         <source>Ignore meshes</source>
@@ -888,7 +1471,7 @@ Output folder: %2</source>
     </message>
     <message>
         <source>Convert textures to BMP (8-bit)</source>
-        <translation>Dokuları BMP'ye dönüştür (8-bit)</translation>
+        <translation>Dokuları BMP&apos;ye dönüştür (8-bit)</translation>
     </message>
     <message>
         <source>When unchecked, Unity textures are exported as 32-bit PNG with alpha channel</source>
@@ -902,11 +1485,7 @@ Animasyon dosyalarını buraya sürükleyip bırakın veya gözat düğmesini ku
     </message>
     <message>
         <source>Mirror UV Y-axis for GR2 to SMD conversion (fixes texture orientation)</source>
-        <translation>GR2'den SMD'ye dönüştürmede UV Y eksenini yansıt (doku yönünü düzeltir)</translation>
-    </message>
-    <message>
-        <source>Invert alpha channel for DDS textures (fixes transparency issues)</source>
-        <translation>DDS dokuları için alfa kanalını ters çevir (şeffaflık sorunlarını düzeltir)</translation>
+        <translation>GR2&apos;den SMD&apos;ye dönüştürmede UV Y eksenini yansıt (doku yönünü düzeltir)</translation>
     </message>
     <message>
         <source>Write QC</source>
@@ -937,72 +1516,150 @@ Animasyon dosyalarını buraya sürükleyip bırakın veya gözat düğmesini ku
         <translation>Animasyon dosyaları (*.smd *.gr2);;Tüm dosyalar (*.*)</translation>
     </message>
     <message>
+        <source>Drop files or folders here
+
+The operation is picked from the file type.</source>
+        <translation>Dosya veya klasörleri buraya bırakın
+
+İşlem dosya türüne göre seçilir.</translation>
+    </message>
+    <message>
+        <source>This model could not be previewed.</source>
+        <translation>Bu model önizlenemedi.</translation>
+    </message>
+    <message>
+        <source>LTB to SMD</source>
+        <translation>LTB&apos;den SMD&apos;ye</translation>
+    </message>
+    <message>
+        <source>GR2 to SMD</source>
+        <translation>GR2&apos;den SMD&apos;ye</translation>
+    </message>
+    <message>
+        <source>FBX/GLB/OBJ to SMD</source>
+        <translation>FBX/GLB/OBJ&apos;den SMD&apos;ye</translation>
+    </message>
+    <message>
+        <source>v_ to p_ / w_ model</source>
+        <translation>v_&apos;den p_ / w_ modeline</translation>
+    </message>
+    <message>
+        <source>DTX to BMP</source>
+        <translation>DTX&apos;ten BMP&apos;ye</translation>
+    </message>
+    <message>
+        <source>Extract REZ</source>
+        <translation>REZ çıkar</translation>
+    </message>
+    <message>
+        <source>Extract PAK (CSO)</source>
+        <translation>PAK çıkar (CSO)</translation>
+    </message>
+    <message>
+        <source>Extract XFS</source>
+        <translation>XFS çıkar</translation>
+    </message>
+    <message>
+        <source>Extract VPK / GMA</source>
+        <translation>VPK / GMA çıkar</translation>
+    </message>
+    <message>
+        <source>Extract Unity assets</source>
+        <translation>Unity varlıklarını çıkar</translation>
+    </message>
+    <message>
+        <source>Nothing to do</source>
+        <translation>Yapılacak bir şey yok</translation>
+    </message>
+    <message>
+        <source>Pick an operation</source>
+        <translation>Bir işlem seçin</translation>
+    </message>
+    <message>
+        <source>Waiting</source>
+        <translation>Bekliyor</translation>
+    </message>
+    <message>
+        <source>Drag files or folders here, or use Add files.</source>
+        <translation>Dosya veya klasörleri buraya sürükleyin ya da Dosya ekle&apos;yi kullanın.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n file(s)</source>
+        <translation>
+            <numerusform>%n dosya</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>No file selected</source>
+        <translation>Dosya seçilmedi</translation>
+    </message>
+    <message>
+        <source>Too large to preview.</source>
+        <translation>Önizlemek için çok büyük.</translation>
+    </message>
+    <message>
+        <source>%1 x %2</source>
+        <translation>%1 x %2</translation>
+    </message>
+    <message>
+        <source>REZ archive. Convert extracts it to the output folder.</source>
+        <translation>REZ arşivi. Dönüştür, onu çıktı klasörüne çıkarır.</translation>
+    </message>
+    <message>
+        <source>Browse in Archives</source>
+        <translation>Arşivlerde göz at</translation>
+    </message>
+    <message>
+        <source>Counter-Strike Online PAK archive. Convert extracts it to the output folder.</source>
+        <translation>Counter-Strike Online PAK arşivi. Dönüştür, onu çıktı klasörüne çıkarır.</translation>
+    </message>
+    <message>
+        <source>XFS archive. Convert extracts it to the output folder.</source>
+        <translation>XFS arşivi. Dönüştür, onu çıktı klasörüne çıkarır.</translation>
+    </message>
+    <message>
+        <source>Source engine archive. Convert extracts it to the output folder.</source>
+        <translation>Source motoru arşivi. Dönüştür, onu çıktı klasörüne çıkarır.</translation>
+    </message>
+    <message>
+        <source>GoldSrc view model. Convert makes the p_ and w_ models from it.</source>
+        <translation>GoldSrc view modeli. Dönüştür, ondan p_ ve w_ modellerini yapar.</translation>
+    </message>
+    <message>
+        <source>There is no 3D preview for this format yet.</source>
+        <translation>Bu biçim için henüz 3D önizleme yok.</translation>
+    </message>
+    <message>
+        <source>Unity assets. Convert extracts meshes, textures and animation clips.</source>
+        <translation>Unity varlıkları. Dönüştür, mesh&apos;leri, dokuları ve animasyon kliplerini çıkarır.</translation>
+    </message>
+    <message>
+        <source>Vortigaunt does not know what to do with this file. Pick an operation in Properties.</source>
+        <translation>Vortigaunt bu dosyayla ne yapacağını bilmiyor. Özellikler&apos;den bir işlem seçin.</translation>
+    </message>
+    <message>
+        <source>Add Files</source>
+        <translation>Dosya Ekle</translation>
+    </message>
+    <message>
+        <source>Add Folder</source>
+        <translation>Klasör Ekle</translation>
+    </message>
+    <message>
+        <source>Output: %1</source>
+        <translation>Çıktı: %1</translation>
+    </message>
+    <message>
         <source>Remove this animation</source>
         <translation>Bu animasyonu kaldır</translation>
-    </message>
-    <message>
-        <source>Convert LTB </source>
-        <translation>LTB Dönüştür </translation>
-    </message>
-    <message>
-        <source>Extract REZ File</source>
-        <translation>REZ Dosyası Çıkar</translation>
-    </message>
-    <message>
-        <source>Extract PAK File (Counter Strike Online)</source>
-        <translation>PAK Dosyası Çıkar (Counter Strike Online)</translation>
-    </message>
-    <message>
-        <source>Extract XFS File (Xenesis)</source>
-        <translation>XFS Dosyası Çıkar (Xenesis)</translation>
-    </message>
-    <message>
-        <source>All files (*.*)</source>
-        <translation>Tüm dosyalar (*.*)</translation>
     </message>
     <message>
         <source>Supported files (%1);;All files (*.*)</source>
         <translation>Desteklenen dosyalar (%1);;Tüm dosyalar (*.*)</translation>
     </message>
     <message>
-        <source>Select Input File(s)</source>
-        <translation>Girdi Dosyalarını Seç</translation>
-    </message>
-    <message>
-        <source>The following files you selected cannot be used in Unity mode because they belong to this project's other formats (PAK, REZ, XFS, GR2, LTB):
-
-</source>
-        <translation>Seçtiğiniz şu dosyalar bu projenin diğer formatlarına (PAK, REZ, XFS, GR2, LTB) ait olduğu için Unity modunda seçilemez:
-
-</translation>
-    </message>
-    <message>
-        <source>Incompatible File Selection</source>
-        <translation>Uyumsuz Dosya Seçimi</translation>
-    </message>
-    <message>
         <source>%1 files selected</source>
         <translation>%1 dosya seçildi</translation>
-    </message>
-    <message>
-        <source>Input required</source>
-        <translation>Girdi gerekli</translation>
-    </message>
-    <message>
-        <source>Please select an input file or folder.</source>
-        <translation>Lütfen bir girdi dosyası veya klasörü seçin.</translation>
-    </message>
-    <message>
-        <source>The following files were ignored because they belong to other formats supported by this project (e.g. PAK, REZ, XFS, GR2, LTB):
-
-</source>
-        <translation>Aşağıdaki dosyalar bu projenin desteklediği diğer formatlara (örn. PAK, REZ, XFS, GR2, LTB) ait olduğu için yok sayıldı:
-
-</translation>
-    </message>
-    <message>
-        <source>Unsupported Formats Ignored for Unity Mode</source>
-        <translation>Unity Modu için Desteklenmeyen Formatlar Yok Sayıldı</translation>
     </message>
     <message>
         <source>Operation completed with %1 error(s).
@@ -1023,10 +1680,6 @@ Animasyon dosyalarını buraya sürükleyip bırakın veya gözat düğmesini ku
 </source>
         <translation>  ... ve %1 dosya daha.
 </translation>
-    </message>
-    <message>
-        <source>Extraction Complete with Errors</source>
-        <translation>Çıkarma Hatalarla Tamamlandı</translation>
     </message>
     <message>
         <source>REZ %1/%2: %p%</source>
@@ -1090,383 +1743,323 @@ Animasyon dosyalarını buraya sürükleyip bırakın veya gözat düğmesini ku
     </message>
     <message>
         <source>Restart Required</source>
-        <translation>Yeniden Baslatma Gerekli</translation>
+        <translation>Yeniden Başlatma Gerekli</translation>
     </message>
     <message>
         <source>The application needs to restart for the language change to take effect.</source>
-        <translation>Dil degisikliginin uygulanmasi icin uygulamanin yeniden baslatilmasi gerekiyor.</translation>
+        <translation>Dil değişikliğinin uygulanması için uygulamanın yeniden başlatılması gerekiyor.</translation>
     </message>
 </context>
 <context>
-    <name>PakViewerWindow</name>
+    <name>MseViewerWidget</name>
     <message>
-        <source>PAK Viewer - Counter Strike Online</source>
-        <translation>PAK Goruntüleyici - Counter Strike Online</translation>
+        <source>No MSE loaded - nothing to export.</source>
+        <translation>MSE yüklenmedi - aktarılacak bir şey yok.</translation>
     </message>
     <message>
-        <source>PAK File</source>
-        <translation>PAK Dosyasi</translation>
+        <source>Invalid FPS/duration.</source>
+        <translation>Geçersiz FPS/süre.</translation>
     </message>
     <message>
-        <source>Open PAK...</source>
-        <translation>PAK Ac...</translation>
+        <source>Cannot create output directory: %1</source>
+        <translation>Çıktı klasörü oluşturulamıyor: %1</translation>
     </message>
     <message>
-        <source>Open PAK File</source>
-        <translation>PAK Dosyasi Ac</translation>
+        <source>Animation capped at %1 frames (%2s @ %3fps requested).</source>
+        <translation>Animasyon %1 kareyle sınırlandı (%2 sn @ %3 fps istendi).</translation>
     </message>
     <message>
-        <source>Contents</source>
-        <translation>Dosyalar</translation>
+        <source>IFL texture animation flattened to its first frame (%1).</source>
+        <translation>IFL doku animasyonu ilk karesine indirildi (%1).</translation>
     </message>
     <message>
-        <source>Select a PAK file to view...</source>
-        <translation>Görüntülemek için bir PAK dosyası seçin...</translation>
+        <source>%1 MDE submesh(es) dropped - too large for one model (%2 bones).</source>
+        <translation>%1 MDE alt mesh atlandı - tek model için çok büyük (%2 kemik).</translation>
     </message>
     <message>
-        <source>Search:</source>
-        <translation>Ara:</translation>
+        <source>Particle group %1: texture animation flattened to frame 0 (%2 frames).</source>
+        <translation>Parçacık grubu %1: doku animasyonu 0. kareye indirildi (%2 kare).</translation>
     </message>
     <message>
-        <source>Search files... (Ctrl+F)</source>
-        <translation>Dosya ara... (Ctrl+F)</translation>
+        <source>%1 particle slot(s) dropped - model count cap (%2) reached.</source>
+        <translation>%1 parçacık yuvası atlandı - model sayısı sınırına (%2) ulaşıldı.</translation>
     </message>
     <message>
-        <source>Select All Matches</source>
-        <translation>Tüm Eşleşmeleri Seç</translation>
+        <source>Nothing visible to bake (no live particles or meshes within %1s).</source>
+        <translation>Pişirilecek görünür bir şey yok (%1 sn içinde canlı parçacık veya mesh yok).</translation>
     </message>
     <message>
-        <source>Path</source>
-        <translation>Yol</translation>
+        <source>Cannot write %1</source>
+        <translation>%1 yazılamıyor</translation>
     </message>
     <message>
-        <source>Size</source>
-        <translation>Boyut</translation>
+        <source>Texture not found, using white: %1</source>
+        <translation>Doku bulunamadı, beyaz kullanılıyor: %1</translation>
     </message>
     <message>
-        <source>Type</source>
-        <translation>Tur</translation>
+        <source>Failed to write texture %1</source>
+        <translation>%1 dokusu yazılamadı</translation>
     </message>
     <message>
-        <source>Open in Viewer</source>
-        <translation>Goruntüleyicide Ac</translation>
+        <source>GoldSrc export finished: %1</source>
+        <translation>GoldSrc aktarımı bitti: %1</translation>
     </message>
     <message>
-        <source>Open .mdl or .spr files in viewer</source>
-        <translation>.mdl veya .spr dosyalarını görüntüleyicide aç</translation>
+        <source>Models: %1 (%2)</source>
+        <translation>Modeller: %1 (%2)</translation>
     </message>
     <message>
-        <source>Extract Selected</source>
-        <translation>Seçilenleri Çıkar</translation>
+        <source>Files per model: &lt;name&gt;_ref.smd, &lt;name&gt;_anim.smd, &lt;name&gt;.qc | shared textures: %1</source>
+        <translation>Model başına dosyalar: &lt;ad&gt;_ref.smd, &lt;ad&gt;_anim.smd, &lt;ad&gt;.qc | ortak dokular: %1</translation>
     </message>
     <message>
-        <source>Extract All</source>
-        <translation>Tümünü Çıkar</translation>
+        <source>Bones: %1 total | Frames: %2 @ %3 fps | Scale: %4 | Brightness: %5</source>
+        <translation>Kemikler: toplam %1 | Kareler: %2 @ %3 fps | Ölçek: %4 | Parlaklık: %5</translation>
     </message>
     <message>
-        <source>No PAK file loaded</source>
-        <translation>PAK dosyası yüklenmedi</translation>
+        <source>Particle pools: %1 | MDE submeshes: %2</source>
+        <translation>Parçacık havuzları: %1 | MDE alt mesh&apos;leri: %2</translation>
     </message>
     <message>
-        <source>PAK files (*.pak);;All files (*.*)</source>
-        <translation>PAK dosyaları (*.pak);;Tüm dosyalar (*.*)</translation>
+        <source>Billboards frozen from the current camera angle.</source>
+        <translation>Billboard&apos;lar mevcut kamera açısında donduruldu.</translation>
     </message>
     <message>
-        <source>Error</source>
-        <translation>Hata</translation>
+        <source>Compact mode: 2 bones per quad - one quad axis has a fixed size.</source>
+        <translation>Kompakt mod: dörtgen başına 2 kemik - dörtgenin bir ekseni sabit boyutta.</translation>
     </message>
     <message>
-        <source>Failed to open PAK file.</source>
-        <translation>PAK dosyası açılamadı.</translation>
+        <source>IMPORTANT: the effect is split over %1 models - compile each QC and spawn ALL parts at the same origin together.</source>
+        <translation>ÖNEMLİ: efekt %1 modele bölündü - her QC&apos;yi derleyin ve TÜM parçaları aynı noktada birlikte oluşturun.</translation>
     </message>
     <message>
-        <source>Invalid PAK file size.</source>
-        <translation>Geçersiz PAK dosya boyutu.</translation>
+        <source>Fewer parts: enable compact mode (half the bones), bake only one loop of the effect (shorter duration), or lower the FPS.</source>
+        <translation>Daha az parça için: kompakt modu açın (kemiklerin yarısı), efektin yalnızca bir döngüsünü pişirin (daha kısa süre) ya da FPS&apos;yi düşürün.</translation>
     </message>
     <message>
-        <source>Failed to read PAK file data.</source>
-        <translation>PAK dosya verisi okunamadı.</translation>
+        <source>Warnings:</source>
+        <translation>Uyarılar:</translation>
     </message>
     <message>
-        <source>Invalid PAK header. File may be isnt Correct.</source>
-        <translation>Geçersiz PAK başlığı. Dosya hatalı olabilir.</translation>
+        <source>Compile each part with: studiomdl.exe &lt;name&gt;.qc</source>
+        <translation>Her parçayı şununla derleyin: studiomdl.exe &lt;ad&gt;.qc</translation>
     </message>
     <message>
-        <source>Failed to parse PAK entries.</source>
-        <translation>PAK girdileri ayrıştırılamadı.</translation>
+        <source>Resolution must be between 16 and 1024 pixels.</source>
+        <translation>Çözünürlük 16 ile 1024 piksel arasında olmalı.</translation>
     </message>
     <message>
-        <source>%1 files</source>
-        <translation>%1 dosya</translation>
+        <source>OpenGL context not ready - open the effect in the viewer first.</source>
+        <translation>OpenGL bağlamı hazır değil - önce efekti görüntüleyicide açın.</translation>
     </message>
     <message>
-        <source>Failed to extract file.</source>
-        <translation>Dosya çıkarılamadı.</translation>
+        <source>Failed to create the offscreen render target.</source>
+        <translation>Ekran dışı render hedefi oluşturulamadı.</translation>
     </message>
     <message>
-        <source>Failed to create temp file.</source>
-        <translation>Geçici dosya oluşturulamadı.</translation>
+        <source>Palette quantization failed.</source>
+        <translation>Palet nicemleme başarısız.</translation>
     </message>
     <message>
-        <source>Viewer Not Configured</source>
-        <translation>Görüntüleyici Yapılandırılmamış</translation>
+        <source>Sprite export finished: %1</source>
+        <translation>Sprite aktarımı bitti: %1</translation>
     </message>
     <message>
-        <source>Please configure the Model Viewer path in Settings -&gt; Configure...</source>
-        <translation>Lütfen Model Görüntüleyici yolunu Ayarlar -&gt; Ayarlar... bölümünden yapılandırın</translation>
+        <source>Frames: %1 @ %2 fps | Resolution: %3x%3 | Scale: %4 | Brightness: %5</source>
+        <translation>Kareler: %1 @ %2 fps | Çözünürlük: %3x%3 | Ölçek: %4 | Parlaklık: %5</translation>
     </message>
     <message>
-        <source>Viewer Not Found</source>
-        <translation>Görüntüleyici Bulunamadı</translation>
+        <source>Single entity, single precache, no bone limit - baked from the CURRENT frozen camera angle.</source>
+        <translation>Tek entity, tek precache, kemik sınırı yok - MEVCUT dondurulmuş kamera açısından pişirildi.</translation>
     </message>
     <message>
-        <source>The configured viewer executable was not found:
-%1</source>
-        <translation>Yapılandırılan görüntüleyici uygulaması bulunamadı:
-%1</translation>
+        <source>In-game: point an env_sprite (or precache_model + custom spawn) at &quot;sprites/%1.spr&quot;, set its framerate to %2; the additive blend is already baked into the file.</source>
+        <translation>Oyunda: bir env_sprite&apos;ı (ya da precache_model + özel spawn) &quot;sprites/%1.spr&quot; dosyasına yönlendirin, kare hızını %2 yapın; additive karışım dosyaya zaten pişirildi.</translation>
     </message>
     <message>
-        <source>Failed to open file: %1</source>
-        <translation>Dosya açılamadı: %1</translation>
-    </message>
-    <message>
-        <source>Select Output Directory</source>
-        <translation>Çıktı Klasörünü Seç</translation>
-    </message>
-    <message>
-        <source>Extraction complete.
-
-Successful: %1
-Failed: %2</source>
-        <translation>Çıkarma tamamlandı.
-
-Başarılı: %1
-Başarısız: %2</translation>
-    </message>
-    <message>
-        <source>Extraction Complete</source>
-        <translation>Çıkarma Tamamlandı</translation>
-    </message>
-    <message>
-        <source>Extracted %1/%2 files</source>
-        <translation>%1/%2 dosya çıkarıldı</translation>
-    </message>
-    <message>
-        <source>Half-Life Model</source>
-        <translation>Half-Life Modeli</translation>
-    </message>
-    <message>
-        <source>Half-Life Sprite</source>
-        <translation>Half-Life Sprite</translation>
-    </message>
-    <message>
-        <source>Wave Audio</source>
-        <translation>Wave Sesi</translation>
-    </message>
-    <message>
-        <source>Image</source>
-        <translation>Görüntü</translation>
-    </message>
-    <message>
-        <source>Text File</source>
-        <translation>Metin Dosyası</translation>
-    </message>
-    <message>
-        <source>MP3 Audio</source>
-        <translation>MP3 Sesi</translation>
-    </message>
-    <message>
-        <source>Resource list file</source>
-        <translation>Kaynak listesi dosyası</translation>
-    </message>
-    <message>
-        <source>WAD Texture Pack</source>
-        <translation>WAD Doku Paketi</translation>
-    </message>
-    <message>
-        <source>BSP Map</source>
-        <translation>BSP Haritası</translation>
-    </message>
-    <message>
-        <source>Navigation Mesh</source>
-        <translation>Navigasyon Meshi</translation>
-    </message>
-    <message>
-        <source>Voxel file</source>
-        <translation>Voxel dosyası</translation>
-    </message>
-    <message>
-        <source>%1 files (%2 visible)</source>
-        <translation>%1 dosya (%2 görünür)</translation>
+        <source>Note: non-additive (alpha-blended) parts of the effect may show faint dark edges - additive sprite playback cannot reproduce true translucency against an arbitrary in-game background.</source>
+        <translation>Not: efektin additive olmayan (alfa karışımlı) kısımlarında hafif koyu kenarlar görünebilir - additive sprite oynatımı, oyundaki herhangi bir arka plana karşı gerçek yarı saydamlığı veremez.</translation>
     </message>
 </context>
 <context>
-    <name>RezViewerWindow</name>
+    <name>MseViewerWindow</name>
     <message>
-        <source>REZ Viewer - LithTech Engine</source>
-        <translation>REZ Goruntüleyici - LithTech Engine</translation>
+        <source>Metin2 Script Effect Viewer</source>
+        <translation>Metin2 Script Efekt Görüntüleyici</translation>
     </message>
     <message>
-        <source>REZ File</source>
-        <translation>REZ Dosyasi</translation>
+        <source>Open MSE</source>
+        <translation>MSE Aç</translation>
     </message>
     <message>
-        <source>Select a REZ file to view...</source>
-        <translation>Görüntülemek için bir REZ dosyası seçin...</translation>
+        <source>Open Folder</source>
+        <translation>Klasörü Aç</translation>
     </message>
     <message>
-        <source>Open REZ...</source>
-        <translation>REZ Ac...</translation>
+        <source>0 files</source>
+        <translation>0 dosya</translation>
     </message>
     <message>
-        <source>Contents</source>
-        <translation>Dosyalar</translation>
+        <source>Previous</source>
+        <translation>Önceki</translation>
     </message>
     <message>
-        <source>Search:</source>
-        <translation>Ara:</translation>
+        <source>Play</source>
+        <translation>Oynat</translation>
     </message>
     <message>
-        <source>Search files... (Ctrl+F)</source>
-        <translation>Dosya ara... (Ctrl+F)</translation>
+        <source>Pause</source>
+        <translation>Duraklat</translation>
     </message>
     <message>
-        <source>Select All Matches</source>
-        <translation>Tüm Eşleşmeleri Seç</translation>
+        <source>Stop</source>
+        <translation>Durdur</translation>
     </message>
     <message>
-        <source>Path</source>
-        <translation>Yol</translation>
+        <source>Restart</source>
+        <translation>Yeniden Başlat</translation>
     </message>
     <message>
-        <source>Size</source>
-        <translation>Boyut</translation>
+        <source>Next</source>
+        <translation>Sonraki</translation>
     </message>
     <message>
-        <source>Type</source>
-        <translation>Tur</translation>
+        <source>No file loaded</source>
+        <translation>Dosya yüklenmedi</translation>
     </message>
     <message>
-        <source>View DTX</source>
-        <translation>DTX Goruntüle</translation>
+        <source>Time: 0.00s</source>
+        <translation>Süre: 0.00 sn</translation>
     </message>
     <message>
-        <source>View selected DTX file in DTX Viewer</source>
-        <translation>Seçili DTX dosyasını DTX Görüntüleyici'de görüntüle</translation>
+        <source>Particles: 0</source>
+        <translation>Parçacıklar: 0</translation>
     </message>
     <message>
-        <source>View SPR</source>
-        <translation>SPR Görüntüle</translation>
+        <source>Effect Speed</source>
+        <translation>Efekt Hızı</translation>
     </message>
     <message>
-        <source>View selected SPR file in Lithtech Sprite Viewer</source>
-        <translation>Seçili SPR dosyasını Lithtech Sprite Görüntüleyici'de görüntüle</translation>
+        <source>Texture Path</source>
+        <translation>Doku Yolu</translation>
     </message>
     <message>
-        <source>Extract Selected</source>
-        <translation>Seçilenleri Çıkar</translation>
+        <source>Browse...</source>
+        <translation>Gözat...</translation>
     </message>
     <message>
-        <source>Extract All</source>
-        <translation>Tümünü Çıkar</translation>
+        <source>Export</source>
+        <translation>Dışa aktar</translation>
     </message>
     <message>
-        <source>No REZ file loaded</source>
-        <translation>REZ dosyası yüklenmedi</translation>
+        <source>Export SMD/QC (GoldSrc)</source>
+        <translation>SMD/QC Aktar (GoldSrc)</translation>
     </message>
     <message>
-        <source>REZ files (*.rez);;All files (*.*)</source>
-        <translation>REZ dosyaları (*.rez);;Tüm dosyalar (*.*)</translation>
+        <source>Bake the effect into SMD bone animation + QC for studiomdl (CS 1.6 / HL1).
+Billboards face the CURRENT camera angle - orient the view first.</source>
+        <translation>Efekti studiomdl için SMD kemik animasyonu + QC olarak pişir (CS 1.6 / HL1).
+Billboard&apos;lar MEVCUT kamera açısına bakar - önce görünümü ayarlayın.</translation>
     </message>
     <message>
-        <source>Loading REZ: %p%</source>
-        <translation>REZ yükleniyor: %p%</translation>
+        <source>Export Sprite (.spr, GoldSrc)</source>
+        <translation>Sprite Aktar (.spr, GoldSrc)</translation>
     </message>
     <message>
-        <source>Loading REZ file...</source>
-        <translation>REZ dosyası yükleniyor...</translation>
+        <source>Bake the effect into a native multi-frame Half-Life sprite: one
+entity, one precached file, no 128-bone limit. Flat baked billboard
+from the CURRENT camera angle, additive blend only - orient the
+view first. Best for effects too dense to fit a single .mdl.</source>
+        <translation>Efekti çok kareli yerel bir Half-Life sprite&apos;ına pişir: tek
+entity, tek precache dosyası, 128 kemik sınırı yok. MEVCUT kamera
+açısından düz pişmiş billboard, yalnızca additive karışım - önce
+görünümü ayarlayın. Tek .mdl&apos;ye sığmayacak yoğun efektler için en iyisi.</translation>
     </message>
     <message>
-        <source>Error</source>
-        <translation>Hata</translation>
+        <source>Log</source>
+        <translation>Günlük</translation>
     </message>
     <message>
-        <source>Failed to load REZ file.</source>
-        <translation>REZ dosyası yüklenemedi.</translation>
+        <source>Hide Log</source>
+        <translation>Günlüğü Gizle</translation>
     </message>
     <message>
-        <source>No files</source>
-        <translation>Dosya yok</translation>
+        <source>Show Log</source>
+        <translation>Günlüğü Göster</translation>
     </message>
     <message>
-        <source>%1 files</source>
-        <translation>%1 dosya</translation>
+        <source>Export SMD</source>
+        <translation>SMD Aktar</translation>
     </message>
     <message>
-        <source>Failed to read DTX data from REZ file.</source>
-        <translation>REZ dosyasından DTX verisi okunamadı.</translation>
+        <source>Load an MSE effect first.</source>
+        <translation>Önce bir MSE efekti yükleyin.</translation>
     </message>
     <message>
-        <source>Failed to extract SPR file.</source>
-        <translation>SPR dosyası çıkarılamadı.</translation>
+        <source>Animation FPS:</source>
+        <translation>Animasyon FPS:</translation>
     </message>
     <message>
-        <source>Select Output Folder</source>
-        <translation>Çıktı Klasörünü Seç</translation>
+        <source>Duration (s):</source>
+        <translation>Süre (sn):</translation>
     </message>
     <message>
-        <source>Extraction complete.
-
-Successful: %1
-Failed: %2</source>
-        <translation>Çıkarma tamamlandı.
-
-Başarılı: %1
-Başarısız: %2</translation>
+        <source>Metin2 cm -&gt; GoldSrc units. 0.40 maps a 180cm character to 72 units.</source>
+        <translation>Metin2 cm -&gt; GoldSrc birimi. 0.40, 180 cm&apos;lik bir karakteri 72 birime çevirir.</translation>
     </message>
     <message>
-        <source>Extraction Complete</source>
-        <translation>Çıkarma Tamamlandı</translation>
+        <source>Scale:</source>
+        <translation>Ölçek:</translation>
     </message>
     <message>
-        <source>Extracted %1/%2 files</source>
-        <translation>%1/%2 dosya çıkarıldı</translation>
+        <source>Extra RGB multiplier baked into the textures.
+Lower it if the effect renders too bright in-game.</source>
+        <translation>Dokulara pişirilen ek RGB çarpanı.
+Efekt oyunda çok parlak görünüyorsa düşürün.</translation>
     </message>
     <message>
-        <source>LithTech Texture</source>
-        <translation>LithTech Dokusu</translation>
+        <source>Brightness:</source>
+        <translation>Parlaklık:</translation>
     </message>
     <message>
-        <source>LithTech Model</source>
-        <translation>LithTech Modeli</translation>
+        <source>Fit into a single MDL (compact)</source>
+        <translation>Tek MDL&apos;ye sığdır (kompakt)</translation>
     </message>
     <message>
-        <source>LithTech Animation</source>
-        <translation>LithTech Animasyonu</translation>
+        <source>Unchecked: lossless - effects over 128 bones are split into
+several .mdl parts, spawn them all at the same origin.
+Checked: 2 bones per particle (one quad axis keeps a fixed
+size) so the effect usually fits one .mdl.</source>
+        <translation>İşaretsiz: kayıpsız - 128 kemiği aşan efektler birkaç .mdl
+parçasına bölünür, hepsini aynı noktada oluşturun.
+İşaretli: parçacık başına 2 kemik (dörtgenin bir ekseni sabit
+boyutta kalır), böylece efekt genelde tek .mdl&apos;ye sığar.</translation>
     </message>
     <message>
-        <source>Wave Audio</source>
-        <translation>Wave Sesi</translation>
+        <source>Billboards are baked from the CURRENT camera angle.</source>
+        <translation>Billboard&apos;lar MEVCUT kamera açısından pişirilir.</translation>
     </message>
     <message>
-        <source>Image</source>
-        <translation>Görüntü</translation>
+        <source>Select output directory</source>
+        <translation>Çıktı klasörünü seç</translation>
     </message>
     <message>
-        <source>Text File</source>
-        <translation>Metin Dosyası</translation>
+        <source>Export Sprite</source>
+        <translation>Sprite Aktar</translation>
     </message>
     <message>
-        <source>Lithtech Sprite</source>
-        <translation>Lithtech Sprite</translation>
+        <source>Square frame size in pixels. Higher = crisper but bigger file
+(numFrames * res * res bytes, plus a 768-byte shared palette).</source>
+        <translation>Piksel cinsinden kare boyutu. Daha yüksek = daha net ama daha büyük dosya
+(kare sayısı * çöz * çöz bayt, artı 768 baytlık ortak palet).</translation>
     </message>
     <message>
-        <source>Map Format</source>
-        <translation>Harita Formatı</translation>
+        <source>Resolution:</source>
+        <translation>Çözünürlük:</translation>
     </message>
     <message>
-        <source>%1 files (%2 visible)</source>
-        <translation>%1 dosya (%2 görünür)</translation>
+        <source>Renders off-screen from the CURRENT camera angle - orient the view before exporting. Additive blend only.</source>
+        <translation>MEVCUT kamera açısından ekran dışında render alır - aktarmadan önce görünümü ayarlayın. Yalnızca additive karışım.</translation>
     </message>
 </context>
 <context>
@@ -1477,11 +2070,19 @@ Başarısız: %2</translation>
     </message>
     <message>
         <source>Model Viewer (.mdl):</source>
-        <translation>Model Goruntüleyici (.mdl):</translation>
+        <translation>Model Görüntüleyici (.mdl):</translation>
     </message>
     <message>
         <source>Path your Half-Life Model Viewer...</source>
         <translation>Half-Life Model Görüntüleyici yolunu belirtin...</translation>
+    </message>
+    <message>
+        <source>Model Compiler:</source>
+        <translation>Model Derleyici:</translation>
+    </message>
+    <message>
+        <source>Path your Model Compiler...</source>
+        <translation>Model derleyicinizin yolu...</translation>
     </message>
     <message>
         <source>Paths</source>
@@ -1505,7 +2106,7 @@ Başarısız: %2</translation>
     </message>
     <message>
         <source>Enable Discord Rich Presence</source>
-        <translation>Discord Rich Presence'ı Etkinleştir</translation>
+        <translation>Discord Rich Presence&apos;ı Etkinleştir</translation>
     </message>
     <message>
         <source>Enable Dark Theme</source>
@@ -1517,11 +2118,15 @@ Başarısız: %2</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Iptal</translation>
+        <translation>İptal</translation>
     </message>
     <message>
         <source>Executables (*.exe);;All files (*.*)</source>
         <translation>Çalıştırılabilir dosyalar (*.exe);;Tüm dosyalar (*.*)</translation>
+    </message>
+    <message>
+        <source>Select studiomdl Executable</source>
+        <translation>studiomdl Programını Seç</translation>
     </message>
     <message>
         <source>Select Default Extract Directory</source>
@@ -1553,7 +2158,7 @@ Başarısız: %2</translation>
     </message>
     <message>
         <source>%1 export not found in %2.</source>
-        <translation>%2 içinde %1 export'u bulunamadı.</translation>
+        <translation>%2 içinde %1 export&apos;u bulunamadı.</translation>
     </message>
     <message>
         <source>%1 failed for %2. HRESULT: 0x%3</source>
@@ -1617,7 +2222,7 @@ Başarısız: %2</translation>
     </message>
     <message>
         <source>Select Model Viewer Executable</source>
-        <translation>Model Goruntüleyici Uygulamasi Seç</translation>
+        <translation>Model Görüntüleyici Uygulaması Seç</translation>
     </message>
 </context>
 <context>
@@ -1631,7 +2236,7 @@ Başarısız: %2</translation>
     <name>SpriteFixDialog</name>
     <message>
         <source>Fix Sprite - V3 to V2 </source>
-        <translation>Sprite Düzelt - V3'ten V2'ye </translation>
+        <translation>Sprite Düzelt - V3&apos;ten V2&apos;ye </translation>
     </message>
     <message>
         <source>Sprite Type</source>
@@ -1694,11 +2299,7 @@ Başarısız: %2</translation>
     <name>SpriteViewerWindow</name>
     <message>
         <source>Sprite Viewer</source>
-        <translation>Sprite Goruntüleyici</translation>
-    </message>
-    <message>
-        <source>File</source>
-        <translation>Dosya</translation>
+        <translation>Sprite Görüntüleyici</translation>
     </message>
     <message>
         <source>Create</source>
@@ -1737,10 +2338,6 @@ Başarısız: %2</translation>
         <translation>Yol...</translation>
     </message>
     <message>
-        <source>Frame Preview (Scroll=Zoom, RightClick=Background, LeftDrag=Select)</source>
-        <translation>Kare Önizleme (Tekerlek=Yakınlaştırma, SağTık=Arkaplan, SolSürükle=Seçim)</translation>
-    </message>
-    <message>
         <source>Zoom: 100%</source>
         <translation>Yakınlaştırma: %100</translation>
     </message>
@@ -1767,12 +2364,8 @@ Use for 640hud sprite coordinates.</source>
 640hud sprite koordinatları için kullanın.</translation>
     </message>
     <message>
-        <source>Sprite File</source>
-        <translation>Sprite Dosyasi</translation>
-    </message>
-    <message>
         <source>Open Sprite...</source>
-        <translation>Sprite Ac...</translation>
+        <translation>Sprite Aç...</translation>
     </message>
     <message>
         <source>No sprite loaded.</source>
@@ -1781,22 +2374,6 @@ Use for 640hud sprite coordinates.</source>
     <message>
         <source>Extract Frame...</source>
         <translation>Kare Çıkar...</translation>
-    </message>
-    <message>
-        <source>Extract All Frames...</source>
-        <translation>Tüm Kareleri Çıkar...</translation>
-    </message>
-    <message>
-        <source>Save (Ctrl+S)</source>
-        <translation>Kaydet (Ctrl+S)</translation>
-    </message>
-    <message>
-        <source>Save As...</source>
-        <translation>Farkli Kaydet...</translation>
-    </message>
-    <message>
-        <source>Fix Sprite</source>
-        <translation>Sprite Fixle</translation>
     </message>
     <message>
         <source>Lithtech Texture Directory</source>
@@ -1823,16 +2400,12 @@ Use for 640hud sprite coordinates.</source>
         <translation>Kareleri BMP Olarak Dışa Aktar</translation>
     </message>
     <message>
-        <source>Frames</source>
-        <translation>Kareler</translation>
-    </message>
-    <message>
         <source>Color Palette</source>
         <translation>Renk Paleti</translation>
     </message>
     <message>
         <source>Click a color to see RGB values</source>
-        <translation>RGB degerlerini gormek icin renge tiklayin</translation>
+        <translation>RGB değerlerini görmek için renge tıklayın</translation>
     </message>
     <message>
         <source>B+</source>
@@ -1856,7 +2429,7 @@ Use for 640hud sprite coordinates.</source>
     </message>
     <message>
         <source>Invert</source>
-        <translation>Ters Cevir</translation>
+        <translation>Ters Çevir</translation>
     </message>
     <message>
         <source>Swap</source>
@@ -1873,18 +2446,6 @@ Use for 640hud sprite coordinates.</source>
     <message>
         <source>B &lt;-&gt; G</source>
         <translation>B &lt;-&gt; G</translation>
-    </message>
-    <message>
-        <source>↩</source>
-        <translation>↩</translation>
-    </message>
-    <message>
-        <source>↪</source>
-        <translation>↪</translation>
-    </message>
-    <message>
-        <source>⟲</source>
-        <translation>⟲</translation>
     </message>
     <message>
         <source>Undo (Ctrl+Z)</source>
@@ -1905,10 +2466,6 @@ Use for 640hud sprite coordinates.</source>
     <message>
         <source>S: 0</source>
         <translation>S: 0</translation>
-    </message>
-    <message>
-        <source>Animation</source>
-        <translation>Animasyon</translation>
     </message>
     <message>
         <source>Play</source>
@@ -1948,7 +2505,7 @@ Use for 640hud sprite coordinates.</source>
     </message>
     <message>
         <source>Speed (ms):</source>
-        <translation>Hiz (ms):</translation>
+        <translation>Hız (ms):</translation>
     </message>
     <message>
         <source>Sprite Type</source>
@@ -1960,11 +2517,11 @@ Use for 640hud sprite coordinates.</source>
     </message>
     <message>
         <source>Sprite Properties</source>
-        <translation>Sprite Ozellikleri</translation>
+        <translation>Sprite Özellikleri</translation>
     </message>
     <message>
         <source>Sprite Settings</source>
-        <translation>Sprite Ayarlari</translation>
+        <translation>Sprite Ayarları</translation>
     </message>
     <message>
         <source>Select Frame Images</source>
@@ -1972,7 +2529,7 @@ Use for 640hud sprite coordinates.</source>
     </message>
     <message>
         <source>Remove Selected</source>
-        <translation>Secileni Kaldir</translation>
+        <translation>Seçileni Kaldır</translation>
     </message>
     <message>
         <source>Create Sprite</source>
@@ -1981,6 +2538,94 @@ Use for 640hud sprite coordinates.</source>
     <message>
         <source>Browse Frames...</source>
         <translation>Karelere Gözat...</translation>
+    </message>
+    <message>
+        <source>Open sprite</source>
+        <translation>Sprite aç</translation>
+    </message>
+    <message>
+        <source>Open a GoldSrc, CSO or LithTech sprite</source>
+        <translation>GoldSrc, CSO veya LithTech sprite&apos;ı aç</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Kaydet</translation>
+    </message>
+    <message>
+        <source>Save the palette and properties to the sprite (Ctrl+S)</source>
+        <translation>Paleti ve özellikleri sprite&apos;a kaydet (Ctrl+S)</translation>
+    </message>
+    <message>
+        <source>Save as</source>
+        <translation>Farklı kaydet</translation>
+    </message>
+    <message>
+        <source>Save the sprite to a new file</source>
+        <translation>Sprite&apos;ı yeni bir dosyaya kaydet</translation>
+    </message>
+    <message>
+        <source>Extract frame</source>
+        <translation>Kareyi çıkar</translation>
+    </message>
+    <message>
+        <source>Save the frame shown as an image</source>
+        <translation>Gösterilen kareyi resim olarak kaydet</translation>
+    </message>
+    <message>
+        <source>Extract all</source>
+        <translation>Tümünü çıkar</translation>
+    </message>
+    <message>
+        <source>Save every frame as an image</source>
+        <translation>Tüm kareleri resim olarak kaydet</translation>
+    </message>
+    <message>
+        <source>Open the previous sprite in the folder (Up)</source>
+        <translation>Klasördeki önceki sprite&apos;ı aç (Yukarı)</translation>
+    </message>
+    <message>
+        <source>Open the next sprite in the folder (Down)</source>
+        <translation>Klasördeki sonraki sprite&apos;ı aç (Aşağı)</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Görüntüle</translation>
+    </message>
+    <message>
+        <source>Look at a sprite and edit its palette</source>
+        <translation>Bir sprite&apos;a bak ve paletini düzenle</translation>
+    </message>
+    <message>
+        <source>Make a sprite from images</source>
+        <translation>Resimlerden sprite oluştur</translation>
+    </message>
+    <message>
+        <source>Turn CSO (V3) sprites into GoldSrc (V2) ones in a batch</source>
+        <translation>CSO (V3) sprite&apos;larını toplu olarak GoldSrc (V2) sprite&apos;larına çevir</translation>
+    </message>
+    <message>
+        <source>Wheel: zoom. Right click: background. Drag: select a region.</source>
+        <translation>Tekerlek: yakınlaştır. Sağ tık: arka plan. Sürükle: bölge seç.</translation>
+    </message>
+    <message>
+        <source>Open a sprite from the ribbon or the folder on the left.</source>
+        <translation>Şeritten ya da soldaki klasörden bir sprite açın.</translation>
+    </message>
+    <message>
+        <source>Fix Sprite (V3 to V2)</source>
+        <translation>Sprite&apos;ı Düzelt (V3&apos;ten V2&apos;ye)</translation>
+    </message>
+    <message>
+        <source>Turn this CSO sprite into a GoldSrc one</source>
+        <translation>Bu CSO sprite&apos;ını GoldSrc sprite&apos;ına çevir</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>Sıfırla</translation>
+    </message>
+    <message>
+        <source>Frames (Drag &amp; Drop supported)</source>
+        <translation>Kareler (Sürükle &amp; Bırak desteklenir)</translation>
     </message>
     <message>
         <source>Parallel</source>
@@ -2016,7 +2661,7 @@ This color will be placed at palette index 255.
 Works only with AlphaTest format.
 Common: Blue (0,0,255) or Black (0,0,0)</source>
         <translation>Şeffaf olması gereken rengi seçin.
-Bu renk palet indeksi 255'e yerleştirilecek.
+Bu renk palet indeksi 255&apos;e yerleştirilecek.
 Yalnızca AlphaTest formatıyla çalışır.
 Yaygın: Mavi (0,0,255) veya Siyah (0,0,0)</translation>
     </message>
@@ -2033,12 +2678,24 @@ Yaygın: Mavi (0,0,255) veya Siyah (0,0,0)</translation>
         <translation>Kontrast:</translation>
     </message>
     <message>
+        <source>Version:</source>
+        <translation>Sürüm:</translation>
+    </message>
+    <message>
+        <source>V2 - GoldSrc </source>
+        <translation>V2 - GoldSrc </translation>
+    </message>
+    <message>
+        <source>V3 - CSO (DXT5, keeps alpha)</source>
+        <translation>V3 - CSO (DXT5, alfayı korur)</translation>
+    </message>
+    <message>
         <source>Sprite files (*.spr)</source>
         <translation>Sprite dosyaları (*.spr)</translation>
     </message>
     <message>
         <source>Drag &amp; drop V3 sprite files here or use the Add button. All sprites will be converted to V2 format.</source>
-        <translation>V3 sprite dosyalarını buraya sürükleyip bırakın veya Ekle düğmesini kullanın. Tüm sprite'lar V2 formatına dönüştürülecektir.</translation>
+        <translation>V3 sprite dosyalarını buraya sürükleyip bırakın veya Ekle düğmesini kullanın. Tüm sprite&apos;lar V2 formatına dönüştürülecektir.</translation>
     </message>
     <message>
         <source>Conversion Settings</source>
@@ -2076,7 +2733,7 @@ Varsayılan: 32</translation>
     </message>
     <message>
         <source>Select Sprites to Fix</source>
-        <translation>Düzeltilecek Sprite'ları Seç</translation>
+        <translation>Düzeltilecek Sprite&apos;ları Seç</translation>
     </message>
     <message>
         <source>Format Changed</source>
@@ -2102,11 +2759,11 @@ Atlandı (V2): %3</translation>
     </message>
     <message>
         <source>No Palette Available for Lithtech Engine Sprite</source>
-        <translation>Lithtech Engine Sprite'ı için Palet Mevcut Değil</translation>
+        <translation>Lithtech Engine Sprite&apos;ı için Palet Mevcut Değil</translation>
     </message>
     <message>
         <source>No palette available for V3 Sprites</source>
-        <translation>V3 Sprite'lar için palet mevcut değil</translation>
+        <translation>V3 Sprite&apos;lar için palet mevcut değil</translation>
     </message>
     <message>
         <source>Click a color to see RGB values (%1 colors)</source>
@@ -2118,11 +2775,11 @@ Atlandı (V2): %3</translation>
     </message>
     <message>
         <source> The fix is only available for V3 sprites.</source>
-        <translation> Düzeltme yalnızca V3 sprite'lar için kullanılabilir.</translation>
+        <translation> Düzeltme yalnızca V3 sprite&apos;lar için kullanılabilir.</translation>
     </message>
     <message>
         <source>Save Fixed Sprite</source>
-        <translation>Düzeltilmiş Sprite'ı Kaydet</translation>
+        <translation>Düzeltilmiş Sprite&apos;ı Kaydet</translation>
     </message>
     <message>
         <source>Error</source>
@@ -2225,10 +2882,6 @@ Atlandı (V2): %3</translation>
         <translation>%2 kareden %1 tanesi %3 olarak çıkarıldı.</translation>
     </message>
     <message>
-        <source>Image files (*.bmp *.png *.jpg *.jpeg *.gif *.tga *.tiff *.tif);;All files (*.*)</source>
-        <translation>Görüntü dosyaları (*.bmp *.png *.jpg *.jpeg *.gif *.tga *.tiff *.tif);;Tüm dosyalar (*.*)</translation>
-    </message>
-    <message>
         <source>No frames selected.</source>
         <translation>Kare seçilmedi.</translation>
     </message>
@@ -2317,8 +2970,20 @@ Atlandı (V2): %3</translation>
         <translation>Yinele</translation>
     </message>
     <message>
+        <source>Image files (%1);;All files (*.*)</source>
+        <translation>Resim dosyaları (%1);;Tüm dosyalar (*.*)</translation>
+    </message>
+    <message>
+        <source>Failed to create the V3 sprite.</source>
+        <translation>V3 sprite oluşturulamadı.</translation>
+    </message>
+    <message>
+        <source>V3 sprite created with %1 frame(s), one DXT5 texture each.</source>
+        <translation>%1 kareli V3 sprite oluşturuldu, her biri bir DXT5 dokusu.</translation>
+    </message>
+    <message>
         <source>Edit Color %1</source>
-        <translation>Renk %1'i Düzenle</translation>
+        <translation>Renk %1&apos;i Düzenle</translation>
     </message>
     <message>
         <source>Color %1 changed</source>
@@ -2409,10 +3074,6 @@ Atlandı (V2): %3</translation>
         <translation>Format:</translation>
     </message>
     <message>
-        <source>Navigate Sprites</source>
-        <translation>Spritelarda Gezin</translation>
-    </message>
-    <message>
         <source>Sprites to Fix (Drag &amp; Drop supported)</source>
         <translation>Duzeltilecek Spriteler (Surukle Birak)</translation>
     </message>
@@ -2454,6 +3115,332 @@ Atlandı (V2): %3</translation>
     </message>
 </context>
 <context>
+    <name>SteamWorkshopDownloaderDialog</name>
+    <message>
+        <source>Steam Workshop Downloader</source>
+        <translation>Steam Workshop İndirici</translation>
+    </message>
+    <message>
+        <source>Enter Steam Workshop URL or ID</source>
+        <translation>Steam Workshop bağlantısı veya ID girin</translation>
+    </message>
+    <message>
+        <source>Show Item</source>
+        <translation>Öğeyi Göster</translation>
+    </message>
+    <message>
+        <source>Look the item up without downloading it</source>
+        <translation>Öğeyi indirmeden göster</translation>
+    </message>
+    <message>
+        <source>Download Item</source>
+        <translation>Öğeyi İndir</translation>
+    </message>
+    <message>
+        <source>Folder:</source>
+        <translation>Klasör:</translation>
+    </message>
+    <message>
+        <source>Browse...</source>
+        <translation>Gözat...</translation>
+    </message>
+    <message>
+        <source>Ready.</source>
+        <translation>Hazır.</translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation>Aç</translation>
+    </message>
+    <message>
+        <source>Open the downloaded file in the tab that fits it</source>
+        <translation>İndirilen dosyayı ona uygun sekmede aç</translation>
+    </message>
+    <message>
+        <source>Show in Folder</source>
+        <translation>Klasörde Göster</translation>
+    </message>
+    <message>
+        <source>No item yet</source>
+        <translation>Henüz öğe yok</translation>
+    </message>
+    <message>
+        <source>Paste a Workshop link or item ID above, then show or download it.</source>
+        <translation>Yukarıya bir Workshop bağlantısı veya öğe ID&apos;si yapıştırın, sonra gösterin ya da indirin.</translation>
+    </message>
+    <message>
+        <source>updated %1</source>
+        <translation>güncellendi %1</translation>
+    </message>
+    <message>
+        <source>No preview</source>
+        <translation>Önizleme yok</translation>
+    </message>
+    <message>
+        <source>Loading preview...</source>
+        <translation>Önizleme yükleniyor...</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Hata</translation>
+    </message>
+    <message>
+        <source>Please specify a valid destination folder.</source>
+        <translation>Lütfen geçerli bir hedef klasör belirtin.</translation>
+    </message>
+    <message>
+        <source>Downloading %1 (AppID: %2)...</source>
+        <translation>%1 indiriliyor (AppID: %2)...</translation>
+    </message>
+    <message>
+        <source>Invalid Input</source>
+        <translation>Geçersiz Girdi</translation>
+    </message>
+    <message>
+        <source>Please enter a valid Steam Workshop URL or numeric Item ID.</source>
+        <translation>Lütfen geçerli bir Steam Workshop bağlantısı veya sayısal öğe ID&apos;si girin.</translation>
+    </message>
+    <message>
+        <source>Resolving Steam Item ID %1...</source>
+        <translation>Steam öğe ID&apos;si %1 çözümleniyor...</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>Hata: %1</translation>
+    </message>
+    <message>
+        <source>Fetch Failed</source>
+        <translation>Bilgi Alınamadı</translation>
+    </message>
+    <message>
+        <source>Ready to download.</source>
+        <translation>İndirmeye hazır.</translation>
+    </message>
+    <message>
+        <source>Select Output Directory</source>
+        <translation>Çıktı Klasörünü Seç</translation>
+    </message>
+    <message>
+        <source>Downloading: %1 MB / %2 MB (%3%)</source>
+        <translation>İndiriliyor: %1 MB / %2 MB (%3%)</translation>
+    </message>
+    <message>
+        <source>Download completed: %1</source>
+        <translation>İndirme tamamlandı: %1</translation>
+    </message>
+    <message>
+        <source>Download failed: %1</source>
+        <translation>İndirme başarısız: %1</translation>
+    </message>
+    <message>
+        <source>Download Failed</source>
+        <translation>İndirme Başarısız</translation>
+    </message>
+    <message>
+        <source>Failed to download workshop item.
+Error: %1</source>
+        <translation>Workshop öğesi indirilemedi.
+Hata: %1</translation>
+    </message>
+</context>
+<context>
+    <name>TextureWorkspace</name>
+    <message>
+        <source>Search (name, or a pattern like *.vtf)</source>
+        <translation>Ara (ad veya *.vtf gibi bir kalıp)</translation>
+    </message>
+    <message>
+        <source>Color and alpha</source>
+        <translation>Renk ve alfa</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation>Renk</translation>
+    </message>
+    <message>
+        <source>Alpha</source>
+        <translation>Alfa</translation>
+    </message>
+    <message>
+        <source>Fit</source>
+        <translation>Sığdır</translation>
+    </message>
+    <message>
+        <source>1:1</source>
+        <translation>1:1</translation>
+    </message>
+    <message>
+        <source>Frame</source>
+        <translation>Kare</translation>
+    </message>
+    <message>
+        <source>Face</source>
+        <translation>Yüz</translation>
+    </message>
+    <message>
+        <source>Mipmap</source>
+        <translation>Mipmap</translation>
+    </message>
+    <message>
+        <source>BMPs are 8-bit with a palette of 256 colors, at most 512 x 512.</source>
+        <translation>BMP&apos;ler 256 renkli paletle 8-bit ve en fazla 512 x 512 olur.</translation>
+    </message>
+    <message>
+        <source>Transparent pixels as mask (blue)</source>
+        <translation>Saydam pikseller maske olarak (mavi)</translation>
+    </message>
+    <message>
+        <source>For $texrendermode masked: pixels with alpha below 128 get palette index 255. Not used for DTX, whose alpha is a gloss mask.</source>
+        <translation>$texrendermode masked için: alfası 128&apos;in altındaki pikseller palet indeksi 255 alır. Alfası parlaklık maskesi olan DTX için kullanılmaz.</translation>
+    </message>
+    <message>
+        <source>Power of two sides</source>
+        <translation>Kenarlar 2&apos;nin kuvveti</translation>
+    </message>
+    <message>
+        <source>Save as BMP...</source>
+        <translation>BMP olarak kaydet...</translation>
+    </message>
+    <message>
+        <source>Save as PNG...</source>
+        <translation>PNG olarak kaydet...</translation>
+    </message>
+    <message>
+        <source>Export selected to output</source>
+        <translation>Seçilenleri çıktıya aktar</translation>
+    </message>
+    <message>
+        <source>Write the selected textures as BMPs to the output folder</source>
+        <translation>Seçili dokuları BMP olarak çıktı klasörüne yaz</translation>
+    </message>
+    <message>
+        <source>Send to WAD</source>
+        <translation>WAD&apos;a gönder</translation>
+    </message>
+    <message>
+        <source>Add the selected textures to the WAD open in the WAD tab</source>
+        <translation>Seçili dokuları WAD sekmesinde açık olan WAD&apos;a ekle</translation>
+    </message>
+    <message>
+        <source>Save as BMP</source>
+        <translation>BMP olarak kaydet</translation>
+    </message>
+    <message>
+        <source>Bitmap images (*.bmp)</source>
+        <translation>Bitmap resimleri (*.bmp)</translation>
+    </message>
+    <message>
+        <source>Save error</source>
+        <translation>Kaydetme hatası</translation>
+    </message>
+    <message>
+        <source>Failed to save BMP file.</source>
+        <translation>BMP dosyası kaydedilemedi.</translation>
+    </message>
+    <message>
+        <source>Save as PNG</source>
+        <translation>PNG olarak kaydet</translation>
+    </message>
+    <message>
+        <source>PNG images (*.png)</source>
+        <translation>PNG resimleri (*.png)</translation>
+    </message>
+    <message>
+        <source>Failed to save PNG file.</source>
+        <translation>PNG dosyası kaydedilemedi.</translation>
+    </message>
+    <message>
+        <source>unreadable</source>
+        <translation>okunamıyor</translation>
+    </message>
+    <message>
+        <source>No textures open.</source>
+        <translation>Açık doku yok.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n texture(s)</source>
+        <translation>
+            <numerusform>%n doku</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 of %2 textures</source>
+        <translation>%1 / %2 doku</translation>
+    </message>
+    <message>
+        <source>This texture could not be decoded.</source>
+        <translation>Bu doku çözülemedi.</translation>
+    </message>
+    <message>
+        <source>Open textures from the ribbon, or drop them here.</source>
+        <translation>Şeritten doku açın ya da buraya bırakın.</translation>
+    </message>
+    <message>
+        <source>No texture selected.</source>
+        <translation>Doku seçilmedi.</translation>
+    </message>
+    <message>
+        <source>From an archive</source>
+        <translation>Bir arşivden</translation>
+    </message>
+    <message>
+        <source>Size: %1 x %2</source>
+        <translation>Boyut: %1 x %2</translation>
+    </message>
+    <message>
+        <source>Format: %1</source>
+        <translation>Biçim: %1</translation>
+    </message>
+    <message>
+        <source>Frames: %1, faces: %2, mipmaps: %3</source>
+        <translation>Kareler: %1, yüzler: %2, mipmap&apos;ler: %3</translation>
+    </message>
+    <message>
+        <source>Alpha: gloss mask</source>
+        <translation>Alfa: parlaklık maskesi</translation>
+    </message>
+    <message>
+        <source>Alpha: has transparent pixels</source>
+        <translation>Alfa: saydam pikseller var</translation>
+    </message>
+    <message>
+        <source>Alpha: opaque</source>
+        <translation>Alfa: opak</translation>
+    </message>
+    <message>
+        <source>GoldSrc</source>
+        <translation>GoldSrc</translation>
+    </message>
+    <message>
+        <source>Larger than 512: scaled down to fit when saved.</source>
+        <translation>512&apos;den büyük: kaydedilirken sığacak şekilde küçültülür.</translation>
+    </message>
+    <message>
+        <source>Fits the 512 x 512 limit.</source>
+        <translation>512 x 512 sınırına uyuyor.</translation>
+    </message>
+    <message>
+        <source>Sides are not powers of two.</source>
+        <translation>Kenarlar 2&apos;nin kuvveti değil.</translation>
+    </message>
+    <message>
+        <source>Open Textures</source>
+        <translation>Dokuları Aç</translation>
+    </message>
+    <message>
+        <source>Textures (*.dtx *.vtf *.dds *.tga *.bmp *.png *.jpg *.jpeg);;All files (*.*)</source>
+        <translation>Dokular (*.dtx *.vtf *.dds *.tga *.bmp *.png *.jpg *.jpeg);;Tüm dosyalar (*.*)</translation>
+    </message>
+    <message>
+        <source>Open a Folder of Textures</source>
+        <translation>Doku Klasörü Aç</translation>
+    </message>
+    <message>
+        <source>Saved %1 texture(s) to %2</source>
+        <translation>%1 doku %2 konumuna kaydedildi</translation>
+    </message>
+</context>
+<context>
     <name>VortigauntUpdateCheck</name>
     <message>
         <source>No Update Available</source>
@@ -2461,7 +3448,7 @@ Atlandı (V2): %3</translation>
     </message>
     <message>
         <source>You are running the latest version of Vortigaunt (%1).</source>
-        <translation>Vortigaunt'un en son sürümünü kullanıyorsunuz (%1).</translation>
+        <translation>Vortigaunt&apos;un en son sürümünü kullanıyorsunuz (%1).</translation>
     </message>
     <message>
         <source>Update Check Failed</source>
@@ -2473,7 +3460,7 @@ Atlandı (V2): %3</translation>
     </message>
     <message>
         <source>Invalid response from GitHub</source>
-        <translation>GitHub'dan geçersiz yanıt</translation>
+        <translation>GitHub&apos;dan geçersiz yanıt</translation>
     </message>
     <message>
         <source>No version information in release</source>
@@ -2486,7 +3473,7 @@ Current version: %1
 Latest version: %2
 
 Would you like to visit the download page?</source>
-        <translation>Vortigaunt'un yeni bir sürümü mevcut!
+        <translation>Vortigaunt&apos;un yeni bir sürümü mevcut!
 
 Geçerli sürüm: %1
 En son sürüm: %2
@@ -2496,316 +3483,6 @@ En son sürüm: %2
     <message>
         <source>Update Available</source>
         <translation>Güncelleme Mevcut</translation>
-    </message>
-</context>
-<context>
-    <name>VpkViewerWindow</name>
-    <message>
-        <source>VPK / GMA Viewer - Source Engine</source>
-        <translation>VPK / GMA Görüntüleyici - Source Engine</translation>
-    </message>
-    <message>
-        <source>Archive File (VPK / GMA)</source>
-        <translation>Arşiv Dosyası (VPK / GMA)</translation>
-    </message>
-    <message>
-        <source>Select a VPK or GMA file to view...</source>
-        <translation>Görüntülemek için bir VPK veya GMA dosyası seçin...</translation>
-    </message>
-    <message>
-        <source>Open VPK / GMA...</source>
-        <translation>VPK / GMA Aç...</translation>
-    </message>
-    <message>
-        <source>Contents</source>
-        <translation>Dosyalar</translation>
-    </message>
-    <message>
-        <source>Search:</source>
-        <translation>Ara:</translation>
-    </message>
-    <message>
-        <source>Search files... (Ctrl+F)</source>
-        <translation>Dosya ara... (Ctrl+F)</translation>
-    </message>
-    <message>
-        <source>Select All Matches</source>
-        <translation>Tüm Eşleşmeleri Seç</translation>
-    </message>
-    <message>
-        <source>Path</source>
-        <translation>Yol</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation>Boyut</translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <translation>Tür</translation>
-    </message>
-    <message>
-        <source>Extract Selected</source>
-        <translation>Seçilenleri Çıkar</translation>
-    </message>
-    <message>
-        <source>Extract All</source>
-        <translation>Tümünü Çıkar</translation>
-    </message>
-    <message>
-        <source>No archive loaded</source>
-        <translation>Arşiv yüklenmedi</translation>
-    </message>
-    <message>
-        <source>Open VPK / GMA File</source>
-        <translation>VPK / GMA Dosyası Aç</translation>
-    </message>
-    <message>
-        <source>Source archives (*.vpk *.gma);;VPK files (*.vpk);;GMA files (*.gma);;All files (*.*)</source>
-        <translation>Source arşivleri (*.vpk *.gma);;VPK dosyaları (*.vpk);;GMA dosyaları (*.gma);;Tüm dosyalar (*.*)</translation>
-    </message>
-    <message>
-        <source>Cannot Open</source>
-        <translation>Açılamıyor</translation>
-    </message>
-    <message>
-        <source>This appears to be a data chunk file (*_NNN.vpk).
-Please open the corresponding _dir.vpk file instead.</source>
-        <translation>Bu bir veri parçası dosyası gibi görünüyor (*_NNN.vpk).
-Lütfen bunun yerine ilgili _dir.vpk dosyasını açın.</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Hata</translation>
-    </message>
-    <message>
-        <source>Failed to load VPK file.
-
-The file may be corrupted or not a valid VPK archive.</source>
-        <translation>VPK dosyası yüklenemedi.
-
-Dosya bozuk veya geçerli bir VPK arşivi olmayabilir.</translation>
-    </message>
-    <message>
-        <source>Failed to load GMA file.
-
-The file may be corrupted or not a valid Garry's Mod addon.</source>
-        <translation>GMA dosyası yüklenemedi.
-
-Dosya bozuk veya geçerli bir Garry's Mod eklentisi olmayabilir.</translation>
-    </message>
-    <message>
-        <source>%1 files — %2 (by %3)</source>
-        <translation>%1 dosya — %2 (%3 tarafından)</translation>
-    </message>
-    <message>
-        <source>%1 files</source>
-        <translation>%1 dosya</translation>
-    </message>
-    <message>
-        <source>Select Output Directory</source>
-        <translation>Çıktı Klasörünü Seç</translation>
-    </message>
-    <message>
-        <source>Extraction complete.
-
-Successful: %1
-Failed: %2</source>
-        <translation>Çıkarma tamamlandı.
-
-Başarılı: %1
-Başarısız: %2</translation>
-    </message>
-    <message>
-        <source>Extraction Complete</source>
-        <translation>Çıkarma Tamamlandı</translation>
-    </message>
-    <message>
-        <source>Extracted %1/%2 files</source>
-        <translation>%1/%2 dosya çıkarıldı</translation>
-    </message>
-    <message>
-        <source>Source Model</source>
-        <translation>Source Modeli</translation>
-    </message>
-    <message>
-        <source>Source Model Data</source>
-        <translation>Source Model Verisi</translation>
-    </message>
-    <message>
-        <source>Source Texture</source>
-        <translation>Source Dokusu</translation>
-    </message>
-    <message>
-        <source>Source Material</source>
-        <translation>Source Materyali</translation>
-    </message>
-    <message>
-        <source>Audio</source>
-        <translation>Ses</translation>
-    </message>
-    <message>
-        <source>Image</source>
-        <translation>Görüntü</translation>
-    </message>
-    <message>
-        <source>Text File</source>
-        <translation>Metin Dosyası</translation>
-    </message>
-    <message>
-        <source>Source Map</source>
-        <translation>Source Haritası</translation>
-    </message>
-    <message>
-        <source>Sprite</source>
-        <translation>Sprite</translation>
-    </message>
-    <message>
-        <source>Particle System</source>
-        <translation>Parçacık Sistemi</translation>
-    </message>
-    <message>
-        <source>Physics Mesh</source>
-        <translation>Fizik Meshi</translation>
-    </message>
-    <message>
-        <source>Lua Script</source>
-        <translation>Lua Scripti</translation>
-    </message>
-    <message>
-        <source>Choreography Scene</source>
-        <translation>Koreografi Sahnesi</translation>
-    </message>
-    <message>
-        <source>JSON Data</source>
-        <translation>JSON Verisi</translation>
-    </message>
-    <message>
-        <source>%1 files (%2 visible)</source>
-        <translation>%1 dosya (%2 görünür)</translation>
-    </message>
-</context>
-<context>
-    <name>VtfViewerDialog</name>
-    <message>
-        <source>VTF Viewer - Source Engine</source>
-        <translation>VTF Görüntüleyici - Source Engine</translation>
-    </message>
-    <message>
-        <source>Open VTF...</source>
-        <translation>VTF Aç...</translation>
-    </message>
-    <message>
-        <source>Save as 8-bit BMP...</source>
-        <translation>8-bit BMP olarak kaydet...</translation>
-    </message>
-    <message>
-        <source>No file loaded.</source>
-        <translation>Hiçbir dosya yüklenmedi.</translation>
-    </message>
-    <message>
-        <source>Frame:</source>
-        <translation>Kare:</translation>
-    </message>
-    <message>
-        <source>Face:</source>
-        <translation>Yüz:</translation>
-    </message>
-    <message>
-        <source>Mipmap:</source>
-        <translation>Mipmap:</translation>
-    </message>
-    <message>
-        <source>Select VTF file</source>
-        <translation>VTF dosyası seç</translation>
-    </message>
-    <message>
-        <source>VTF textures (*.vtf);;All files (*.*)</source>
-        <translation>VTF dokuları (*.vtf);;Tüm dosyalar (*.*)</translation>
-    </message>
-    <message>
-        <source>VTF error</source>
-        <translation>VTF hatası</translation>
-    </message>
-    <message>
-        <source>Cannot open file:
-%1</source>
-        <translation>Dosya açılamıyor:
-%1</translation>
-    </message>
-    <message>
-        <source>Failed to load VTF file.
-
-%1</source>
-        <translation>VTF dosyası yüklenemedi.
-
-%1</translation>
-    </message>
-    <message>
-        <source>No image data for the selected frame/face/mipmap.</source>
-        <translation>Seçilen kare/yüz/mipmap için görüntü verisi yok.</translation>
-    </message>
-    <message>
-        <source>Failed to decode image data.
-
-%1</source>
-        <translation>Görüntü verisi çözümlenemedi.
-
-%1</translation>
-    </message>
-    <message>
-        <source>Image error</source>
-        <translation>Görüntü hatası</translation>
-    </message>
-    <message>
-        <source>Failed to construct image from decoded data.</source>
-        <translation>Çözümlenen veriden görüntü oluşturulamadı.</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation>Bilinmeyen</translation>
-    </message>
-    <message>
-        <source>%1  |  %2 x %3  |  %4  |  v%5.%6  |  %7 frame(s), %8 mipmap(s)</source>
-        <translation>%1  |  %2 x %3  |  %4  |  v%5.%6  |  %7 kare, %8 mipmap</translation>
-    </message>
-    <message>
-        <source>Save as 8-bit BMP</source>
-        <translation>8-bit BMP olarak kaydet</translation>
-    </message>
-    <message>
-        <source>Bitmap images (*.bmp)</source>
-        <translation>Bitmap görüntüleri (*.bmp)</translation>
-    </message>
-    <message>
-        <source>GoldSrc Size Limit</source>
-        <translation>GoldSrc Boyut Sınırı</translation>
-    </message>
-    <message>
-        <source>The image size (%1 x %2) does not fit GoldSrc texture limits (max 512 x 512).
-
-Do you want to save it resized to 512 x 512?</source>
-        <translation>Görüntü boyutu (%1 x %2) GoldSrc doku sınırlarına uymuyor (en fazla 512 x 512).
-
-512 x 512 olarak yeniden boyutlandırıp kaydetmek ister misiniz?</translation>
-    </message>
-    <message>
-        <source>Save error</source>
-        <translation>Kaydetme hatası</translation>
-    </message>
-    <message>
-        <source>Failed to save BMP file.</source>
-        <translation>BMP dosyası kaydedilemedi.</translation>
-    </message>
-    <message>
-        <source>Saved</source>
-        <translation>Kaydedildi</translation>
-    </message>
-    <message>
-        <source>Saved 8-bit BMP:
-%1</source>
-        <translation>8-bit BMP kaydedildi:
-%1</translation>
     </message>
 </context>
 <context>
@@ -2823,12 +3500,12 @@ Do you want to save it resized to 512 x 512?</source>
         <translation>Yeni WAD oluştur</translation>
     </message>
     <message>
-        <source>Open WAD...</source>
-        <translation>WAD Aç...</translation>
-    </message>
-    <message>
         <source>Open existing WAD file</source>
         <translation>Mevcut WAD dosyasını aç</translation>
+    </message>
+    <message>
+        <source>Open WAD</source>
+        <translation>WAD Aç</translation>
     </message>
     <message>
         <source>Save</source>
@@ -2839,54 +3516,62 @@ Do you want to save it resized to 512 x 512?</source>
         <translation>WAD dosyasını kaydet</translation>
     </message>
     <message>
-        <source>Save As...</source>
-        <translation>Farklı Kaydet...</translation>
-    </message>
-    <message>
         <source>Save WAD to new file</source>
-        <translation>WAD'ı yeni dosyaya kaydet</translation>
+        <translation>WAD&apos;ı yeni dosyaya kaydet</translation>
     </message>
     <message>
-        <source>Textures: 0 / %1</source>
-        <translation>Dokular: 0 / %1</translation>
+        <source>Save As</source>
+        <translation>Farklı Kaydet</translation>
     </message>
     <message>
-        <source>Filter:</source>
-        <translation>Filtre:</translation>
+        <source>Add images</source>
+        <translation>Resim ekle</translation>
+    </message>
+    <message>
+        <source>Add images as textures; they are fitted into 512 x 512 and 256 colors</source>
+        <translation>Resimleri doku olarak ekle; 512 x 512 ve 256 renge sığdırılır</translation>
+    </message>
+    <message>
+        <source>Remove the selected textures</source>
+        <translation>Seçili dokuları kaldır</translation>
+    </message>
+    <message>
+        <source>Extract</source>
+        <translation>Çıkar</translation>
+    </message>
+    <message>
+        <source>Save the selected textures as images</source>
+        <translation>Seçili dokuları resim olarak kaydet</translation>
+    </message>
+    <message>
+        <source>Rename the selected texture (F2, or double-click)</source>
+        <translation>Seçili dokuyu yeniden adlandır (F2 ya da çift tıklama)</translation>
+    </message>
+    <message>
+        <source>Replace image</source>
+        <translation>Resmi değiştir</translation>
+    </message>
+    <message>
+        <source>Give the selected texture the picture of another image; its name stays</source>
+        <translation>Seçili dokuya başka bir resmin görüntüsünü ver; adı aynı kalır</translation>
     </message>
     <message>
         <source>Type to filter textures...</source>
         <translation>Dokuları filtrelemek için yazın...</translation>
     </message>
     <message>
-        <source>Add Images...</source>
-        <translation>Görüntü Ekle...</translation>
-    </message>
-    <message>
         <source>Remove</source>
         <translation>Kaldır</translation>
-    </message>
-    <message>
-        <source>Extract...</source>
-        <translation>Çıkar...</translation>
     </message>
     <message>
         <source>Rename</source>
         <translation>Yeniden Adlandır</translation>
     </message>
     <message>
-        <source>Preview</source>
-        <translation>Önizleme</translation>
-    </message>
-    <message>
         <source>Select a texture
 to preview</source>
         <translation>Önizlemek için
 bir doku seçin</translation>
-    </message>
-    <message>
-        <source>WAD Editor - New</source>
-        <translation>WAD Düzenleyici - Yeni</translation>
     </message>
     <message>
         <source>Open WAD File</source>
@@ -2899,6 +3584,162 @@ bir doku seçin</translation>
     <message>
         <source>WAD Editor - %1</source>
         <translation>WAD Düzenleyici - %1</translation>
+    </message>
+    <message>
+        <source>Fit</source>
+        <translation>Sığdır</translation>
+    </message>
+    <message>
+        <source>1:1</source>
+        <translation>1:1</translation>
+    </message>
+    <message>
+        <source>Play animation</source>
+        <translation>Animasyonu oynat</translation>
+    </message>
+    <message>
+        <source>Play the frames of this animated texture (+0 ... +9) at the game&apos;s 10 frames a second</source>
+        <translation>Bu animasyonlu dokunun karelerini (+0 ... +9) oyundaki gibi saniyede 10 kare oynat</translation>
+    </message>
+    <message>
+        <source>Select a texture to see its properties.</source>
+        <translation>Özelliklerini görmek için bir doku seçin.</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Ad</translation>
+    </message>
+    <message>
+        <source>The name without its prefix; the type below adds the prefix. GoldSrc allows 15 characters in all.</source>
+        <translation>Öneki olmadan ad; öneki aşağıdaki tür ekler. GoldSrc toplamda 15 karaktere izin verir.</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation>Normal</translation>
+    </message>
+    <message>
+        <source>Masked  {</source>
+        <translation>Maskeli  {</translation>
+    </message>
+    <message>
+        <source>Water  !</source>
+        <translation>Su  !</translation>
+    </message>
+    <message>
+        <source>Animated  +0 ... +9</source>
+        <translation>Animasyonlu  +0 ... +9</translation>
+    </message>
+    <message>
+        <source>Toggled  +a ... +j</source>
+        <translation>Değişen  +a ... +j</translation>
+    </message>
+    <message>
+        <source>Light  ~</source>
+        <translation>Işık  ~</translation>
+    </message>
+    <message>
+        <source>Masked: palette colour 255 (blue) is see-through.
+Water: drawn as a wavy liquid surface.
+Animated: +0 to +9 of one name play in a loop.
+Toggled: +a to +j are the second look a button switches to.
+Light: emits light when the map is compiled with lights.rad.</source>
+        <translation>Maskeli: palet rengi 255 (mavi) saydamdır.
+Su: dalgalı bir sıvı yüzeyi olarak çizilir.
+Animasyonlu: aynı adın +0 ile +9 arası döngüde oynar.
+Değişen: +a ile +j arası, bir düğmenin geçtiği ikinci görünümdür.
+Işık: harita lights.rad ile derlenince ışık yayar.</translation>
+    </message>
+    <message>
+        <source>Frame:</source>
+        <translation>Kare:</translation>
+    </message>
+    <message>
+        <source>Type:</source>
+        <translation>Tür:</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Boyut</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>Tümü</translation>
+    </message>
+    <message>
+        <source>Every texture</source>
+        <translation>Tüm dokular</translation>
+    </message>
+    <message>
+        <source>Masked textures</source>
+        <translation>Maskeli dokular</translation>
+    </message>
+    <message>
+        <source>Water textures</source>
+        <translation>Su dokuları</translation>
+    </message>
+    <message>
+        <source>Animated and toggled textures</source>
+        <translation>Animasyonlu ve değişen dokular</translation>
+    </message>
+    <message>
+        <source>Light textures</source>
+        <translation>Işık dokuları</translation>
+    </message>
+    <message>
+        <source>Sort:</source>
+        <translation>Sırala:</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tür</translation>
+    </message>
+    <message>
+        <source>Thumbnail size</source>
+        <translation>Küçük resim boyutu</translation>
+    </message>
+    <message>
+        <source>List</source>
+        <translation>Liste</translation>
+    </message>
+    <message>
+        <source>Show the textures as a list with their sizes</source>
+        <translation>Dokuları boyutlarıyla birlikte liste olarak göster</translation>
+    </message>
+    <message>
+        <source>Drop images here to add them, or a WAD to open it.</source>
+        <translation>Eklemek için resimleri, açmak için bir WAD&apos;ı buraya bırakın.</translation>
+    </message>
+    <message>
+        <source>New images:</source>
+        <translation>Yeni resimler:</translation>
+    </message>
+    <message>
+        <source>Scale to multiples of 16</source>
+        <translation>16&apos;nın katlarına ölçekle</translation>
+    </message>
+    <message>
+        <source>Keep size, see-through border</source>
+        <translation>Boyutu koru, saydam kenar</translation>
+    </message>
+    <message>
+        <source>GoldSrc needs sides that are multiples of 16. Scaling stretches the image a little; the border keeps it as it is and makes the texture masked ({).</source>
+        <translation>GoldSrc kenarların 16&apos;nın katı olmasını ister. Ölçekleme resmi biraz esnetir; kenar boşluğu onu olduğu gibi bırakır ve dokuyu maskeli ({) yapar.</translation>
+    </message>
+    <message>
+        <source>Color Palette</source>
+        <translation>Renk Paleti</translation>
+    </message>
+    <message>
+        <source>Click a color to see RGB values</source>
+        <translation>RGB değerlerini görmek için renge tıklayın</translation>
+    </message>
+    <message>
+        <source>Mipmaps</source>
+        <translation>Mipmap&apos;ler</translation>
+    </message>
+    <message>
+        <source>Index %1: R %2, G %3, B %4</source>
+        <translation>İndeks %1: R %2, G %3, B %4</translation>
     </message>
     <message>
         <source>Error</source>
@@ -2935,14 +3776,6 @@ Textures: %1</source>
 Dokular: %1</translation>
     </message>
     <message>
-        <source>Limit Reached</source>
-        <translation>Sınıra Ulaşıldı</translation>
-    </message>
-    <message>
-        <source>Maximum texture count (%1) reached.</source>
-        <translation>Maksimum doku sayısına (%1) ulaşıldı.</translation>
-    </message>
-    <message>
         <source>Add Images</source>
         <translation>Görüntü Ekle</translation>
     </message>
@@ -2951,22 +3784,8 @@ Dokular: %1</translation>
         <translation>Tüm Görüntüler (*.bmp *.png *.jpg *.jpeg *.tga *.dds);;BMP (*.bmp);;PNG (*.png);;JPEG (*.jpg *.jpeg);;TGA (*.tga);;DDS (*.dds);;Tüm Dosyalar (*.*)</translation>
     </message>
     <message>
-        <source>Maximum texture count reached. Remaining files skipped.</source>
-        <translation>Maksimum doku sayısına ulaşıldı. Kalan dosyalar atlandı.</translation>
-    </message>
-    <message>
         <source>Images Added</source>
         <translation>Görüntüler Eklendi</translation>
-    </message>
-    <message>
-        <source>Added: %1
-Failed: %2</source>
-        <translation>Eklendi: %1
-Başarısız: %2</translation>
-    </message>
-    <message>
-        <source>No images could be added. Check format compatibility.</source>
-        <translation>Hiçbir görüntü eklenemedi. Format uyumluluğunu kontrol edin.</translation>
     </message>
     <message>
         <source>Remove Textures</source>
@@ -2991,24 +3810,104 @@ Başarısız: %2</translation>
 %2</translation>
     </message>
     <message>
-        <source>Rename Texture</source>
-        <translation>Dokuyu Yeniden Adlandır</translation>
+        <source>The name is empty.</source>
+        <translation>Ad boş.</translation>
     </message>
     <message>
-        <source>New name (max %1 characters):</source>
-        <translation>Yeni ad (en fazla %1 karakter):</translation>
+        <source>%1 characters: GoldSrc allows %2 with the prefix.</source>
+        <translation>%1 karakter: GoldSrc önekle birlikte %2 karaktere izin verir.</translation>
     </message>
     <message>
-        <source>Failed to rename texture. Invalid name.</source>
-        <translation>Doku yeniden adlandırılamadı. Geçersiz ad.</translation>
+        <source>%1 is already in this WAD.</source>
+        <translation>%1 bu WAD&apos;da zaten var.</translation>
+    </message>
+    <message>
+        <source>%1: the name is longer than %2 characters</source>
+        <translation>%1: ad %2 karakterden uzun</translation>
+    </message>
+    <message>
+        <source>%1: the name is used twice</source>
+        <translation>%1: ad iki kez kullanılmış</translation>
+    </message>
+    <message>
+        <source>%1: %2 x %3 is not a multiple of 16</source>
+        <translation>%1: %2 x %3, 16&apos;nın katı değil</translation>
+    </message>
+    <message>
+        <source>%1: larger than 512 x 512</source>
+        <translation>%1: 512 x 512&apos;den büyük</translation>
+    </message>
+    <message>
+        <source>%1: an animation with a single frame</source>
+        <translation>%1: tek kareli bir animasyon</translation>
+    </message>
+    <message>
+        <source>%1: frames of the animation are missing</source>
+        <translation>%1: animasyonun bazı kareleri eksik</translation>
+    </message>
+    <message>
+        <source>No textures yet. Add images from the ribbon.</source>
+        <translation>Henüz doku yok. Şeritten resim ekleyin.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n texture(s)</source>
+        <translation>
+            <numerusform>%n doku</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n warning(s)</source>
+        <translation>
+            <numerusform>%n uyarı</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Sides must be multiples of 16</source>
+        <translation>Kenarlar 16&apos;nın katı olmalı</translation>
+    </message>
+    <message>
+        <source>Larger than 512 x 512</source>
+        <translation>512 x 512&apos;den büyük</translation>
+    </message>
+    <message>
+        <source>In the WAD: %1</source>
+        <translation>WAD içinde: %1</translation>
+    </message>
+    <message>
+        <source>Color 255 is see-through in this texture.</source>
+        <translation>Bu dokuda 255. renk saydam.</translation>
     </message>
     <message>
         <source>%1 textures selected</source>
         <translation>%1 doku seçildi</translation>
     </message>
     <message>
-        <source>Textures: %1 / %2</source>
-        <translation>Dokular: %1 / %2</translation>
+        <source>%1 (the WAD is full)</source>
+        <translation>%1 (WAD dolu)</translation>
+    </message>
+    <message>
+        <source>Added: %1</source>
+        <translation>Eklendi: %1</translation>
+    </message>
+    <message>
+        <source>Names shortened to the 15 characters GoldSrc allows:</source>
+        <translation>GoldSrc&apos;nin izin verdiği 15 karaktere kısaltılan adlar:</translation>
+    </message>
+    <message>
+        <source>Not added:</source>
+        <translation>Eklenemeyenler:</translation>
+    </message>
+    <message>
+        <source>Replace Image</source>
+        <translation>Resmi Değiştir</translation>
+    </message>
+    <message>
+        <source>All Images (*.bmp *.png *.jpg *.jpeg *.tga *.dds);;All Files (*.*)</source>
+        <translation>Tüm Resimler (*.bmp *.png *.jpg *.jpeg *.tga *.dds);;Tüm Dosyalar (*.*)</translation>
+    </message>
+    <message>
+        <source>The image could not be read.</source>
+        <translation>Resim okunamadı.</translation>
     </message>
     <message>
         <source>Unsaved Changes</source>
@@ -3017,195 +3916,6 @@ Başarısız: %2</translation>
     <message>
         <source>Save changes before proceeding?</source>
         <translation>Devam etmeden önce değişiklikler kaydedilsin mi?</translation>
-    </message>
-</context>
-<context>
-    <name>XfsViewerWindow</name>
-    <message>
-        <source>XFS Viewer</source>
-        <translation>XFS Goruntüleyici - (Wolfteam, Rakion, vb.)</translation>
-    </message>
-    <message>
-        <source>XFS Archive</source>
-        <translation>XFS Arsivi</translation>
-    </message>
-    <message>
-        <source>Open XFS...</source>
-        <translation>XFS Ac...</translation>
-    </message>
-    <message>
-        <source>Open XFS Archive</source>
-        <translation>XFS Arsivi Ac</translation>
-    </message>
-    <message>
-        <source>Contents</source>
-        <translation>Dosyalar</translation>
-    </message>
-    <message>
-        <source>Select an XFS file to view...</source>
-        <translation>Görüntülemek için bir XFS dosyası seçin...</translation>
-    </message>
-    <message>
-        <source>Search:</source>
-        <translation>Ara:</translation>
-    </message>
-    <message>
-        <source>Search files... (Ctrl+F)</source>
-        <translation>Dosya ara... (Ctrl+F)</translation>
-    </message>
-    <message>
-        <source>Select All Matches</source>
-        <translation>Tüm Eşleşmeleri Seç</translation>
-    </message>
-    <message>
-        <source>Path</source>
-        <translation>Yol</translation>
-    </message>
-    <message>
-        <source>Packed</source>
-        <translation>Paketli</translation>
-    </message>
-    <message>
-        <source>Unpacked</source>
-        <translation>Paketsiz</translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <translation>Tur</translation>
-    </message>
-    <message>
-        <source>View SPR</source>
-        <translation>SPR Görüntüle</translation>
-    </message>
-    <message>
-        <source>View selected SPR file in Lithtech Sprite Viewer</source>
-        <translation>Seçili SPR dosyasını Lithtech Sprite Görüntüleyici'de görüntüle</translation>
-    </message>
-    <message>
-        <source>Extract Selected</source>
-        <translation>Seçilenleri Çıkar</translation>
-    </message>
-    <message>
-        <source>Extract All</source>
-        <translation>Tümünü Çıkar</translation>
-    </message>
-    <message>
-        <source>No XFS file loaded</source>
-        <translation>XFS dosyası yüklenmedi</translation>
-    </message>
-    <message>
-        <source>XFS files (*.xfs);;All files (*.*)</source>
-        <translation>XFS dosyaları (*.xfs);;Tüm dosyalar (*.*)</translation>
-    </message>
-    <message>
-        <source>Loading XFS...</source>
-        <translation>XFS yükleniyor...</translation>
-    </message>
-    <message>
-        <source>Loading XFS archive...</source>
-        <translation>XFS arşivi yükleniyor...</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Hata</translation>
-    </message>
-    <message>
-        <source>Failed to load XFS file. The file may be corrupted or not a valid XFS archive.</source>
-        <translation>XFS dosyası yüklenemedi. Dosya bozuk veya geçerli bir XFS arşivi olmayabilir.</translation>
-    </message>
-    <message>
-        <source>Archive: %1 | Total packed: %2 | Total unpacked: %3</source>
-        <translation>Arşiv: %1 | Toplam paketli: %2 | Toplam paketsiz: %3</translation>
-    </message>
-    <message>
-        <source>No files found</source>
-        <translation>Dosya bulunamadı</translation>
-    </message>
-    <message>
-        <source>%1 files</source>
-        <translation>%1 dosya</translation>
-    </message>
-    <message>
-        <source>Failed to extract SPR file.</source>
-        <translation>SPR dosyası çıkarılamadı.</translation>
-    </message>
-    <message>
-        <source>Select Output Directory</source>
-        <translation>Çıktı Klasörünü Seç</translation>
-    </message>
-    <message>
-        <source>Extracting: %p%</source>
-        <translation>Çıkarılıyor: %p%</translation>
-    </message>
-    <message>
-        <source>Extracted %1 files</source>
-        <translation>%1 dosya çıkarıldı</translation>
-    </message>
-    <message>
-        <source>Extraction Complete</source>
-        <translation>Çıkarma Tamamlandı</translation>
-    </message>
-    <message>
-        <source>Successfully extracted %1 files to:
-%2</source>
-        <translation>%1 dosya başarıyla şuraya çıkarıldı:
-%2</translation>
-    </message>
-    <message>
-        <source>Extraction failed</source>
-        <translation>Çıkarma başarısız</translation>
-    </message>
-    <message>
-        <source>Extraction Failed</source>
-        <translation>Çıkarma Başarısız</translation>
-    </message>
-    <message>
-        <source>Failed to extract files. The archive may be corrupted.</source>
-        <translation>Dosyalar çıkarılamadı. Arşiv bozuk olabilir.</translation>
-    </message>
-    <message>
-        <source>%1 files (%2 visible)</source>
-        <translation>%1 dosya (%2 görünür)</translation>
-    </message>
-    <message>
-        <source>Sprite</source>
-        <translation>Sprite</translation>
-    </message>
-    <message>
-        <source>Image Data</source>
-        <translation>Görüntü Verisi</translation>
-    </message>
-    <message>
-        <source>Data File</source>
-        <translation>Veri Dosyası</translation>
-    </message>
-    <message>
-        <source>Text Config</source>
-        <translation>Metin Yapılandırması</translation>
-    </message>
-    <message>
-        <source>Audio</source>
-        <translation>Ses</translation>
-    </message>
-    <message>
-        <source>Texture</source>
-        <translation>Doku</translation>
-    </message>
-    <message>
-        <source>Animation</source>
-        <translation>Animasyon</translation>
-    </message>
-    <message>
-        <source>Model</source>
-        <translation>Model</translation>
-    </message>
-    <message>
-        <source>Script</source>
-        <translation>Script</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation>Bilinmeyen</translation>
     </message>
 </context>
 </TS>

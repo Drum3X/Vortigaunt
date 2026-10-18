@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QImage>
+#include <QList>
+#include <QPair>
 #include <QWidget>
 
 #include <functional>
@@ -53,6 +55,11 @@ public slots:
     void exportBmp();
     void exportPng();
     void exportSelectedBmp();
+    // the selected textures, or the one shown, for the WAD tab
+    void sendSelectedToWad();
+
+signals:
+    void sendToWad(const QList<QPair<QString, QImage>>& images);
 
 private:
     struct Texture
@@ -102,4 +109,5 @@ private:
     QPushButton*  m_saveBmpButton = nullptr;
     QPushButton*  m_savePngButton = nullptr;
     QPushButton*  m_exportButton = nullptr;
+    QPushButton*  m_wadButton = nullptr;
 };

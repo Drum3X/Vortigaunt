@@ -353,6 +353,9 @@ void MainWindow::setupRibbon()
     workspaceCommand(m_wadWorkspace->removeAction(), tr("Remove"), kIconClose, m_wadWorkspace);
     workspaceCommand(m_wadWorkspace->extractAction(), tr("Extract"), kIconExtract, m_wadWorkspace);
     workspaceCommand(m_wadWorkspace->renameAction(), tr("Rename"), kIconRename, m_wadWorkspace);
+    workspaceCommand(m_wadWorkspace->replaceAction(), tr("Replace\nimage"), kIconFrame, m_wadWorkspace);
+    QAction* texturesToWadAction = command(tr("Send to\nWAD"), tr("Add the selected textures to the WAD open in the WAD tab"), kIconWad);
+    connect(texturesToWadAction, &QAction::triggered, m_textureWorkspace, &TextureWorkspace::sendSelectedToWad);
     m_audioConvertAction = new QAction(tr("Convert WAV for Goldsrc..."), this);
     tool(m_audioConvertAction, tr("Convert\nWAV"), kIconAudio);
     connect(m_audioConvertAction, &QAction::triggered, this, &MainWindow::onOpenAudioConverter);
@@ -410,6 +413,7 @@ void MainWindow::setupRibbon()
     QWidget* textureExportGroup = m_ribbon->addGroup(textureTab, tr("Export"));
     m_ribbon->addButton(textureExportGroup, exportBmpAction);
     m_ribbon->addButton(textureExportGroup, exportPngAction);
+    m_ribbon->addButton(textureExportGroup, texturesToWadAction);
 
     const int spriteTab = m_ribbon->addTab(tr("Sprites"));
     m_persistentWorkspaces.push_back({ m_spriteWorkspace, spriteTab, tr("Sprites") });
@@ -440,8 +444,10 @@ void MainWindow::setupRibbon()
     m_ribbon->addButton(wadTextureGroup, m_wadWorkspace->removeAction());
     m_ribbon->addButton(wadTextureGroup, m_wadWorkspace->extractAction());
     m_ribbon->addButton(wadTextureGroup, m_wadWorkspace->renameAction());
+    m_ribbon->addButton(wadTextureGroup, m_wadWorkspace->replaceAction());
 
     const int toolsTab = m_ribbon->addTab(tr("Tools"));
+    m_toolsRibbonTab = toolsTab;
     QWidget* soundGroup = m_ribbon->addGroup(toolsTab, tr("Sound"));
     m_ribbon->addButton(soundGroup, m_audioConvertAction);
     QWidget* downloadGroup = m_ribbon->addGroup(toolsTab, tr("Download"));
@@ -891,6 +897,19 @@ void MainWindow::setupPreview()
     m_spriteWorkspace->hide();
     m_wadWorkspace = new WadMakerDialog(this);
     m_wadWorkspace->hide();
+    // textures of the other tabs go into the WAD
+    auto sendToWad = [this](const QList<QPair<QString, QImage>>& images) {
+        showWorkspace(m_wadWorkspace);
+        m_wadWorkspace->addImages(images);
+    };
+    connect(m_textureWorkspace, &TextureWorkspace::sendToWad, this, sendToWad);
+    connect(m_archiveWorkspace, &ArchiveWorkspace::sendToWad, this, sendToWad);
+    // an unsaved WAD shows a * on its tab
+    connect(m_wadWorkspace, &WadMakerDialog::modifiedChanged, this, [this](bool modified) {
+        const int index = m_workspaces->indexOf(m_wadWorkspace);
+        if (index > 0)
+            m_workspaces->setTabText(index, tr("WAD") + (modified ? QStringLiteral("*") : QString()));
+    });
 }
 
 void MainWindow::openToolTab(QWidget* tool, const QString& title)
@@ -958,7 +977,10 @@ const MainWindow::Workspace* MainWindow::workspaceOf(QWidget* widget) const
 void MainWindow::showWorkspace(QWidget* widget)
 {
     if (const Workspace* workspace = workspaceOf(widget))
-        openToolTab(widget, workspace->title);
+    {
+        const bool unsaved = widget == m_wadWorkspace && m_wadWorkspace->isModified();
+        openToolTab(widget, workspace->title + (unsaved ? QStringLiteral("*") : QString()));
+    }
 }
 
 void MainWindow::openArchive(const QString& path)
@@ -986,6 +1008,33 @@ void MainWindow::openWad(const QString& path)
     m_wadWorkspace->loadWad(path);
 }
 
+void MainWindow::openPaths(const QStringList& paths)
+{
+    QStringList textures;
+    QStringList others;
+    for (const QString& path : paths)
+    {
+        const QString ext = QFileInfo(path).suffix().toLower();
+        if (ArchiveSource::isArchive(path))
+            openArchive(path);
+        else if (ext == "dtx" || ext == "vtf")
+            textures << path;
+        else if (ext == "spr")
+            openSprite(path);
+        else if (ext == "wad")
+            openWad(path);
+        else
+            others << path;
+    }
+    if (!textures.isEmpty())
+        openTextures(textures);
+    if (!others.isEmpty())
+    {
+        addPaths(others);
+        m_workspaces->setCurrentIndex(0);
+    }
+}
+
 void MainWindow::onWorkspaceChanged(int index)
 {
     // the file list and its settings belong to Convert
@@ -1009,6 +1058,8 @@ void MainWindow::onWorkspaceChanged(int index)
         m_ribbon->setCurrentTab(0);
     else if (const Workspace* workspace = workspaceOf(m_workspaces->widget(index)))
         m_ribbon->setCurrentTab(workspace->ribbonTab);
+    else if (index > 0)
+        m_ribbon->setCurrentTab(m_toolsRibbonTab);
 }
 
 MainWindow::FileOp MainWindow::detectFileOp(const QString& path)
@@ -1661,7 +1712,11 @@ void MainWindow::onOpenLoLModelDownloader()
 
 void MainWindow::onOpenSteamWorkshopDownloader()
 {
-    openToolOnce("workshop", tr("Steam Workshop"), []() { return new SteamWorkshopDownloaderDialog(nullptr); });
+    openToolOnce("workshop", tr("Steam Workshop"), [this]() {
+        auto* downloader = new SteamWorkshopDownloaderDialog(nullptr);
+        connect(downloader, &SteamWorkshopDownloaderDialog::openFiles, this, &MainWindow::openPaths);
+        return downloader;
+    });
 }
 
 #ifdef METIN2_SCRIPT_EFFECT
@@ -2476,33 +2531,25 @@ void MainWindow::dropEvent(QDropEvent* event)
         if (url.isLocalFile())
             paths << url.toLocalFile();
     }
-    if (m_workspaces->currentWidget() == m_archiveWorkspace)
+    // on Convert everything goes in the list; on another tab each file goes where it belongs
+    if (m_workspaces->currentIndex() == 0)
     {
-        QStringList others;
-        for (const QString& p : paths)
-        {
-            if (ArchiveSource::isArchive(p))
-                m_archiveWorkspace->openArchive(p);
-            else
-                others << p;
-        }
-        paths = others;
-        if (!paths.isEmpty())
-            m_workspaces->setCurrentIndex(0);
+        addPaths(paths);
     }
     else if (m_workspaces->currentWidget() == m_textureWorkspace)
     {
-        // textures and folders stay here, anything else goes to Convert
+        // images and folders stay in Textures
         QStringList textures;
         QStringList others;
         for (const QString& p : paths)
             (QFileInfo(p).isDir() || TextureWorkspace::isTexture(p) ? textures : others) << p;
         m_textureWorkspace->addFiles(textures);
-        paths = others;
-        if (!paths.isEmpty())
-            m_workspaces->setCurrentIndex(0);
+        openPaths(others);
     }
-    addPaths(paths);
+    else
+    {
+        openPaths(paths);
+    }
     event->acceptProposedAction();
 }
 
@@ -2615,7 +2662,7 @@ void MainWindow::onExportLog()
     QTextStream out(&file);
     out << m_logEdit->toPlainText();
     
-    VortigauntLog::Vortigaunt_Printf(tr("^2Log exported to: ^3%1").arg(fileName));
+    VortigauntLog::Vortigaunt_Printf(QStringLiteral("^2Log exported to: ^3%1").arg(fileName));
 }
 
 // Clear log

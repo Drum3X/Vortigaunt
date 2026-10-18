@@ -180,6 +180,9 @@ ArchiveWorkspace::ArchiveWorkspace(std::function<QString()> outputDir, QWidget* 
     rightLayout->addWidget(m_openButton);
     rightLayout->addWidget(m_extractButton);
     rightLayout->addWidget(m_convertButton);
+    m_wadButton = new QPushButton(tr("Send to WAD"), right);
+    m_wadButton->setToolTip(tr("Add the selected textures to the WAD open in the WAD tab"));
+    rightLayout->addWidget(m_wadButton);
 
     splitter->addWidget(left);
     splitter->addWidget(centre);
@@ -198,6 +201,7 @@ ArchiveWorkspace::ArchiveWorkspace(std::function<QString()> outputDir, QWidget* 
     connect(m_openButton, &QPushButton::clicked, this, &ArchiveWorkspace::openSelectedInViewer);
     connect(m_extractButton, &QPushButton::clicked, this, &ArchiveWorkspace::extractSelected);
     connect(m_convertButton, &QPushButton::clicked, this, &ArchiveWorkspace::sendSelectedToConvert);
+    connect(m_wadButton, &QPushButton::clicked, this, &ArchiveWorkspace::sendSelectedToWad);
 
     showArchive(-1);
 }
@@ -378,6 +382,10 @@ void ArchiveWorkspace::updatePreview()
     m_openButton->setEnabled(false);
     m_extractButton->setEnabled(source && !selected.empty() && !m_busy);
     m_convertButton->setEnabled(source && !selected.empty() && !m_busy);
+    bool textures = false;
+    for (size_t index : selected)
+        textures = textures || (source && TextureWorkspace::isTexture(source->entries()[index].path));
+    m_wadButton->setEnabled(textures && !m_busy);
 
     if (!source || selected.size() != 1)
     {
@@ -499,6 +507,27 @@ void ArchiveWorkspace::sendSelectedToConvert()
     const std::vector<size_t> selected = selectedEntries();
     if (!selected.empty())
         extract(selected, [this](const QStringList& files) { emit addToConvert(files); });
+}
+
+void ArchiveWorkspace::sendSelectedToWad()
+{
+    ArchiveSource* source = current();
+    if (!source)
+        return;
+    QList<QPair<QString, QImage>> images;
+    for (size_t index : selectedEntries())
+    {
+        const QFileInfo name(source->entries()[index].path);
+        QByteArray data;
+        if (!TextureWorkspace::isTexture(name.fileName()) || !source->read(index, data))
+            continue;
+        const TextureWorkspace::Decoded decoded = TextureWorkspace::decode(name.suffix().toLower(), data);
+        if (!decoded.image.isNull())
+            images.append({ name.completeBaseName(),
+                            decoded.alphaIsGloss ? decoded.image.convertToFormat(QImage::Format_RGB32) : decoded.image });
+    }
+    if (!images.isEmpty())
+        emit sendToWad(images);
 }
 
 void ArchiveWorkspace::setBusy(bool busy)

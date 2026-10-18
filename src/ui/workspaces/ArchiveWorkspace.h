@@ -1,5 +1,8 @@
 #pragma once
 
+#include <QImage>
+#include <QList>
+#include <QPair>
 #include <QWidget>
 
 #include <functional>
@@ -36,11 +39,14 @@ public slots:
     void extractAll();
     // extracts the selected files and hands them to the Convert list
     void sendSelectedToConvert();
+    // the selected textures, decoded, for the WAD tab
+    void sendSelectedToWad();
 
 signals:
     void addToConvert(const QStringList& paths);
     void openTexture(const QString& name, const QByteArray& data);
     void openSprite(const QString& path);
+    void sendToWad(const QList<QPair<QString, QImage>>& images);
 
 private:
     void showArchive(int index);
@@ -73,4 +79,5 @@ private:
     QPushButton*    m_openButton = nullptr;
     QPushButton*    m_extractButton = nullptr;
     QPushButton*    m_convertButton = nullptr;
+    QPushButton*    m_wadButton = nullptr;
 };

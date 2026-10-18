@@ -61,6 +61,9 @@ public:
     // shows the WAD tab with the WAD open in it
     void openWad(const QString& path);
 
+    // each file where it belongs: archives, textures, sprites and WADs in their tabs, the rest in the Convert list
+    void openPaths(const QStringList& paths);
+
     // Drag & drop support
     void dragEnterEvent(QDragEnterEvent* event) override;
     void dropEvent(QDropEvent* event) override;
@@ -223,6 +226,7 @@ private:
     // Ribbon, workspaces and panels
     RibbonBar*     m_ribbon = nullptr;
     std::vector<Workspace> m_persistentWorkspaces;
+    int            m_toolsRibbonTab = -1;
     QTabWidget*    m_workspaces = nullptr;
     ArchiveWorkspace* m_archiveWorkspace = nullptr;
     TextureWorkspace* m_textureWorkspace = nullptr;

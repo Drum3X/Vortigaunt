@@ -15,12 +15,12 @@
 #include <functional>
 
 #include <QListWidget>
+#include <QMouseEvent>
 #include <QPushButton>
 #include <QCheckBox>
 #include <QLabel>
 #include <QLineEdit>
 #include <QProgressBar>
-#include <QPlainTextEdit>
 #include <QComboBox>
 #include <QScrollArea>
 #include <QGridLayout>
@@ -28,7 +28,6 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGroupBox>
-#include <QSplitter>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QCompleter>
@@ -165,7 +164,6 @@ LoLModelDownloadDialog::LoLModelDownloadDialog(QWidget* parent)
     , m_contentStack(nullptr)
     , m_viewerWidget(nullptr)
     , m_backToSkinsButton(nullptr)
-    , m_previousLogWidget(nullptr)
 {
     m_networkManager = new QNetworkAccessManager(this);
     m_currentReply = nullptr;
@@ -199,11 +197,10 @@ LoLModelDownloadDialog::~LoLModelDownloadDialog()
 }
 
 
+// to the main window's log, like everything else
 void LoLModelDownloadDialog::logToDialog(const QString& message)
 {
-    if (m_logEdit) {
-        VortigauntLog::Vortigaunt_Printf(m_logEdit, message);
-    }
+    VortigauntLog::Vortigaunt_Printf(message);
 }
 
 
@@ -220,8 +217,6 @@ void LoLModelDownloadDialog::setupUI()
     mainLayout->setContentsMargins(8, 8, 8, 8);
     
     // Champion selection
-    auto* championGroup = new QGroupBox(tr("Champion"));
-    championGroup->setStyleSheet("QGroupBox { font-weight: bold; }");
     auto* championLayout = new QHBoxLayout();
     
     championLayout->addWidget(new QLabel(tr("Champion:")));
@@ -232,24 +227,15 @@ void LoLModelDownloadDialog::setupUI()
     m_championCombo->setMinimumWidth(300);
 
     m_championCombo->setCompleter(nullptr); // Disable default completer, we'll use autocomplete
+    m_championCombo->lineEdit()->setPlaceholderText(tr("Type champion name and press Enter..."));
     championLayout->addWidget(m_championCombo, 1);
-    
-    
-    championGroup->setLayout(championLayout);
-    
-    // Skin selection - Modern grid layout with splash arts
-    auto* skinGroup = new QGroupBox(tr("Skins"));
-    skinGroup->setStyleSheet("QGroupBox { font-weight: bold; }");
-    auto* skinLayout = new QVBoxLayout();
-    skinLayout->setSpacing(10);
-    
-    auto* skinButtonLayout = new QHBoxLayout();
     m_refreshSkinsButton = new QPushButton(tr("Refresh Skins"));
     m_refreshSkinsButton->setEnabled(false);
-    skinButtonLayout->addWidget(m_refreshSkinsButton);
-    
-    skinButtonLayout->addStretch();
-    skinLayout->addLayout(skinButtonLayout);
+    championLayout->addWidget(m_refreshSkinsButton);
+
+    // Skin selection - Modern grid layout with splash arts
+    auto* skinLayout = new QVBoxLayout();
+    skinLayout->setContentsMargins(0, 0, 0, 0);
     
     // Create stacked widget for skin cards and 3D viewer
     m_contentStack = new QStackedWidget();
@@ -264,7 +250,6 @@ void LoLModelDownloadDialog::setupUI()
     m_skinScrollArea->setWidgetResizable(true);
     m_skinScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_skinScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    m_skinScrollArea->setStyleSheet("QScrollArea { border: 1px solid #3a3a3a; border-radius: 8px; background-color: #1a1a1a; }");
     
     m_skinContainer = new QWidget();
     m_skinGridLayout = new QGridLayout(m_skinContainer);
@@ -290,7 +275,6 @@ void LoLModelDownloadDialog::setupUI()
     
     // Back button
     m_backToSkinsButton = new QPushButton(tr("Back to Skins"));
-    m_backToSkinsButton->setStyleSheet("QPushButton { padding: 8px; font-weight: bold; }");
     connect(m_backToSkinsButton, &QPushButton::clicked, [this]() {
         
         // Clear viewed skin ID when going back
@@ -323,7 +307,7 @@ void LoLModelDownloadDialog::setupUI()
         // Clean up temp file if exists
         if (!m_currentTempFile.isEmpty() && QFileInfo::exists(m_currentTempFile)) {
             QFile::remove(m_currentTempFile);
-            logToDialog(tr("DEBUG: [Viewer] Temp file deleted: %1").arg(m_currentTempFile));
+            logToDialog(QStringLiteral("DEBUG: [Viewer] Temp file deleted: %1").arg(m_currentTempFile));
             m_currentTempFile.clear();
         }
         
@@ -368,7 +352,7 @@ void LoLModelDownloadDialog::setupUI()
             if (!animNames.isEmpty() && m_animCombo) {
                 m_animCombo->addItems(animNames);
                 m_animCombo->setEnabled(true);
-                logToDialog(tr("DEBUG: Loaded %1 animations").arg(animNames.size()));
+                logToDialog(QStringLiteral("DEBUG: Loaded %1 animations").arg(animNames.size()));
             } else if (m_animCombo) {
                 m_animCombo->setEnabled(false);
             }
@@ -383,7 +367,7 @@ void LoLModelDownloadDialog::setupUI()
                     m_meshList->addItem(item);
                 }
             }
-            logToDialog(tr("DEBUG: Loaded %1 meshes").arg(meshNames.size()));
+            logToDialog(QStringLiteral("DEBUG: Loaded %1 meshes").arg(meshNames.size()));
         } else if (m_animCombo) {
             m_animCombo->setEnabled(false);
         }
@@ -396,7 +380,7 @@ void LoLModelDownloadDialog::setupUI()
             m_chromaCombo->clear();
             m_chromaCombo->addItems(chromaNames);
             m_chromaCombo->setEnabled(true);
-            logToDialog(tr("DEBUG: Loaded %1 chroma(s)").arg(count));
+            logToDialog(QStringLiteral("DEBUG: Loaded %1 chroma(s)").arg(count));
         }
     });
 
@@ -429,7 +413,7 @@ void LoLModelDownloadDialog::setupUI()
         if (index >= 0 && m_viewerWidget) {
             QString animName = m_animCombo->itemText(index);
             m_viewerWidget->setCurrentAnimation(animName);
-            logToDialog(tr("Animation selected: %1").arg(animName));
+            logToDialog(QStringLiteral("Animation selected: %1").arg(animName));
         }
     });
     
@@ -448,7 +432,7 @@ void LoLModelDownloadDialog::setupUI()
     connect(m_chromaCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
         if (m_viewerWidget) {
             m_viewerWidget->setCurrentChroma(index - 1); // -1 because index 0 is "Base"
-            logToDialog(tr("Chroma selected: %1").arg(m_chromaCombo->itemText(index)));
+            logToDialog(QStringLiteral("Chroma selected: %1").arg(m_chromaCombo->itemText(index)));
         }
     });
     
@@ -478,22 +462,16 @@ void LoLModelDownloadDialog::setupUI()
     m_contentStack->addWidget(viewerPage); // Index 1
     
     skinLayout->addWidget(m_contentStack, 1);
-    skinGroup->setLayout(skinLayout);
-    
-    
+
     // Output path
-    auto* outputGroup = new QGroupBox(tr("Output"));
     auto* outputLayout = new QHBoxLayout();
-    
     outputLayout->addWidget(new QLabel(tr("Folder:")));
     m_outputPathEdit = new QLineEdit();
     m_outputPathEdit->setPlaceholderText(tr("Leave empty for default output folder..."));
     m_browseOutputButton = new QPushButton(tr("Browse..."));
     outputLayout->addWidget(m_outputPathEdit, 1);
     outputLayout->addWidget(m_browseOutputButton);
-    
-    outputGroup->setLayout(outputLayout);
-    
+
     // Buttons
     auto* buttonLayout = new QHBoxLayout();
     m_cancelButton = new QPushButton(tr("Cancel"));
@@ -501,7 +479,6 @@ void LoLModelDownloadDialog::setupUI()
     m_cancelButton->setEnabled(false);
     buttonLayout->addWidget(m_cancelButton);
     buttonLayout->addStretch();
-    
 
     
     m_singleSmdCheckbox = new QCheckBox(tr("Make Seperate SMDs as Single SMD"));
@@ -519,31 +496,12 @@ void LoLModelDownloadDialog::setupUI()
     connect(m_writeQCCheckbox, &QCheckBox::toggled, m_compileModelCheckbox, &QCheckBox::setEnabled);
     
     m_viewCharacterButton = new QPushButton(tr("View Character"));
-    m_viewCharacterButton->setStyleSheet("QPushButton { padding: 10px 20px; font-weight: bold; background-color: #2196F3; color: white; } QPushButton:hover { background-color: #1976D2; } QPushButton:disabled { background-color: #666; }");
     m_viewCharacterButton->setEnabled(false);
     buttonLayout->addWidget(m_viewCharacterButton);
 
     m_downloadButton = new QPushButton(tr("Export SMD"));
-    m_downloadButton->setStyleSheet("QPushButton { padding: 10px 20px; font-weight: bold; background-color: #4CAF50; color: white; } QPushButton:hover { background-color: #45a049; } QPushButton:disabled { background-color: #666; }");
     m_downloadButton->setEnabled(false);
     buttonLayout->addWidget(m_downloadButton);
-    
-    // Log
-    QGroupBox* logGroup = new QGroupBox(tr("Log"));
-    logGroup->setStyleSheet("QGroupBox { font-weight: bold; }");
-    QVBoxLayout* logLayout = new QVBoxLayout();
-    logLayout->setContentsMargins(0, 0, 0, 0);
-    
-    m_logEdit = new QPlainTextEdit();
-    m_logEdit->setReadOnly(true);
-    m_logEdit->setFont(QFont("Consolas", 9));
-    m_logEdit->setStyleSheet("QTextEdit { background-color: #1a1a1a; color: #ffffff; }");
-    m_logEdit->setMinimumHeight(100);
-
-    
-    logLayout->addWidget(m_logEdit);
-
-    logGroup->setLayout(logLayout);
     
     // Status bar
     auto* statusLayout = new QHBoxLayout();
@@ -555,43 +513,14 @@ void LoLModelDownloadDialog::setupUI()
     m_progressBar->setTextVisible(true);
     m_progressBar->setFormat("%p%");
     m_progressBar->setMinimumWidth(200);
-    
-    // Hide/Show Log button in status bar
-    QPushButton* toggleLogButton = new QPushButton(tr("Hide Log"));
-    toggleLogButton->setCheckable(false);
-    toggleLogButton->setChecked(false);
-    toggleLogButton->setMinimumWidth(100);
-    
-    connect(toggleLogButton, &QPushButton::toggled, [this, logGroup, toggleLogButton](bool checked) {
-        logGroup->setVisible(checked);
-        toggleLogButton->setText(checked ? tr("Hide Log") : tr("Show Log"));
-    });
-    
     statusLayout->addWidget(m_statusLabel, 1);
     statusLayout->addWidget(m_progressBar);
-    statusLayout->addWidget(toggleLogButton);
-    
-    // Create splitter for resizable log area
-    QSplitter* mainSplitter = new QSplitter(Qt::Vertical);
-    
-    // Top section (champion, skins, output, buttons)
-    QWidget* topSection = new QWidget();
-    auto* topLayout = new QVBoxLayout(topSection);
-    topLayout->setContentsMargins(0, 0, 0, 0);
-    topLayout->addWidget(championGroup);
-    topLayout->addWidget(skinGroup, 1);
-    topLayout->addWidget(outputGroup);
-    topLayout->addLayout(buttonLayout);
-    
-    mainSplitter->addWidget(topSection);
-    mainSplitter->addWidget(logGroup);
-    
-  
-    mainSplitter->setSizes({700, 300});
-    mainSplitter->setChildrenCollapsible(false); // Prevent log from being completely hidden
-    
-    // TODO: Fix it. Cant resize because of this.
-    mainLayout->addWidget(mainSplitter, 1);
+
+    // the champion, its skins (or the 3D view), where they go and what to do; messages go to the main log
+    mainLayout->addLayout(championLayout);
+    mainLayout->addLayout(skinLayout, 1);
+    mainLayout->addLayout(outputLayout);
+    mainLayout->addLayout(buttonLayout);
     mainLayout->addLayout(statusLayout);
     
     // Connections
@@ -634,7 +563,7 @@ void LoLModelDownloadDialog::setupUI()
 
 void LoLModelDownloadDialog::loadChampionList()
 {
-    logToDialog(tr("Loading champion list..."));
+    logToDialog(QStringLiteral("Loading champion list..."));
     m_statusLabel->setText(tr("Loading champions..."));
     m_championCombo->setEnabled(false);
     
@@ -675,7 +604,7 @@ void LoLModelDownloadDialog::loadChampionList()
     completer->setFilterMode(Qt::MatchContains);
     m_championCombo->setCompleter(completer);
     
-    logToDialog(tr("DEBUG: ^2%1 champions loaded").arg(champions.size()));
+    logToDialog(QStringLiteral("DEBUG: ^2%1 champions loaded").arg(champions.size()));
     m_statusLabel->setText(tr("Ready"));
     m_championCombo->setEnabled(true);
 }
@@ -699,7 +628,7 @@ void LoLModelDownloadDialog::onChampionSelected()
         m_contentStack->setCurrentIndex(0);
         setWindowTitle(tr("LoL Model Download"));
         
-        logToDialog(tr("^3View closed, switching to new champion"));
+        logToDialog(QStringLiteral("^3View closed, switching to new champion"));
     }
     
     if (championName.isEmpty() || !m_championList.contains(championName)) {
@@ -719,7 +648,7 @@ void LoLModelDownloadDialog::onChampionSelected()
     }
     
     m_currentChampion = championName;
-    logToDialog(tr("^2Champion selected: %1").arg(championName));
+    logToDialog(QStringLiteral("^2Champion selected: %1").arg(championName));
     loadSkinList(championName);
 }
 
@@ -729,7 +658,7 @@ void LoLModelDownloadDialog::loadSkinList(const QString& championName)
         return;
     }
     
-    logToDialog(tr("^3Loading skins for %1...").arg(championName));
+    logToDialog(QStringLiteral("^3Loading skins for %1...").arg(championName));
     m_statusLabel->setText(tr("Loading skins..."));
     
     // first clear existing skin cards
@@ -752,7 +681,7 @@ void LoLModelDownloadDialog::loadSkinList(const QString& championName)
     connect(reply, &QNetworkReply::finished, this, &LoLModelDownloadDialog::onSkinListLoaded);
     connect(reply, &QNetworkReply::errorOccurred, this, [this, championName](QNetworkReply::NetworkError error) {
         Q_UNUSED(error);
-        logToDialog(tr("ERROR: ^1Failed to load skins for %1").arg(championName));
+        logToDialog(QStringLiteral("ERROR: ^1Failed to load skins for %1").arg(championName));
         m_statusLabel->setText(tr("Failed to load skins"));
         m_refreshSkinsButton->setEnabled(true);
     });
@@ -766,7 +695,7 @@ void LoLModelDownloadDialog::onSkinListLoaded()
     }
     
     if (reply->error() != QNetworkReply::NoError) {
-        logToDialog(tr("ERROR: ^1Network error: %1").arg(reply->errorString()));
+        logToDialog(QStringLiteral("ERROR: ^1Network error: %1").arg(reply->errorString()));
         m_statusLabel->setText(tr("Network error"));
         m_refreshSkinsButton->setEnabled(true);
         reply->deleteLater();
@@ -1154,10 +1083,10 @@ void LoLModelDownloadDialog::onSkinListLoaded()
     reply->deleteLater();
     
     if (m_skinModels.isEmpty()) {
-        logToDialog(tr("^3No skins found. Try refreshing or check champion name."));
+        logToDialog(QStringLiteral("^3No skins found. Try refreshing or check champion name."));
         m_statusLabel->setText(tr("No skins found"));
     } else {
-        logToDialog(tr("DEBUG: ^2%1 skins loaded").arg(m_skinModels.size()));
+        logToDialog(QStringLiteral("DEBUG: ^2%1 skins loaded").arg(m_skinModels.size()));
         m_statusLabel->setText(tr("Ready"));
     }
     
@@ -1487,9 +1416,9 @@ void LoLModelDownloadDialog::onDownloadClicked()
     m_progressBar->setVisible(true);
     m_progressBar->setValue(0);
     
-    logToDialog(tr("=").repeated(80));
-    logToDialog(tr("Starting SMD export for %1 skin(s)...").arg(selectedSkins.size()));
-    logToDialog(tr("DEBUG: Output folder: %1").arg(outputDir));
+    logToDialog(QStringLiteral("=").repeated(80));
+    logToDialog(QStringLiteral("Starting SMD export for %1 skin(s)...").arg(selectedSkins.size()));
+    logToDialog(QStringLiteral("DEBUG: Output folder: %1").arg(outputDir));
     
     QApplication::processEvents();
     
@@ -1508,10 +1437,10 @@ void LoLModelDownloadDialog::onDownloadClicked()
         m_statusLabel->setText(tr("Exporting %1/%2: %3").arg(current).arg(total).arg(skin.name));
         QApplication::processEvents();
         
-        logToDialog(tr("\n[%1/%2] %3 (ID: %4)").arg(current).arg(total).arg(skin.name).arg(skin.id));
+        logToDialog(QStringLiteral("\n[%1/%2] %3 (ID: %4)").arg(current).arg(total).arg(skin.name).arg(skin.id));
         QApplication::processEvents();
         
-        logToDialog(tr("  Downloading GLB..."));
+        logToDialog(QStringLiteral("  Downloading GLB..."));
         QApplication::processEvents();
         
         QString tempDir = QDir::temp().filePath("VortigauntTemp");
@@ -1538,7 +1467,7 @@ void LoLModelDownloadDialog::onDownloadClicked()
         );
         
         if (!downloadSuccess) {
-            logToDialog(tr("  Failed to download model."));
+            logToDialog(QStringLiteral("  Failed to download model."));
             QApplication::processEvents();
             continue;
         }
@@ -1578,15 +1507,15 @@ void LoLModelDownloadDialog::onDownloadClicked()
         }
         
         if (glbFile.isEmpty() || !QFileInfo::exists(glbFile)) {
-            logToDialog(tr("  Could not find downloaded GLB file."));
+            logToDialog(QStringLiteral("  Could not find downloaded GLB file."));
             QApplication::processEvents();
             continue;
         }
         
-        logToDialog(tr("DEBUG:   GLB downloaded: %1").arg(QFileInfo(glbFile).fileName()));
+        logToDialog(QStringLiteral("DEBUG:   GLB downloaded: %1").arg(QFileInfo(glbFile).fileName()));
         QApplication::processEvents();
         
-        logToDialog(tr("  Exporting to SMD..."));
+        logToDialog(QStringLiteral("  Exporting to SMD..."));
         QApplication::processEvents();
         
         // Create output folder structure: champion/skinName/
@@ -1610,7 +1539,7 @@ void LoLModelDownloadDialog::onDownloadClicked()
         QApplication::processEvents();
         
         if (!scene || !scene->mRootNode) {
-            logToDialog(tr("  Failed to load model: %1").arg(importer.GetErrorString()));
+            logToDialog(QStringLiteral("  Failed to load model: %1").arg(importer.GetErrorString()));
             QApplication::processEvents();
             continue;
         }
@@ -1631,7 +1560,7 @@ void LoLModelDownloadDialog::onDownloadClicked()
             hiddenMeshes = m_viewerWidget->getHiddenMeshIndices();
             if (!hiddenMeshes.empty()) {
                 smdWriter.SetHiddenMeshIndices(hiddenMeshes);
-                logToDialog(tr("DEBUG:   Excluding %1 hidden mesh(es) from export").arg(hiddenMeshes.size()));
+                logToDialog(QStringLiteral("DEBUG:   Excluding %1 hidden mesh(es) from export").arg(hiddenMeshes.size()));
                 QApplication::processEvents();
             }
         }
@@ -1640,12 +1569,12 @@ void LoLModelDownloadDialog::onDownloadClicked()
             QString refPath = QDir(modelDir).filePath("reference.smd");
             
             if (!smdWriter.ExportMeshSMD(scene, refPath.toStdString())) {
-                logToDialog(tr("  Failed to export reference mesh."));
+                logToDialog(QStringLiteral("  Failed to export reference mesh."));
                 QApplication::processEvents();
                 continue;
             }
             
-            logToDialog(tr("DEBUG:   Reference mesh exported: reference.smd"));
+            logToDialog(QStringLiteral("DEBUG:   Reference mesh exported: reference.smd"));
         } else {
             // Export separate SMDs per mesh
             for (unsigned int meshIdx = 0; meshIdx < scene->mNumMeshes; meshIdx++) {
@@ -1702,7 +1631,7 @@ void LoLModelDownloadDialog::onDownloadClicked()
                 
                 QString refPath = QDir(modelDir).filePath(QString::fromStdString(baseName) + ".smd");
                 if (smdWriter.ExportMeshSMD(scene, refPath.toStdString())) {
-                    logToDialog(tr("DEBUG:   Mesh exported: %1.smd").arg(QString::fromStdString(baseName)));
+                    logToDialog(QStringLiteral("DEBUG:   Mesh exported: %1.smd").arg(QString::fromStdString(baseName)));
                 }
             }
             
@@ -1714,15 +1643,15 @@ void LoLModelDownloadDialog::onDownloadClicked()
         // Export animations using optimized function (builds node list ONCE)
         int animCount = 0;
         if (scene->mNumAnimations > 0) {
-            logToDialog(tr("DEBUG:   Starting animation export..."));
-            logToDialog(tr("DEBUG:   Total animations: %1, Total nodes: %2").arg(scene->mNumAnimations).arg(scene->mRootNode ? 1 : 0));
+            logToDialog(QStringLiteral("DEBUG:   Starting animation export..."));
+            logToDialog(QStringLiteral("DEBUG:   Total animations: %1, Total nodes: %2").arg(scene->mNumAnimations).arg(scene->mRootNode ? 1 : 0));
             QApplication::processEvents();
             
-            logToDialog(tr("DEBUG:   Exporting %1 animation(s)...").arg(scene->mNumAnimations));
+            logToDialog(QStringLiteral("DEBUG:   Exporting %1 animation(s)...").arg(scene->mNumAnimations));
             QApplication::processEvents();
             
             // Manual export with debug logging
-            logToDialog(tr("DEBUG:   Building node list..."));
+            logToDialog(QStringLiteral("DEBUG:   Building node list..."));
             QApplication::processEvents();
             
             // Count nodes for debug
@@ -1735,7 +1664,7 @@ void LoLModelDownloadDialog::onDownloadClicked()
                 }
             };
             countNodes(scene->mRootNode);
-            logToDialog(tr("DEBUG:   Node count: %1").arg(nodeCount));
+            logToDialog(QStringLiteral("DEBUG:   Node count: %1").arg(nodeCount));
             QApplication::processEvents();
             
             // Export each animation with detailed timing
@@ -1767,11 +1696,11 @@ void LoLModelDownloadDialog::onDownloadClicked()
                 }
                 int actualFrames = (int)(std::ceil(maxTime * 30.0)) + 1;
                 
-                logToDialog(tr("DEBUG:     [%1/%2] %3 (ch:%4)")
+                logToDialog(QStringLiteral("DEBUG:     [%1/%2] %3 (ch:%4)")
                     .arg(i + 1).arg(scene->mNumAnimations)
                     .arg(animName)
                     .arg(anim->mNumChannels));
-                logToDialog(tr("DEBUG:       dur=%1, tps=%2, maxTime=%3, frames=%4")
+                logToDialog(QStringLiteral("DEBUG:       dur=%1, tps=%2, maxTime=%3, frames=%4")
                     .arg(duration).arg(ticksPerSec).arg(maxTime).arg(actualFrames));
                 QApplication::processEvents();
                 
@@ -1783,16 +1712,16 @@ void LoLModelDownloadDialog::onDownloadClicked()
                 }
                 qint64 elapsed = timer.elapsed();
                 
-                logToDialog(tr("DEBUG:       Done in %1 ms").arg(elapsed));
+                logToDialog(QStringLiteral("DEBUG:       Done in %1 ms").arg(elapsed));
                 QApplication::processEvents();
             }
             
-            logToDialog(tr("  Done: %1 animations exported").arg(animCount));
+            logToDialog(QStringLiteral("  Done: %1 animations exported").arg(animCount));
         }
         
         // Extract textures as 512x512 8-bit color BMP files
         // Texture file names match mesh part names for Blender compatibility
-        logToDialog(tr("  Extracting textures..."));
+        logToDialog(QStringLiteral("  Extracting textures..."));
         QApplication::processEvents();
         
         int textureCount = 0;
@@ -1885,7 +1814,7 @@ void LoLModelDownloadDialog::onDownloadClicked()
                 // Compressed texture (PNG, JPG, etc.)
                 QByteArray data(reinterpret_cast<const char*>(aiTex->pcData), aiTex->mWidth);
                 if (!image.loadFromData(data)) {
-                    logToDialog(tr("    Failed to load embedded texture for %1").arg(QString::fromStdString(meshName)));
+                    logToDialog(QStringLiteral("    Failed to load embedded texture for %1").arg(QString::fromStdString(meshName)));
                     continue;
                 }
             } else {
@@ -1905,14 +1834,14 @@ void LoLModelDownloadDialog::onDownloadClicked()
             if (BMP::saveGoldSrcTexture(bmpPath.toStdString(), scaledImage)) {
                 textureCount++;
             } else {
-                logToDialog(tr("    Failed to save texture: %1").arg(QString::fromStdString(meshName) + ".bmp"));
+                logToDialog(QStringLiteral("    Failed to save texture: %1").arg(QString::fromStdString(meshName) + ".bmp"));
             }
         }
         
         if (textureCount > 0) {
-            logToDialog(tr("  Extracted %1 texture(s) as 512x512 8-bit BMP").arg(textureCount));
+            logToDialog(QStringLiteral("  Extracted %1 texture(s) as 512x512 8-bit BMP").arg(textureCount));
         } else {
-            logToDialog(tr("  No embedded textures found to extract"));
+            logToDialog(QStringLiteral("  No embedded textures found to extract"));
         }
         QApplication::processEvents();
         
@@ -1940,11 +1869,11 @@ void LoLModelDownloadDialog::onDownloadClicked()
                         BMP::saveGoldSrcTexture(dstFile.toStdString(), scaledImage);
                     }
                 }
-                logToDialog(tr("  Converted chroma textures for: %1").arg(cDirName));
+                logToDialog(QStringLiteral("  Converted chroma textures for: %1").arg(cDirName));
             }
         }
         
-        logToDialog(tr("  SMD export completed!"));
+        logToDialog(QStringLiteral("  SMD export completed!"));
         QApplication::processEvents();
         
         // Generate QC file if checkbox is checked
@@ -1987,19 +1916,19 @@ void LoLModelDownloadDialog::onDownloadClicked()
             
             QString qcPath = QDir(modelDir).filePath(skinSafeName + ".qc");
             if (qcWriter.Write(qcPath.toStdString())) {
-                logToDialog(tr("QC file created: %1").arg(QFileInfo(qcPath).fileName()));
+                logToDialog(QStringLiteral("QC file created: %1").arg(QFileInfo(qcPath).fileName()));
                 if (m_compileModelCheckbox->isChecked())
                 {
-                    logToDialog(tr("Compiling % 1 ...").arg(QFileInfo(qcPath).fileName()));
+                    logToDialog(QStringLiteral("Compiling % 1 ...").arg(QFileInfo(qcPath).fileName()));
                     QApplication::processEvents();
                     const QCCompileResult compiled = QCFile::Compile(SettingsDialog::getStudioMdlPath().toStdString(), qcPath.toStdString());
                     if (compiled.Ok)
-                        logToDialog(tr("^2Compiled:^7 %1").arg(QString::fromStdString(compiled.ModelPath)));
+                        logToDialog(QStringLiteral("^2Compiled:^7 %1").arg(QString::fromStdString(compiled.ModelPath)));
                     else
-                        logToDialog(tr("^1Compile failed:^7 %1").arg(QString::fromStdString(compiled.Error)));
+                        logToDialog(QStringLiteral("^1Compile failed:^7 %1").arg(QString::fromStdString(compiled.Error)));
                 }
             } else {
-                logToDialog(tr("  ^1Failed to create QC file:^7 %1").arg(QString::fromStdString(qcWriter.GetError())));
+                logToDialog(QStringLiteral("  ^1Failed to create QC file:^7 %1").arg(QString::fromStdString(qcWriter.GetError())));
             }
         }
         
@@ -2018,10 +1947,10 @@ void LoLModelDownloadDialog::onDownloadClicked()
     m_downloadButton->setEnabled(true);
     
     if (m_cancelled) {
-        logToDialog(tr("\nExport cancelled."));
+        logToDialog(QStringLiteral("\nExport cancelled."));
         m_statusLabel->setText(tr("Cancelled"));
     } else {
-        logToDialog(tr("\nExport completed! %1/%2 skins exported successfully.").arg(successCount).arg(total));
+        logToDialog(QStringLiteral("\nExport completed! %1/%2 skins exported successfully.").arg(successCount).arg(total));
         m_statusLabel->setText(tr("Export completed"));
         QMessageBox::information(this, tr("Export Complete"), 
                                 QString(tr("Successfully exported %1 skin(s) to SMD format.\n\nOutput folder: %2"))
@@ -2033,7 +1962,7 @@ void LoLModelDownloadDialog::onCancelClicked()
 {
     m_cancelled = true;
     m_cancelButton->setEnabled(false);
-    logToDialog(tr("Cancelling download..."));
+    logToDialog(QStringLiteral("Cancelling download..."));
     m_statusLabel->setText(tr("Cancelling..."));
     
     if (m_currentReply) {
@@ -2107,9 +2036,9 @@ void LoLModelDownloadDialog::downloadModel(const QString& championName, const QS
     );
     
     if (success) {
-        logToDialog(tr("DEBUG:   ^2Success"));
+        logToDialog(QStringLiteral("DEBUG:   ^2Success"));
     } else {
-        logToDialog(tr("DEBUG:   ^1Failed"));
+        logToDialog(QStringLiteral("DEBUG:   ^1Failed"));
     }
 }
 
@@ -2254,7 +2183,7 @@ void LoLModelDownloadDialog::openGLBViewer(const QString& skinId)
                 
             if (reply->error() != QNetworkReply::NoError) {
                 reply->deleteLater();
-                logToDialog(tr("^1[Viewer] Download failed: %1").arg(reply->errorString()));
+                logToDialog(QStringLiteral("^1[Viewer] Download failed: %1").arg(reply->errorString()));
                 m_statusLabel->setText(tr("Download failed"));
                 QMessageBox::warning(this, tr("Download Failed"), 
                                     tr("Failed to download model from CDN. Please check your internet connection."));
@@ -2267,7 +2196,7 @@ void LoLModelDownloadDialog::openGLBViewer(const QString& skinId)
                 
             // Validate GLB data
             if (data.size() < 12 || data.left(4) != "glTF") {
-                logToDialog(tr("^1[Viewer] Invalid GLB data received"));
+                logToDialog(QStringLiteral("^1[Viewer] Invalid GLB data received"));
                 m_statusLabel->setText(tr("Download failed - invalid data"));
                 QMessageBox::warning(this, tr("Download Failed"), 
                                     tr("Downloaded data is not a valid GLB file."));
@@ -2278,7 +2207,7 @@ void LoLModelDownloadDialog::openGLBViewer(const QString& skinId)
             // Write to temp file
             QFile file(tempFilePath);
             if (!file.open(QIODevice::WriteOnly)) {
-                logToDialog(tr("^1[Viewer] Cannot write temp file: %1").arg(tempFilePath));
+                logToDialog(QStringLiteral("^1[Viewer] Cannot write temp file: %1").arg(tempFilePath));
                 m_contentStack->setCurrentIndex(0);
                 return;
             }
@@ -2292,7 +2221,7 @@ void LoLModelDownloadDialog::openGLBViewer(const QString& skinId)
             m_currentTempFile = tempFilePath;
                 
             QFileInfo tempFileInfo(tempFilePath);
-            logToDialog(tr("DEBUG: ^2Model downloaded (%1 MB)")
+            logToDialog(QStringLiteral("DEBUG: ^2Model downloaded (%1 MB)")
                 .arg(tempFileInfo.size() / 1024.0 / 1024.0, 0, 'f', 2));
             m_statusLabel->setText(tr("Loading model..."));
                 
@@ -2313,7 +2242,7 @@ void LoLModelDownloadDialog::openGLBViewerWithFile(const QString& skinId, const 
     }
     
     if (!m_viewerWidget) {
-        logToDialog(tr("^1[Viewer] Cannot load GLB: 3D Viewer is not available on this system"));
+        logToDialog(QStringLiteral("^1[Viewer] Cannot load GLB: 3D Viewer is not available on this system"));
         QMessageBox::warning(this, tr("Viewer Error"), tr("3D Viewer is not available on this system."));
         m_contentStack->setCurrentIndex(0);
         return;
@@ -2325,9 +2254,9 @@ void LoLModelDownloadDialog::openGLBViewerWithFile(const QString& skinId, const 
     // Connect modelLoaded signal to handle success/failure and async chroma detection
     connect(m_viewerWidget, &GLBViewer::modelLoaded, this, [this, skinModel, skinId, filePath](bool success) {
         if (success) {
-            logToDialog(tr("^2[Viewer] Model loaded successfully"));
+            logToDialog(QStringLiteral("^2[Viewer] Model loaded successfully"));
             if (skinModel) {
-                logToDialog(tr("DEBUG: ^2Opening 3D viewer for %1").arg(skinModel->name));
+                logToDialog(QStringLiteral("DEBUG: ^2Opening 3D viewer for %1").arg(skinModel->name));
             }
             m_viewerWidget->update();
             m_statusLabel->setText(tr("Ready"));
@@ -2337,7 +2266,7 @@ void LoLModelDownloadDialog::openGLBViewerWithFile(const QString& skinId, const 
                 startAsyncChromaDetection(skinId, filePath);
             });
         } else {
-            logToDialog(tr("^1[Viewer] Failed to load GLB: %1").arg(filePath));
+            logToDialog(QStringLiteral("^1[Viewer] Failed to load GLB: %1").arg(filePath));
             m_statusLabel->setText(tr("Load failed"));
             QMessageBox::warning(this, tr("Load Failed"), 
                                 tr("Failed to load GLB model."));
@@ -2348,11 +2277,11 @@ void LoLModelDownloadDialog::openGLBViewerWithFile(const QString& skinId, const 
     // Process events to ensure QStackedWidget page transition is processed by Qt Wayland
     QCoreApplication::processEvents();
 
-    logToDialog(tr("[Viewer] Waiting for OpenGL compositor readiness..."));
+    logToDialog(QStringLiteral("[Viewer] Waiting for OpenGL compositor readiness..."));
     
     // Give OpenGL time to initialize on Linux compositors, then load
     QTimer::singleShot(200, this, [this, filePath]() {
-        logToDialog(tr("[Viewer] Loading GLB..."));
+        logToDialog(QStringLiteral("[Viewer] Loading GLB..."));
         m_viewerWidget->loadGLB(filePath);
     });
 }
@@ -2372,7 +2301,7 @@ void LoLModelDownloadDialog::startAsyncChromaDetection(const QString& skinId, co
     
     int baseId = skinId.toInt();
     if (baseId <= 0) {
-        logToDialog(tr("No chromas detected for this skin"));
+        logToDialog(QStringLiteral("No chromas detected for this skin"));
         return;
     }
     
@@ -2383,15 +2312,15 @@ void LoLModelDownloadDialog::startAsyncChromaDetection(const QString& skinId, co
         QStringList glbTextureNames = tempDownloader.getTextureNamesFromGLB(glbFilePath);
         if (!glbTextureNames.isEmpty()) {
             probeTextureName = glbTextureNames.first();
-            logToDialog(tr("[Chroma] Using texture '%1' for CDN probe").arg(probeTextureName));
+            logToDialog(QStringLiteral("[Chroma] Using texture '%1' for CDN probe").arg(probeTextureName));
         }
     }
     if (probeTextureName.isEmpty()) {
-        logToDialog(tr("[Chroma] No texture names found in GLB, cannot detect chromas"));
+        logToDialog(QStringLiteral("[Chroma] No texture names found in GLB, cannot detect chromas"));
         return;
     }
     
-    logToDialog(tr("[Chroma] Checking for chromas (async)..."));
+    logToDialog(QStringLiteral("[Chroma] Checking for chromas (async)..."));
     
     // Send parallel HEAD requests for chroma detection (same range as before: -30 to +30)
     // But now fully async — no QEventLoop!
@@ -2448,20 +2377,20 @@ void LoLModelDownloadDialog::startAsyncChromaDetection(const QString& skinId, co
                             return a.toInt() < b.toInt();
                         });
                     
-                    logToDialog(tr("[Chroma] Detected %1 chromas, loading textures...").arg(m_detectedChromaIds.size()));
+                    logToDialog(QStringLiteral("[Chroma] Detected %1 chromas, loading textures...").arg(m_detectedChromaIds.size()));
                     
                     if (m_viewerWidget && replySkinId == m_viewedSkinId) {
                         m_viewerWidget->loadChromaTextures(m_currentChampion, skinId, m_detectedChromaIds);
                     }
                 } else {
-                    logToDialog(tr("No chromas detected for this skin"));
+                    logToDialog(QStringLiteral("No chromas detected for this skin"));
                 }
             }
         });
     }
     
     m_chromaDetectionPending = requestCount;
-    logToDialog(tr("DEBUG: [Chroma] Sent %1 async HEAD requests").arg(requestCount));
+    logToDialog(QStringLiteral("DEBUG: [Chroma] Sent %1 async HEAD requests").arg(requestCount));
 }
 
 

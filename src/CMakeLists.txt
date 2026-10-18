@@ -70,6 +70,8 @@ set(VORTIGAUNT_GUI_HEADERS
     ui/widgets/LoLModelDownloader.h
     ui/widgets/GLBViewer.h
     ui/widgets/RibbonBar.h
+    ui/widgets/TextureView.h
+    ui/widgets/PaletteWidget.h
 
 
     ui/ThemeManager.h
@@ -167,6 +169,7 @@ set(VORTIGAUNT_GUI
     ui/widgets/LoLModelDownloader.cpp
     ui/widgets/GLBViewer.cpp
     ui/widgets/RibbonBar.cpp
+    ui/widgets/PaletteWidget.cpp
 
 
     core/LanguageManager.cpp
@@ -300,14 +303,16 @@ if(BUILD_GUI)
     qt_add_translations(VortigauntTool_gui
         TS_FILES ${TS_FILES}
         QM_FILES_OUTPUT_VARIABLE QM_FILES
-        LUPDATE_OPTIONS -no-obsolete -locations relative
+        LUPDATE_OPTIONS -no-obsolete -locations none
         LRELEASE_OPTIONS -compress
     )
 
-    # Copy .qm files to build directory
-    add_custom_command(TARGET VortigauntTool_gui POST_BUILD
+    # Copy .qm files to build directory; a target of its own so a changed translation is copied
+    # even when the program itself is not linked again
+    add_custom_target(VortigauntTool_gui_translations ALL
         COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:VortigauntTool_gui>/translations"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${QM_FILES} "$<TARGET_FILE_DIR:VortigauntTool_gui>/translations"
+        DEPENDS ${QM_FILES}
         COMMENT "Copying translation files to output directory"
     )
 

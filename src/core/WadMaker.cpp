@@ -313,115 +313,144 @@ bool WadArchive::loadBmp(const std::string& path, WadTexture& texture)
     return resizeAndValidate(texture);
 }
 
-bool WadArchive::loadViaQImage(const std::string& path, WadTexture& texture)
+bool WadArchive::loadImageFile(const std::string& path, WadFit fit, WadTexture& texture)
 {
+    const std::string ext = getFileExtension(path);
+
+    // an 8-bit BMP of a size GoldSrc takes is used as it is, its palette included
+    if (ext == "bmp")
+    {
+        std::ifstream file(FileIO::toPath(path), std::ios::binary);
+        uint8_t header[54] = {};
+        file.read(reinterpret_cast<char*>(header), sizeof(header));
+        uint32_t width = 0, height = 0;
+        uint16_t bits = 0;
+        std::memcpy(&width, header + 18, 4);
+        std::memcpy(&height, header + 22, 4);
+        std::memcpy(&bits, header + 28, 2);
+        const bool exact = file && bits == 8 && width % 16 == 0 && height % 16 == 0 &&
+                           width <= WadConstants::MAX_TEXTURE_SIZE && height <= WadConstants::MAX_TEXTURE_SIZE;
+        if (exact || !HAS_QT_IMAGE_SUPPORT)
+            return loadBmp(path, texture);
+    }
+
 #if HAS_QT_IMAGE_SUPPORT
-    QImage image = ImageUtils::loadImage(path);
+    const QImage image = ImageUtils::loadImage(path);
     if (image.isNull())
     {
         Vortigaunt_Printf("ERROR: Cannot load image file: " + path);
         return false;
     }
-
-    // Convert to ARGB32 — QImage handles all formats (PNG, JPEG, TGA, DDS, BMP)
-    image = image.convertToFormat(QImage::Format_ARGB32);
-
-    int origWidth  = image.width();
-    int origHeight = image.height();
-
-    // Round up to nearest 16 (WAD3 requirement)
-    uint32_t width  = static_cast<uint32_t>(((origWidth  + 15) / 16) * 16);
-    uint32_t height = static_cast<uint32_t>(((origHeight + 15) / 16) * 16);
-    if (width  < 16) width  = 16;
-    if (height < 16) height = 16;
-
-    texture.width  = width;
-    texture.height = height;
-
-    int total = static_cast<int>(width * height);
-
-    // Build flat ARGB pixel array (padded canvas, default = fully transparent)
-    // Padding pixels on right/bottom (from rounding up to 16) must be transparent,
-    // not opaque black, so they get mapped to index 255
-    std::vector<uint32_t> argbPixels(total, 0x00000000u);
-
-    // Center the source image within the padded canvas
-    int offsetX = (static_cast<int>(width)  - origWidth)  / 2;
-    int offsetY = (static_cast<int>(height) - origHeight) / 2;
-
-    for (int y = 0; y < origHeight; ++y)
-    {
-        const QRgb* scanline = reinterpret_cast<const QRgb*>(image.constScanLine(y));
-        for (int x = 0; x < origWidth; ++x)
-            argbPixels[(y + offsetY) * width + (x + offsetX)] = static_cast<uint32_t>(scanline[x]);
-    }
-
-    // fully see-through pixels become index 255 (blue); half see-through ones are blended onto black
-    bool hasTransparency = false;
-    for (uint32_t& c : argbPixels)
-    {
-        const uint32_t a = c >> 24;
-        if (a == 0)
-        {
-            hasTransparency = true;
-        }
-        else if (a < 255)
-        {
-            const auto blend = [a](uint32_t v) { return (v * a + 127) / 255; };
-            c = 0xFF000000u | blend((c >> 16) & 0xFF) << 16 | blend((c >> 8) & 0xFF) << 8 | blend(c & 0xFF);
-        }
-    }
-
-    if (!BMP::quantize(argbPixels.data(), static_cast<int>(width), static_cast<int>(height), hasTransparency,
-                       texture.palette, texture.mip0))
-    {
-        return false;
-    }
-
-    return resizeAndValidate(texture);
+    return textureFromImage(image, fit, texture);
 #else
+    (void)fit;
     Vortigaunt_Printf("ERROR: Image loading requires Qt (GUI build only): " + path);
     return false;
 #endif
 }
 
-
-
-bool WadArchive::addTextureFromImage(const std::string& name, const std::string& imagePath)
+#if HAS_QT_IMAGE_SUPPORT
+bool WadArchive::textureFromImage(const QImage& image, WadFit fit, WadTexture& texture)
 {
-    std::string ext = getFileExtension(imagePath);
-    
-    WadTexture texture;
-    texture.name = sanitizeTextureName(name);
-    
-    bool success = false;
-    
-    if (ext == "bmp")
+    if (image.isNull())
+        return false;
+    QImage argb = image.convertToFormat(QImage::Format_ARGB32);
+
+    // at most 512 a side, then sides that are multiples of 16
+    const int limit = static_cast<int>(WadConstants::MAX_TEXTURE_SIZE);
+    if (argb.width() > limit || argb.height() > limit)
     {
-        success = loadBmp(imagePath, texture);
+        LogF("Resizing texture from %dx%d to fit 512x512 limit", argb.width(), argb.height());
+        argb = argb.scaled(limit, limit, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     }
-	else if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "tga" /* || ext == "dds"*/)// TODO: add native DDS support
+    if (fit == WadFit::Scale)
     {
-        success = loadViaQImage(imagePath, texture);
+        const int width = (std::max)(16, (argb.width() + 8) / 16 * 16);
+        const int height = (std::max)(16, (argb.height() + 8) / 16 * 16);
+        if (width != argb.width() || height != argb.height())
+            argb = argb.scaled((std::min)(width, limit), (std::min)(height, limit), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     }
     else
     {
-        Vortigaunt_Printf("ERROR: Unsupported image format: " + ext);
-        return false;
+        const int width = (argb.width() + 15) / 16 * 16;
+        const int height = (argb.height() + 15) / 16 * 16;
+        if (width != argb.width() || height != argb.height())
+        {
+            QImage padded(width, height, QImage::Format_ARGB32);
+            padded.fill(Qt::transparent);
+            for (int y = 0; y < argb.height(); ++y)
+                std::memcpy(padded.scanLine(y + (height - argb.height()) / 2) + ((width - argb.width()) / 2) * 4,
+                            argb.constScanLine(y), static_cast<size_t>(argb.width()) * 4);
+            argb = padded;
+        }
     }
-    
-    if (success)
+
+    // below half alpha is a hole (palette index 255), the rest is opaque
+    const int total = argb.width() * argb.height();
+    std::vector<uint32_t> pixels(static_cast<size_t>(total));
+    bool transparent = false;
+    for (int y = 0; y < argb.height(); ++y)
     {
-        Vortigaunt_Printf("Added texture '" + texture.name + "' (" + 
-            std::to_string(texture.width) + "x" + std::to_string(texture.height) + 
-            ") from " + ext);
-        m_textures.push_back(std::move(texture));
+        const auto* line = reinterpret_cast<const uint32_t*>(argb.constScanLine(y));
+        for (int x = 0; x < argb.width(); ++x)
+        {
+            const uint32_t c = line[x];
+            const bool hole = (c >> 24) < 128;
+            transparent = transparent || hole;
+            pixels[static_cast<size_t>(y) * argb.width() + x] = hole ? 0u : (c | 0xFF000000u);
+        }
     }
-    
-    return success;
+
+    texture.width = static_cast<uint32_t>(argb.width());
+    texture.height = static_cast<uint32_t>(argb.height());
+    if (!BMP::quantize(pixels.data(), argb.width(), argb.height(), transparent, texture.palette, texture.mip0))
+        return false;
+
+    // GoldSrc only shows the holes of a { texture
+    if (transparent && !texture.name.empty() && std::string("{!+~").find(texture.name[0]) == std::string::npos)
+        texture.name = sanitizeTextureName("{" + texture.name);
+    generateMipmaps(texture);
+    return true;
+}
+#endif
+
+bool WadArchive::addTextureFromImage(const std::string& name, const std::string& imagePath, WadFit fit)
+{
+    WadTexture texture;
+    texture.name = sanitizeTextureName(name);
+    if (!loadImageFile(imagePath, fit, texture))
+        return false;
+
+    Vortigaunt_Printf("Added texture '" + texture.name + "' (" +
+        std::to_string(texture.width) + "x" + std::to_string(texture.height) + ") from " + imagePath);
+    m_textures.push_back(std::move(texture));
+    return true;
 }
 
+#if HAS_QT_IMAGE_SUPPORT
+bool WadArchive::addTextureFromImage(const std::string& name, const QImage& image, WadFit fit)
+{
+    WadTexture texture;
+    texture.name = sanitizeTextureName(name);
+    if (!textureFromImage(image, fit, texture))
+        return false;
+    m_textures.push_back(std::move(texture));
+    return true;
+}
+#endif
 
+bool WadArchive::replaceTextureImage(size_t index, const std::string& imagePath, WadFit fit)
+{
+    if (index >= m_textures.size())
+        return false;
+    WadTexture texture;
+    texture.name = m_textures[index].name;
+    if (!loadImageFile(imagePath, fit, texture))
+        return false;
+    texture.name = m_textures[index].name;
+    m_textures[index] = std::move(texture);
+    return true;
+}
 
 bool WadArchive::addTextureFromRgb(const std::string& name, uint32_t width, uint32_t height,
                                  const uint8_t* rgbData)
@@ -697,7 +726,7 @@ bool WadArchive::renameTexture(size_t index, const std::string& newName)
 #if HAS_QT_IMAGE_SUPPORT
 QImage WadArchive::textureThumbnail(size_t index, int maxSize)
 {
-    QImage fullImage = textureFullImage(index);
+    QImage fullImage = textureImage(index);
     if (fullImage.isNull())
     {
         return QImage();
@@ -706,34 +735,36 @@ QImage WadArchive::textureThumbnail(size_t index, int maxSize)
     return fullImage.scaled(maxSize, maxSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }
 
-QImage WadArchive::textureFullImage(size_t index)
+QImage WadArchive::textureImage(size_t index, int mip) const
 {
-    if (index >= m_textures.size())
+    if (index >= m_textures.size() || mip < 0 || mip > 3)
     {
         return QImage();
     }
-    
+
     const WadTexture& texture = m_textures[index];
-    if (texture.mip0.empty() || texture.width == 0 || texture.height == 0)
+    const std::vector<uint8_t>* levels[] = { &texture.mip0, &texture.mip1, &texture.mip2, &texture.mip3 };
+    const std::vector<uint8_t>& data = *levels[mip];
+    const uint32_t width = texture.width >> mip;
+    const uint32_t height = texture.height >> mip;
+    if (width == 0 || height == 0 || data.size() < static_cast<size_t>(width) * height)
     {
         return QImage();
     }
-    
-    // Convert indexed data + palette to RGB QImage
-    QImage image(static_cast<int>(texture.width), static_cast<int>(texture.height), QImage::Format_RGB888);
-    
-    for (uint32_t y = 0; y < texture.height; ++y)
+
+    // indexed data + palette; a masked texture shows its colour 255 as a hole, like the game
+    const bool masked = !texture.name.empty() && texture.name[0] == '{';
+    QImage image(static_cast<int>(width), static_cast<int>(height), QImage::Format_ARGB32);
+    for (uint32_t y = 0; y < height; ++y)
     {
-        uchar* scanline = image.scanLine(y);
-        for (uint32_t x = 0; x < texture.width; ++x)
+        auto* scanline = reinterpret_cast<QRgb*>(image.scanLine(static_cast<int>(y)));
+        for (uint32_t x = 0; x < width; ++x)
         {
-            uint8_t paletteIndex = texture.mip0[y * texture.width + x];
-            scanline[x * 3 + 0] = texture.palette[paletteIndex * 3 + 0];  // R
-            scanline[x * 3 + 1] = texture.palette[paletteIndex * 3 + 1];  // G
-            scanline[x * 3 + 2] = texture.palette[paletteIndex * 3 + 2];  // B
+            const uint8_t paletteIndex = data[y * width + x];
+            const uint8_t* rgb = texture.palette + paletteIndex * 3;
+            scanline[x] = masked && paletteIndex == 255 ? qRgba(0, 0, 0, 0) : qRgb(rgb[0], rgb[1], rgb[2]);
         }
     }
-    
     return image;
 }
 #endif // HAS_QT_IMAGE_SUPPORT

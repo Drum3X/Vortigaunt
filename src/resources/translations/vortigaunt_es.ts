@@ -45,6 +45,172 @@
     </message>
 </context>
 <context>
+    <name>ArchiveSource</name>
+    <message>
+        <source>REZ (LithTech)</source>
+        <translation>REZ (LithTech)</translation>
+    </message>
+    <message>
+        <source>PAK (Counter-Strike Online)</source>
+        <translation>PAK (Counter-Strike Online)</translation>
+    </message>
+    <message>
+        <source>XFS (Xenesis)</source>
+        <translation>XFS (Xenesis)</translation>
+    </message>
+    <message>
+        <source>VPK (Source)</source>
+        <translation>VPK (Source)</translation>
+    </message>
+    <message>
+        <source>GMA (Garry&apos;s Mod)</source>
+        <translation>GMA (Garry&apos;s Mod)</translation>
+    </message>
+    <message>
+        <source>This is a data part of a VPK. Open the matching _dir.vpk instead.</source>
+        <translation>Es una parte de datos de un VPK. Abre en su lugar el _dir.vpk correspondiente.</translation>
+    </message>
+    <message>
+        <source>Not an archive Vortigaunt can read.</source>
+        <translation>No es un archivo que Vortigaunt pueda leer.</translation>
+    </message>
+    <message>
+        <source>The archive could not be read. It may be damaged or of a version Vortigaunt does not know.</source>
+        <translation>No se pudo leer el archivo. Puede estar dañado o ser de una versión que Vortigaunt no conoce.</translation>
+    </message>
+</context>
+<context>
+    <name>ArchiveWorkspace</name>
+    <message>
+        <source>Open archives</source>
+        <translation>Archivos abiertos</translation>
+    </message>
+    <message>
+        <source>Folders</source>
+        <translation>Carpetas</translation>
+    </message>
+    <message>
+        <source>Search (name, or a pattern like *.dtx)</source>
+        <translation>Buscar (nombre o un patrón como *.dtx)</translation>
+    </message>
+    <message>
+        <source>All types</source>
+        <translation>Todos los tipos</translation>
+    </message>
+    <message>
+        <source>Textures</source>
+        <translation>Texturas</translation>
+    </message>
+    <message>
+        <source>Sprites</source>
+        <translation>Sprites</translation>
+    </message>
+    <message>
+        <source>Models</source>
+        <translation>Modelos</translation>
+    </message>
+    <message>
+        <source>Sounds</source>
+        <translation>Sonidos</translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation>Texto</translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation>Otros</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Nombre</translation>
+    </message>
+    <message>
+        <source>Folder</source>
+        <translation>Carpeta</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tipo</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Tamaño</translation>
+    </message>
+    <message>
+        <source>Open in viewer</source>
+        <translation>Abrir en el visor</translation>
+    </message>
+    <message>
+        <source>Extract selected</source>
+        <translation>Extraer selección</translation>
+    </message>
+    <message>
+        <source>Send to Convert list</source>
+        <translation>Enviar a la lista de Convertir</translation>
+    </message>
+    <message>
+        <source>Extract the selected files to the output folder and add them to the Convert list</source>
+        <translation>Extraer los archivos seleccionados en la carpeta de salida y añadirlos a la lista de Convertir</translation>
+    </message>
+    <message>
+        <source>Send to WAD</source>
+        <translation>Enviar al WAD</translation>
+    </message>
+    <message>
+        <source>Add the selected textures to the WAD open in the WAD tab</source>
+        <translation>Añadir las texturas seleccionadas al WAD abierto en la pestaña WAD</translation>
+    </message>
+    <message>
+        <source>Cannot open archive</source>
+        <translation>No se puede abrir el archivo</translation>
+    </message>
+    <message>
+        <source>Open Archives</source>
+        <translation>Abrir archivos</translation>
+    </message>
+    <message>
+        <source>Archives (*.rez *.pak *.xfs *.vpk *.gma);;All files (*.*)</source>
+        <translation>Archivos comprimidos (*.rez *.pak *.xfs *.vpk *.gma);;Todos los archivos (*.*)</translation>
+    </message>
+    <message>
+        <source>Open an archive from the ribbon, or drop one here.</source>
+        <translation>Abre un archivo desde la cinta o suéltalo aquí.</translation>
+    </message>
+    <message>
+        <source>%1 of %2 files</source>
+        <translation>%1 de %2 archivos</translation>
+    </message>
+    <message>
+        <source>%1 files selected</source>
+        <translation>%1 archivos seleccionados</translation>
+    </message>
+    <message>
+        <source>Select a file to preview it.</source>
+        <translation>Selecciona un archivo para previsualizarlo.</translation>
+    </message>
+    <message>
+        <source>Open the sprite in the viewer to see its frames.</source>
+        <translation>Abre el sprite en el visor para ver sus fotogramas.</translation>
+    </message>
+    <message>
+        <source>No preview for this type.</source>
+        <translation>No hay vista previa para este tipo.</translation>
+    </message>
+    <message>
+        <source>This file could not be read from the archive.</source>
+        <translation>No se pudo leer este archivo del archivo comprimido.</translation>
+    </message>
+    <message>
+        <source>This texture could not be decoded.</source>
+        <translation>No se pudo decodificar esta textura.</translation>
+    </message>
+    <message>
+        <source>Extracted %1 file(s) to %2</source>
+        <translation>%1 archivo(s) extraído(s) en %2</translation>
+    </message>
+</context>
+<context>
     <name>AudioConvertDialog</name>
     <message>
         <source>WAV Convert</source>
@@ -192,6 +358,30 @@ Exitosos: %1 de %2</translation>
         <translation>Seleccionar SMD</translation>
     </message>
     <message>
+        <source>Reference Model (optional)</source>
+        <translation>Modelo de referencia (opcional)</translation>
+    </message>
+    <message>
+        <source>An already rigged SMD to copy the rigging from</source>
+        <translation>Un SMD ya riggeado del que copiar el rigging</translation>
+    </message>
+    <message>
+        <source>Rig by example. Every vertex takes the bone of the closest point on this model&apos;s surface, so the result inherits how the original artist rigged it: which helper bones they deformed with, where they put the seams.
+
+Bones are matched by name, so the reference can be any model whose skeleton names agree - Half-Life, Counter-Strike and CSO all use Biped names.
+
+Whatever the reference does not cover - a cape, a backpack, hair it never had - falls back to Bone Heat Diffusion. Leave empty to rig from geometry alone.
+
+The mesh has to be sitting on the skeleton already: the closer the two models overlap, the more of the rigging carries over.</source>
+        <translation>Rigging por ejemplo. Cada vértice toma el hueso del punto más cercano de la superficie de este modelo, así que el resultado hereda cómo lo riggeó el artista original: con qué huesos auxiliares deformó y dónde puso las costuras.
+
+Los huesos se emparejan por nombre, así que la referencia puede ser cualquier modelo cuyo esqueleto tenga los mismos nombres; Half-Life, Counter-Strike y CSO usan nombres Biped.
+
+Lo que la referencia no cubre (una capa, una mochila, un pelo que nunca tuvo) usa Bone Heat Diffusion. Déjalo vacío para riggear solo a partir de la geometría.
+
+La malla tiene que estar ya sobre el esqueleto: cuanto más se solapen los dos modelos, más rigging se transfiere.</translation>
+    </message>
+    <message>
         <source>Output SMD</source>
         <translation>SMD de Salida</translation>
     </message>
@@ -208,8 +398,40 @@ Exitosos: %1 de %2</translation>
         <translation>Escala Manual:</translation>
     </message>
     <message>
+        <source>Write the reference model&apos;s skeleton</source>
+        <translation>Escribir el esqueleto del modelo de referencia</translation>
+    </message>
+    <message>
+        <source>Give the output the skeleton of the reference model instead of the one the mesh came in with. This is what porting a model needs: the animations of the target game are built for the target game&apos;s skeleton, so a model carrying its old skeleton cannot play them - studiomdl refuses it with &quot;illegal parent bone replacement&quot;.
+
+Turn this off only when the mesh is already on the skeleton you want to keep and the reference is there just to improve the rigging.
+
+Has no effect without a reference model.</source>
+        <translation>Da a la salida el esqueleto del modelo de referencia en lugar del que traía la malla. Es lo que necesita portar un modelo: las animaciones del juego de destino están hechas para su esqueleto, así que un modelo con su esqueleto antiguo no puede reproducirlas; studiomdl lo rechaza con &quot;illegal parent bone replacement&quot;.
+
+Desactívalo solo si la malla ya está en el esqueleto que quieres conservar y la referencia está solo para mejorar el rigging.
+
+No tiene efecto sin un modelo de referencia.</translation>
+    </message>
+    <message>
         <source>Enable if mesh is oriented differently (e.g., from Blender)</source>
         <translation>Activar si la malla está orientada de forma diferente (p. ej., desde Blender)</translation>
+    </message>
+    <message>
+        <source>Bone Heat Diffusion (recommended)</source>
+        <translation>Bone Heat Diffusion (recomendado)</translation>
+    </message>
+    <message>
+        <source>Solves smooth weights across the mesh surface and collapses them to one bone per vertex, which is what Blender does with Automatic Weights followed by Limit Total 1. It knows which bones a vertex can actually see, so weights cannot leak between limbs. Uncheck to use the older nearest-bone matching.</source>
+        <translation>Calcula pesos suaves por la superficie de la malla y los reduce a un hueso por vértice, como hace Blender con Automatic Weights seguido de Limit Total 1. Sabe qué huesos puede ver realmente un vértice, así que los pesos no se filtran entre extremidades. Desmárcalo para usar el emparejamiento antiguo por hueso más cercano.</translation>
+    </message>
+    <message>
+        <source>Snap seams to joints</source>
+        <translation>Ajustar costuras a las articulaciones</translation>
+    </message>
+    <message>
+        <source>Cuts the boundary between two bones on the plane through the joint they share. GoldSrc binds every vertex to a single bone, so a crease at the joint is unavoidable; it is smallest when the cut sits on the pivot.</source>
+        <translation>Corta el límite entre dos huesos en el plano que pasa por la articulación que comparten. GoldSrc une cada vértice a un solo hueso, así que un pliegue en la articulación es inevitable; es mínimo cuando el corte está en el pivote.</translation>
     </message>
     <message>
         <source>Use Hierarchy Depth Penalty (Enable for Player Models)</source>
@@ -260,8 +482,20 @@ Exitosos: %1 de %2</translation>
         <translation>Asegúrate de que tu malla esté correctamente ajustada al hueso como en esta imagen. Como Auto-Rig está en beta, pueden ocurrir errores.</translation>
     </message>
     <message>
+        <source>Select Reference Model</source>
+        <translation>Seleccionar modelo de referencia</translation>
+    </message>
+    <message>
+        <source>SMD Files (*.smd);;All Files (*)</source>
+        <translation>Archivos SMD (*.smd);;Todos los archivos (*)</translation>
+    </message>
+    <message>
         <source>Auto-Rig Tip - Full Preview</source>
         <translation>Consejo de Auto-Rig - Vista Previa Completa</translation>
+    </message>
+    <message>
+        <source>Excluded automatically: %1</source>
+        <translation>Excluido automáticamente: %1</translation>
     </message>
     <message>
         <source>%1 / %2 bones active</source>
@@ -281,107 +515,6 @@ Exitosos: %1 de %2</translation>
     </message>
 </context>
 <context>
-    <name>DtxViewerDialog</name>
-    <message>
-        <source>DTX Viewer</source>
-        <translation>Visor DTX</translation>
-    </message>
-    <message>
-        <source>No file loaded.</source>
-        <translation>Ningún archivo cargado.</translation>
-    </message>
-    <message>
-        <source>Open DTX...</source>
-        <translation>Abrir DTX...</translation>
-    </message>
-    <message>
-        <source>Save as 8-bit BMP...</source>
-        <translation>Guardar como BMP de 8 bits...</translation>
-    </message>
-    <message>
-        <source>DTX textures (*.dtx);;All files (*.*)</source>
-        <translation>Texturas DTX (*.dtx);;Todos los archivos (*.*)</translation>
-    </message>
-    <message>
-        <source>DTX error</source>
-        <translation>Error de DTX</translation>
-    </message>
-    <message>
-        <source>Failed to decode DTX texture.</source>
-        <translation>Error al decodificar la textura DTX.</translation>
-    </message>
-    <message>
-        <source>Failed to decode in-memory DTX texture.</source>
-        <translation>Error al decodificar la textura DTX en memoria.</translation>
-    </message>
-    <message>
-        <source>In-memory DTX</source>
-        <translation>DTX en memoria</translation>
-    </message>
-    <message>
-        <source>Save as 8-bit BMP</source>
-        <translation>Guardar como BMP de 8 bits</translation>
-    </message>
-    <message>
-        <source>Bitmap images (*.bmp)</source>
-        <translation>Imágenes de mapa de bits (*.bmp)</translation>
-    </message>
-    <message>
-        <source>GoldSrc Size Limit</source>
-        <translation>Límite de Tamaño de GoldSrc</translation>
-    </message>
-    <message>
-        <source>The image size (%1 x %2) does not fit GoldSrc texture limits (max 512 x 512).
-
-Do you want to save it resized to 512 x 512?</source>
-        <translation>El tamaño de la imagen (%1 x %2) no cumple los límites de textura de GoldSrc (máx. 512 x 512).
-
-¿Deseas guardarla redimensionada a 512 x 512?</translation>
-    </message>
-    <message>
-        <source>Save error</source>
-        <translation>Error al guardar</translation>
-    </message>
-    <message>
-        <source>Failed to save BMP file.</source>
-        <translation>Error al guardar el archivo BMP.</translation>
-    </message>
-    <message>
-        <source>Saved</source>
-        <translation>Guardado</translation>
-    </message>
-    <message>
-        <source>Saved 8-bit BMP:
-%1</source>
-        <translation>BMP de 8 bits guardado:
-%1</translation>
-    </message>
-    <message>
-        <source>Decoded texture is empty.</source>
-        <translation>La textura decodificada está vacía.</translation>
-    </message>
-    <message>
-        <source>Image error</source>
-        <translation>Error de imagen</translation>
-    </message>
-    <message>
-        <source>Failed to construct QImage from decoded data.</source>
-        <translation>Error al construir QImage a partir de los datos decodificados.</translation>
-    </message>
-    <message>
-        <source>%1  (%2 x %3)</source>
-        <translation>%1  (%2 x %3)</translation>
-    </message>
-    <message>
-        <source>DTX</source>
-        <translation>DTX</translation>
-    </message>
-    <message>
-        <source>Select DTX file</source>
-        <translation>Seleccionar archivo DTX</translation>
-    </message>
-</context>
-<context>
     <name>LoLModelDownloadDialog</name>
     <message>
         <source>LoL Model Downloader</source>
@@ -392,16 +525,8 @@ Do you want to save it resized to 512 x 512?</source>
         <translation>Campeón:</translation>
     </message>
     <message>
-        <source>Champion</source>
-        <translation>Campeón</translation>
-    </message>
-    <message>
         <source>Type champion name and press Enter...</source>
         <translation>Escribe el nombre del campeón y presiona Enter...</translation>
-    </message>
-    <message>
-        <source>Skins</source>
-        <translation>Aspectos</translation>
     </message>
     <message>
         <source>Refresh Skins</source>
@@ -432,10 +557,6 @@ Do you want to save it resized to 512 x 512?</source>
         <translation>Carpeta:</translation>
     </message>
     <message>
-        <source>Output</source>
-        <translation>Salida</translation>
-    </message>
-    <message>
         <source>LoL Models by Khada ( modelviewer.lol )</source>
         <translation>Modelos de LoL por Khada ( modelviewer.lol )</translation>
     </message>
@@ -452,6 +573,14 @@ Do you want to save it resized to 512 x 512?</source>
         <translation>Generar QC</translation>
     </message>
     <message>
+        <source>Compile model</source>
+        <translation>Compilar modelo</translation>
+    </message>
+    <message>
+        <source>Run model compiler. Set the location of the model compiler in Settings.</source>
+        <translation>Ejecutar el compilador de modelos. Indica su ubicación en Configuración.</translation>
+    </message>
+    <message>
         <source>View Character</source>
         <translation>Ver Personaje</translation>
     </message>
@@ -460,20 +589,8 @@ Do you want to save it resized to 512 x 512?</source>
         <translation>Exportar SMD</translation>
     </message>
     <message>
-        <source>Log</source>
-        <translation>Registro</translation>
-    </message>
-    <message>
         <source>Ready</source>
         <translation>Listo</translation>
-    </message>
-    <message>
-        <source>Hide Log</source>
-        <translation>Ocultar Registro</translation>
-    </message>
-    <message>
-        <source>Show Log</source>
-        <translation>Mostrar Registro</translation>
     </message>
     <message>
         <source>Loading champions...</source>
@@ -639,44 +756,12 @@ Carpeta de salida: %2</translation>
         <translation>Herramientas</translation>
     </message>
     <message>
-        <source>Lithtech</source>
-        <translation>Lithtech</translation>
-    </message>
-    <message>
-        <source>GoldSrc</source>
-        <translation>GoldSrc</translation>
-    </message>
-    <message>
-        <source>WAD Editor...</source>
-        <translation>Editor WAD...</translation>
-    </message>
-    <message>
-        <source>PAK Viewer (CSO)...</source>
-        <translation>Visor PAK (CSO)...</translation>
-    </message>
-    <message>
-        <source>VPK / GMA Viewer (Source)...</source>
-        <translation>Visor VPK / GMA (Source)...</translation>
-    </message>
-    <message>
-        <source>VTF Viewer (Source)...</source>
-        <translation>Visor VTF (Source)...</translation>
-    </message>
-    <message>
         <source>Convert WAV for Goldsrc...</source>
         <translation>Convertir WAV para Goldsrc...</translation>
     </message>
     <message>
-        <source>Other</source>
-        <translation>Otros</translation>
-    </message>
-    <message>
         <source>League of Legends Models...</source>
         <translation>Modelos de League of Legends...</translation>
-    </message>
-    <message>
-        <source>XFS Viewer (Xenesis File System)...</source>
-        <translation>Visor XFS (Xenesis File System)...</translation>
     </message>
     <message>
         <source>Metin2 Script Effect Viewer...</source>
@@ -687,32 +772,12 @@ Carpeta de salida: %2</translation>
         <translation>Configuración</translation>
     </message>
     <message>
-        <source>DTX Viewer...</source>
-        <translation>Visor DTX...</translation>
-    </message>
-    <message>
-        <source>REZ Viewer...</source>
-        <translation>Visor REZ...</translation>
-    </message>
-    <message>
-        <source>Sprite Viewer...</source>
-        <translation>Visor de Sprites...</translation>
-    </message>
-    <message>
-        <source>Lithtech Sprite Viewer...</source>
-        <translation>Visor de Sprites Lithtech...</translation>
-    </message>
-    <message>
         <source>Auto-Rig (Beta)</source>
         <translation>Auto-Rig (Beta)</translation>
     </message>
     <message>
         <source>Configure...</source>
         <translation>Configurar...</translation>
-    </message>
-    <message>
-        <source>About</source>
-        <translation>Acerca de</translation>
     </message>
     <message>
         <source>About Vortigaunt</source>
@@ -723,16 +788,382 @@ Carpeta de salida: %2</translation>
         <translation>Acerca de Qt</translation>
     </message>
     <message>
-        <source>Update</source>
-        <translation>Actualización</translation>
-    </message>
-    <message>
         <source>Check for Updates...</source>
         <translation>Buscar Actualizaciones...</translation>
     </message>
     <message>
         <source>Language</source>
         <translation>Idioma</translation>
+    </message>
+    <message>
+        <source>Add
+files</source>
+        <translation>Añadir
+archivos</translation>
+    </message>
+    <message>
+        <source>Add files (Ctrl+O)</source>
+        <translation>Añadir archivos (Ctrl+O)</translation>
+    </message>
+    <message>
+        <source>Add
+folder</source>
+        <translation>Añadir
+carpeta</translation>
+    </message>
+    <message>
+        <source>Add every file in a folder that Vortigaunt can convert</source>
+        <translation>Añadir todos los archivos de una carpeta que Vortigaunt puede convertir</translation>
+    </message>
+    <message>
+        <source>Clear
+list</source>
+        <translation>Vaciar
+lista</translation>
+    </message>
+    <message>
+        <source>Remove every file from the list</source>
+        <translation>Quitar todos los archivos de la lista</translation>
+    </message>
+    <message>
+        <source>Convert every file in the list (F5)</source>
+        <translation>Convertir todos los archivos de la lista (F5)</translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation>Detener</translation>
+    </message>
+    <message>
+        <source>Stop after the file being converted</source>
+        <translation>Detener tras el archivo que se está convirtiendo</translation>
+    </message>
+    <message>
+        <source>Write
+QC</source>
+        <translation>Generar
+QC</translation>
+    </message>
+    <message>
+        <source>Compile
+model</source>
+        <translation>Compilar
+modelo</translation>
+    </message>
+    <message>
+        <source>Run studiomdl on the QC to produce the .mdl. Set the location of studiomdl in Settings.</source>
+        <translation>Ejecutar studiomdl con el QC para generar el .mdl. Indica la ubicación de studiomdl en Configuración.</translation>
+    </message>
+    <message>
+        <source>Output
+folder</source>
+        <translation>Carpeta
+de salida</translation>
+    </message>
+    <message>
+        <source>Choose the output folder (Ctrl+Shift+O)</source>
+        <translation>Elegir la carpeta de salida (Ctrl+Shift+O)</translation>
+    </message>
+    <message>
+        <source>Open
+output</source>
+        <translation>Abrir
+salida</translation>
+    </message>
+    <message>
+        <source>Open the output folder</source>
+        <translation>Abrir la carpeta de salida</translation>
+    </message>
+    <message>
+        <source>Open
+archive</source>
+        <translation>Abrir
+archivo</translation>
+    </message>
+    <message>
+        <source>Open REZ, PAK, XFS, VPK or GMA archives</source>
+        <translation>Abrir archivos REZ, PAK, XFS, VPK o GMA</translation>
+    </message>
+    <message>
+        <source>Close
+archive</source>
+        <translation>Cerrar
+archivo</translation>
+    </message>
+    <message>
+        <source>Close the archive shown</source>
+        <translation>Cerrar el archivo mostrado</translation>
+    </message>
+    <message>
+        <source>Extract
+selected</source>
+        <translation>Extraer
+selección</translation>
+    </message>
+    <message>
+        <source>Extract the selected files to the output folder</source>
+        <translation>Extraer los archivos seleccionados en la carpeta de salida</translation>
+    </message>
+    <message>
+        <source>Extract
+all</source>
+        <translation>Extraer
+todo</translation>
+    </message>
+    <message>
+        <source>Extract every file of the archive to the output folder</source>
+        <translation>Extraer todos los archivos del archivo comprimido en la carpeta de salida</translation>
+    </message>
+    <message>
+        <source>Send to
+Convert</source>
+        <translation>Enviar a
+Convertir</translation>
+    </message>
+    <message>
+        <source>Extract the selected files and add them to the Convert list</source>
+        <translation>Extraer los archivos seleccionados y añadirlos a la lista de Convertir</translation>
+    </message>
+    <message>
+        <source>Open
+textures</source>
+        <translation>Abrir
+texturas</translation>
+    </message>
+    <message>
+        <source>Open DTX, VTF, DDS, TGA, BMP, PNG or JPG files</source>
+        <translation>Abrir archivos DTX, VTF, DDS, TGA, BMP, PNG o JPG</translation>
+    </message>
+    <message>
+        <source>Open
+folder</source>
+        <translation>Abrir
+carpeta</translation>
+    </message>
+    <message>
+        <source>Open every texture in a folder and its sub-folders</source>
+        <translation>Abrir todas las texturas de una carpeta y sus subcarpetas</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Eliminar</translation>
+    </message>
+    <message>
+        <source>Remove the selected textures from the list</source>
+        <translation>Quitar de la lista las texturas seleccionadas</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation>Limpiar</translation>
+    </message>
+    <message>
+        <source>Remove every texture from the list</source>
+        <translation>Quitar todas las texturas de la lista</translation>
+    </message>
+    <message>
+        <source>Export
+BMP</source>
+        <translation>Exportar
+BMP</translation>
+    </message>
+    <message>
+        <source>Save every texture in the list, or the ones the search shows, as GoldSrc BMPs to the output folder</source>
+        <translation>Guardar todas las texturas de la lista, o las que muestra la búsqueda, como BMP de GoldSrc en la carpeta de salida</translation>
+    </message>
+    <message>
+        <source>Export
+PNG</source>
+        <translation>Exportar
+PNG</translation>
+    </message>
+    <message>
+        <source>Save every texture in the list, or the ones the search shows, as PNGs to the output folder</source>
+        <translation>Guardar todas las texturas de la lista, o las que muestra la búsqueda, como PNG en la carpeta de salida</translation>
+    </message>
+    <message>
+        <source>Open
+sprite</source>
+        <translation>Abrir
+sprite</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Guardar</translation>
+    </message>
+    <message>
+        <source>Save
+as</source>
+        <translation>Guardar
+como</translation>
+    </message>
+    <message>
+        <source>Extract
+frame</source>
+        <translation>Extraer
+fotograma</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation>Anterior</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation>Siguiente</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Ver</translation>
+    </message>
+    <message>
+        <source>Create
+from images</source>
+        <translation>Crear desde
+imágenes</translation>
+    </message>
+    <message>
+        <source>Fix
+V3 to V2</source>
+        <translation>Corregir
+V3 a V2</translation>
+    </message>
+    <message>
+        <source>New
+WAD</source>
+        <translation>Nuevo
+WAD</translation>
+    </message>
+    <message>
+        <source>Open
+WAD</source>
+        <translation>Abrir
+WAD</translation>
+    </message>
+    <message>
+        <source>Add
+images</source>
+        <translation>Añadir
+imágenes</translation>
+    </message>
+    <message>
+        <source>Extract</source>
+        <translation>Extraer</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>Renombrar</translation>
+    </message>
+    <message>
+        <source>Replace
+image</source>
+        <translation>Reemplazar
+imagen</translation>
+    </message>
+    <message>
+        <source>Send to
+WAD</source>
+        <translation>Enviar
+al WAD</translation>
+    </message>
+    <message>
+        <source>Add the selected textures to the WAD open in the WAD tab</source>
+        <translation>Añadir las texturas seleccionadas al WAD abierto en la pestaña WAD</translation>
+    </message>
+    <message>
+        <source>Convert
+WAV</source>
+        <translation>Convertir
+WAV</translation>
+    </message>
+    <message>
+        <source>LoL
+models</source>
+        <translation>Modelos
+LoL</translation>
+    </message>
+    <message>
+        <source>Steam Workshop Downloader...</source>
+        <translation>Descargador de Steam Workshop...</translation>
+    </message>
+    <message>
+        <source>Steam
+Workshop</source>
+        <translation>Steam
+Workshop</translation>
+    </message>
+    <message>
+        <source>Auto-Rig
+(beta)</source>
+        <translation>Auto-Rig
+(beta)</translation>
+    </message>
+    <message>
+        <source>MSE
+viewer</source>
+        <translation>Visor
+MSE</translation>
+    </message>
+    <message>
+        <source>Files</source>
+        <translation>Archivos</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>Modelo</translation>
+    </message>
+    <message>
+        <source>Archives</source>
+        <translation>Archivos</translation>
+    </message>
+    <message>
+        <source>Archive</source>
+        <translation>Archivo</translation>
+    </message>
+    <message>
+        <source>Textures</source>
+        <translation>Texturas</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation>Exportar</translation>
+    </message>
+    <message>
+        <source>Sprites</source>
+        <translation>Sprites</translation>
+    </message>
+    <message>
+        <source>Sprite</source>
+        <translation>Sprite</translation>
+    </message>
+    <message>
+        <source>Frames</source>
+        <translation>Fotogramas</translation>
+    </message>
+    <message>
+        <source>Folder</source>
+        <translation>Carpeta</translation>
+    </message>
+    <message>
+        <source>Mode</source>
+        <translation>Modo</translation>
+    </message>
+    <message>
+        <source>WAD</source>
+        <translation>WAD</translation>
+    </message>
+    <message>
+        <source>Sound</source>
+        <translation>Sonido</translation>
+    </message>
+    <message>
+        <source>Download</source>
+        <translation>Descargar</translation>
+    </message>
+    <message>
+        <source>Experimental</source>
+        <translation>Experimental</translation>
+    </message>
+    <message>
+        <source>Reset panel layout</source>
+        <translation>Restablecer la disposición de paneles</translation>
     </message>
     <message>
         <source>Discord</source>
@@ -751,52 +1182,84 @@ Carpeta de salida: %2</translation>
         <translation>Repositorio de GitHub de Vortigaunt</translation>
     </message>
     <message>
-        <source>Input</source>
-        <translation>Entrada</translation>
+        <source>Skipped</source>
+        <translation>Omitido</translation>
     </message>
     <message>
-        <source>Path:</source>
-        <translation>Ruta:</translation>
+        <source>Nothing to convert</source>
+        <translation>Nada que convertir</translation>
     </message>
     <message>
-        <source>Browse...</source>
-        <translation>Examinar...</translation>
+        <source>Add files Vortigaunt knows, or pick an operation for them in Properties.</source>
+        <translation>Añade archivos que Vortigaunt reconoce o elige una operación para ellos en Propiedades.</translation>
+    </message>
+    <message>
+        <source>studiomdl not set</source>
+        <translation>studiomdl no configurado</translation>
+    </message>
+    <message>
+        <source>&quot;Compile model&quot; needs studiomdl. Set its location in Settings, or untick &quot;Compile model&quot;.</source>
+        <translation>&quot;Compilar modelo&quot; necesita studiomdl. Indica su ubicación en Configuración o desmarca &quot;Compilar modelo&quot;.</translation>
+    </message>
+    <message>
+        <source>Reference model required</source>
+        <translation>Se necesita un modelo de referencia</translation>
+    </message>
+    <message>
+        <source>Select the p_ model this weapon should be held like, or choose another weapon type.</source>
+        <translation>Selecciona el modelo p_ como el que debe sostenerse esta arma o elige otro tipo de arma.</translation>
+    </message>
+    <message>
+        <source>Cancelled</source>
+        <translation>Cancelado</translation>
+    </message>
+    <message>
+        <source>Extracting...</source>
+        <translation>Extrayendo...</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Hecho</translation>
+    </message>
+    <message>
+        <source>Failed</source>
+        <translation>Falló</translation>
+    </message>
+    <message>
+        <source>Converting...</source>
+        <translation>Convirtiendo...</translation>
+    </message>
+    <message>
+        <source>Finished with Errors</source>
+        <translation>Terminado con errores</translation>
+    </message>
+    <message>
+        <source>LoL Models</source>
+        <translation>Modelos de LoL</translation>
+    </message>
+    <message>
+        <source>Steam Workshop</source>
+        <translation>Steam Workshop</translation>
+    </message>
+    <message>
+        <source>MSE Viewer</source>
+        <translation>Visor MSE</translation>
+    </message>
+    <message>
+        <source>Auto-Rig</source>
+        <translation>Auto-Rig</translation>
+    </message>
+    <message>
+        <source>WAV Converter</source>
+        <translation>Convertidor WAV</translation>
     </message>
     <message>
         <source>Output</source>
         <translation>Salida</translation>
     </message>
     <message>
-        <source>Folder (optional):</source>
-        <translation>Carpeta (opcional):</translation>
-    </message>
-    <message>
-        <source>Leave empty for default output folder...</source>
-        <translation>Dejar vacío para carpeta de salida predeterminada...</translation>
-    </message>
-    <message>
         <source>Operation</source>
         <translation>Operación</translation>
-    </message>
-    <message>
-        <source>Mode:</source>
-        <translation>Modo:</translation>
-    </message>
-    <message>
-        <source>SMD (GoldSource)</source>
-        <translation>SMD (GoldSource)</translation>
-    </message>
-    <message>
-        <source>Convert GR2 </source>
-        <translation>Convertir GR2 (archivo único o carpeta)</translation>
-    </message>
-    <message>
-        <source>Convert MSE Effect (Metin2 Effect Script)</source>
-        <translation>Convertir Efecto MSE (Script de Efectos Metin2)</translation>
-    </message>
-    <message>
-        <source>PAK (Counter Strike Online)</source>
-        <translation>Extraer PAK único (Counter Strike Online)</translation>
     </message>
     <message>
         <source>Ignore meshes</source>
@@ -819,10 +1282,6 @@ Carpeta de salida: %2</translation>
         <translation>Reflejar eje Y de UV</translation>
     </message>
     <message>
-        <source>Invert Alpha</source>
-        <translation>Invertir Canal Alfa</translation>
-    </message>
-    <message>
         <source>Run</source>
         <translation>Ejecutar</translation>
     </message>
@@ -833,6 +1292,158 @@ Carpeta de salida: %2</translation>
     <message>
         <source>Filter:</source>
         <translation>Filtro:</translation>
+    </message>
+    <message>
+        <source>File</source>
+        <translation>Archivo</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Estado</translation>
+    </message>
+    <message>
+        <source>Remove from list</source>
+        <translation>Quitar de la lista</translation>
+    </message>
+    <message>
+        <source>Operation:</source>
+        <translation>Operación:</translation>
+    </message>
+    <message>
+        <source>Picked from the file name; change it when the guess is wrong</source>
+        <translation>Elegido a partir del nombre del archivo; cámbialo si la suposición es incorrecta</translation>
+    </message>
+    <message>
+        <source>Select a file in the list to see its settings.</source>
+        <translation>Selecciona un archivo de la lista para ver su configuración.</translation>
+    </message>
+    <message>
+        <source>Weapon</source>
+        <translation>Arma</translation>
+    </message>
+    <message>
+        <source>Counter-Strike</source>
+        <translation>Counter-Strike</translation>
+    </message>
+    <message>
+        <source>Half-Life</source>
+        <translation>Half-Life</translation>
+    </message>
+    <message>
+        <source>Sven Co-op</source>
+        <translation>Sven Co-op</translation>
+    </message>
+    <message>
+        <source>The game the P model is for. Each has its own player skeleton and hand size, and holds a weapon a little differently.</source>
+        <translation>El juego para el que es el modelo P. Cada uno tiene su propio esqueleto de jugador y tamaño de mano, y sostiene el arma de forma algo distinta.</translation>
+    </message>
+    <message>
+        <source>Game:</source>
+        <translation>Juego:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Automático</translation>
+    </message>
+    <message>
+        <source>Gun</source>
+        <translation>Arma de fuego</translation>
+    </message>
+    <message>
+        <source>Knife / melee</source>
+        <translation>Cuchillo / cuerpo a cuerpo</translation>
+    </message>
+    <message>
+        <source>Grenade</source>
+        <translation>Granada</translation>
+    </message>
+    <message>
+        <source>Pack (C4, mine)</source>
+        <translation>Paquete (C4, mina)</translation>
+    </message>
+    <message>
+        <source>Dual (one in each hand)</source>
+        <translation>Doble (una en cada mano)</translation>
+    </message>
+    <message>
+        <source>Like a reference p_ model</source>
+        <translation>Como un modelo p_ de referencia</translation>
+    </message>
+    <message>
+        <source>How the player holds the weapon. P models of one kind all sit in the hand the same way: a gun points along the hand, a knife stands up out of the fist, a grenade lies in the palm. For anything else, pick a p_ model that is held the way this one should be.</source>
+        <translation>Cómo sostiene el jugador el arma. Los modelos P de un mismo tipo se colocan igual en la mano: un arma de fuego apunta a lo largo de la mano, un cuchillo sale recto del puño, una granada descansa en la palma. Para otra cosa, elige un modelo p_ que se sostenga como debería sostenerse este.</translation>
+    </message>
+    <message>
+        <source>Weapon:</source>
+        <translation>Arma:</translation>
+    </message>
+    <message>
+        <source>Reference p_ model (.mdl)</source>
+        <translation>Modelo p_ de referencia (.mdl)</translation>
+    </message>
+    <message>
+        <source>...</source>
+        <translation>...</translation>
+    </message>
+    <message>
+        <source>Select a reference p_ model</source>
+        <translation>Selecciona un modelo p_ de referencia</translation>
+    </message>
+    <message>
+        <source>GoldSrc model (*.mdl);;All files (*.*)</source>
+        <translation>Modelo GoldSrc (*.mdl);;Todos los archivos (*.*)</translation>
+    </message>
+    <message>
+        <source>Size of the P/W model relative to the V model. Auto works it out from the size of the V model&apos;s hands; the log shows the value it used, which is a good starting point for setting it by hand.</source>
+        <translation>Tamaño del modelo P/W respecto al modelo V. Automático lo calcula a partir del tamaño de las manos del modelo V; el registro muestra el valor usado, un buen punto de partida para ajustarlo a mano.</translation>
+    </message>
+    <message>
+        <source>Scale:</source>
+        <translation>Escala:</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Sí</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>No</translation>
+    </message>
+    <message>
+        <source>V models are usually built left handed and flipped by the engine, so the P/W model has to be the mirror image. Auto mirrors when the weapon stands on the left of the view.</source>
+        <translation>Los modelos V suelen hacerse para zurdos y el motor los invierte, así que el modelo P/W tiene que ser su imagen especular. Automático refleja cuando el arma está a la izquierda de la vista.</translation>
+    </message>
+    <message>
+        <source>Mirror:</source>
+        <translation>Espejo:</translation>
+    </message>
+    <message>
+        <source>Upside down</source>
+        <translation>Al revés</translation>
+    </message>
+    <message>
+        <source>Turns the weapon end for end in the hand. For a grenade or knife that came out the wrong way up.</source>
+        <translation>Da la vuelta al arma en la mano. Para una granada o un cuchillo que salió al revés.</translation>
+    </message>
+    <message>
+        <source>Compile model</source>
+        <translation>Compilar modelo</translation>
+    </message>
+    <message>
+        <source>Unity</source>
+        <translation>Unity</translation>
+    </message>
+    <message>
+        <source>Texture</source>
+        <translation>Textura</translation>
+    </message>
+    <message>
+        <source>Written as an 8-bit BMP of at most 512 x 512. The alpha channel is a gloss mask in DTX textures and is left out.</source>
+        <translation>Se escribe como BMP de 8 bits de 512 x 512 como máximo. En las texturas DTX el canal alfa es una máscara de brillo y se omite.</translation>
+    </message>
+    <message>
+        <source>Properties</source>
+        <translation>Propiedades</translation>
     </message>
     <message>
         <source>All</source>
@@ -849,34 +1460,6 @@ Carpeta de salida: %2</translation>
     <message>
         <source>Error</source>
         <translation>Error</translation>
-    </message>
-    <message>
-        <source>Select input file or drag &amp; drop here...</source>
-        <translation>Select input file or drag &amp; drop here...</translation>
-    </message>
-    <message>
-        <source>Convert LTB</source>
-        <translation>Convertir LTB</translation>
-    </message>
-    <message>
-        <source>Convert GR2</source>
-        <translation>Convertir GR2</translation>
-    </message>
-    <message>
-        <source>Extract REZ file</source>
-        <translation>Extraer archivo REZ</translation>
-    </message>
-    <message>
-        <source>Extract VPK / GMA (Source Engine)</source>
-        <translation>Extraer VPK / GMA (Motor Source)</translation>
-    </message>
-    <message>
-        <source>Extract UnityFS / Assets</source>
-        <translation>Extraer UnityFS / Assets</translation>
-    </message>
-    <message>
-        <source>Convert To:</source>
-        <translation>Convertir a:</translation>
     </message>
     <message>
         <source>Extract multiple file to separate folders</source>
@@ -903,10 +1486,6 @@ Arrastra y suelta archivos de animación aquí o usa el botón examinar.</transl
     <message>
         <source>Mirror UV Y-axis for GR2 to SMD conversion (fixes texture orientation)</source>
         <translation>Reflejar eje Y de UV en la conversión de GR2 a SMD (corrige la orientación de la textura)</translation>
-    </message>
-    <message>
-        <source>Invert alpha channel for DDS textures (fixes transparency issues)</source>
-        <translation>Invertir canal alfa para texturas DDS (corrige problemas de transparencia)</translation>
     </message>
     <message>
         <source>Write QC</source>
@@ -937,72 +1516,151 @@ Arrastra y suelta archivos de animación aquí o usa el botón examinar.</transl
         <translation>Archivos de animación (*.smd *.gr2);;Todos los archivos (*.*)</translation>
     </message>
     <message>
+        <source>Drop files or folders here
+
+The operation is picked from the file type.</source>
+        <translation>Suelta archivos o carpetas aquí
+
+La operación se elige según el tipo de archivo.</translation>
+    </message>
+    <message>
+        <source>This model could not be previewed.</source>
+        <translation>No se pudo previsualizar este modelo.</translation>
+    </message>
+    <message>
+        <source>LTB to SMD</source>
+        <translation>LTB a SMD</translation>
+    </message>
+    <message>
+        <source>GR2 to SMD</source>
+        <translation>GR2 a SMD</translation>
+    </message>
+    <message>
+        <source>FBX/GLB/OBJ to SMD</source>
+        <translation>FBX/GLB/OBJ a SMD</translation>
+    </message>
+    <message>
+        <source>v_ to p_ / w_ model</source>
+        <translation>v_ a modelo p_ / w_</translation>
+    </message>
+    <message>
+        <source>DTX to BMP</source>
+        <translation>DTX a BMP</translation>
+    </message>
+    <message>
+        <source>Extract REZ</source>
+        <translation>Extraer REZ</translation>
+    </message>
+    <message>
+        <source>Extract PAK (CSO)</source>
+        <translation>Extraer PAK (CSO)</translation>
+    </message>
+    <message>
+        <source>Extract XFS</source>
+        <translation>Extraer XFS</translation>
+    </message>
+    <message>
+        <source>Extract VPK / GMA</source>
+        <translation>Extraer VPK / GMA</translation>
+    </message>
+    <message>
+        <source>Extract Unity assets</source>
+        <translation>Extraer recursos de Unity</translation>
+    </message>
+    <message>
+        <source>Nothing to do</source>
+        <translation>Nada que hacer</translation>
+    </message>
+    <message>
+        <source>Pick an operation</source>
+        <translation>Elige una operación</translation>
+    </message>
+    <message>
+        <source>Waiting</source>
+        <translation>En espera</translation>
+    </message>
+    <message>
+        <source>Drag files or folders here, or use Add files.</source>
+        <translation>Arrastra archivos o carpetas aquí, o usa Añadir archivos.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n file(s)</source>
+        <translation>
+            <numerusform>%n archivo</numerusform>
+            <numerusform>%n archivos</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>No file selected</source>
+        <translation>Ningún archivo seleccionado</translation>
+    </message>
+    <message>
+        <source>Too large to preview.</source>
+        <translation>Demasiado grande para previsualizar.</translation>
+    </message>
+    <message>
+        <source>%1 x %2</source>
+        <translation>%1 x %2</translation>
+    </message>
+    <message>
+        <source>REZ archive. Convert extracts it to the output folder.</source>
+        <translation>Archivo REZ. Convertir lo extrae en la carpeta de salida.</translation>
+    </message>
+    <message>
+        <source>Browse in Archives</source>
+        <translation>Explorar en Archivos</translation>
+    </message>
+    <message>
+        <source>Counter-Strike Online PAK archive. Convert extracts it to the output folder.</source>
+        <translation>Archivo PAK de Counter-Strike Online. Convertir lo extrae en la carpeta de salida.</translation>
+    </message>
+    <message>
+        <source>XFS archive. Convert extracts it to the output folder.</source>
+        <translation>Archivo XFS. Convertir lo extrae en la carpeta de salida.</translation>
+    </message>
+    <message>
+        <source>Source engine archive. Convert extracts it to the output folder.</source>
+        <translation>Archivo del motor Source. Convertir lo extrae en la carpeta de salida.</translation>
+    </message>
+    <message>
+        <source>GoldSrc view model. Convert makes the p_ and w_ models from it.</source>
+        <translation>Modelo de vista de GoldSrc. Convertir crea a partir de él los modelos p_ y w_.</translation>
+    </message>
+    <message>
+        <source>There is no 3D preview for this format yet.</source>
+        <translation>Aún no hay vista previa 3D para este formato.</translation>
+    </message>
+    <message>
+        <source>Unity assets. Convert extracts meshes, textures and animation clips.</source>
+        <translation>Recursos de Unity. Convertir extrae mallas, texturas y clips de animación.</translation>
+    </message>
+    <message>
+        <source>Vortigaunt does not know what to do with this file. Pick an operation in Properties.</source>
+        <translation>Vortigaunt no sabe qué hacer con este archivo. Elige una operación en Propiedades.</translation>
+    </message>
+    <message>
+        <source>Add Files</source>
+        <translation>Añadir Archivos</translation>
+    </message>
+    <message>
+        <source>Add Folder</source>
+        <translation>Añadir Carpeta</translation>
+    </message>
+    <message>
+        <source>Output: %1</source>
+        <translation>Salida: %1</translation>
+    </message>
+    <message>
         <source>Remove this animation</source>
         <translation>Eliminar esta animación</translation>
-    </message>
-    <message>
-        <source>Convert LTB </source>
-        <translation>Convertir LTB </translation>
-    </message>
-    <message>
-        <source>Extract REZ File</source>
-        <translation>Extraer Archivo REZ</translation>
-    </message>
-    <message>
-        <source>Extract PAK File (Counter Strike Online)</source>
-        <translation>Extraer Archivo PAK (Counter Strike Online)</translation>
-    </message>
-    <message>
-        <source>Extract XFS File (Xenesis)</source>
-        <translation>Extraer Archivo XFS (Xenesis)</translation>
-    </message>
-    <message>
-        <source>All files (*.*)</source>
-        <translation>Todos los archivos (*.*)</translation>
     </message>
     <message>
         <source>Supported files (%1);;All files (*.*)</source>
         <translation>Archivos soportados (%1);;Todos los archivos (*.*)</translation>
     </message>
     <message>
-        <source>Select Input File(s)</source>
-        <translation>Seleccionar Archivo(s) de Entrada</translation>
-    </message>
-    <message>
-        <source>The following files you selected cannot be used in Unity mode because they belong to this project's other formats (PAK, REZ, XFS, GR2, LTB):
-
-</source>
-        <translation>Los siguientes archivos seleccionados no se pueden elegir en modo Unity porque pertenecen a otros formatos de este proyecto (PAK, REZ, XFS, GR2, LTB):
-
-</translation>
-    </message>
-    <message>
-        <source>Incompatible File Selection</source>
-        <translation>Selección de Archivos Incompatible</translation>
-    </message>
-    <message>
         <source>%1 files selected</source>
         <translation>%1 archivos seleccionados</translation>
-    </message>
-    <message>
-        <source>Input required</source>
-        <translation>Entrada requerida</translation>
-    </message>
-    <message>
-        <source>Please select an input file or folder.</source>
-        <translation>Por favor, selecciona un archivo o carpeta de entrada.</translation>
-    </message>
-    <message>
-        <source>The following files were ignored because they belong to other formats supported by this project (e.g. PAK, REZ, XFS, GR2, LTB):
-
-</source>
-        <translation>Los siguientes archivos fueron ignorados porque pertenecen a otros formatos soportados por este proyecto (p. ej. PAK, REZ, XFS, GR2, LTB):
-
-</translation>
-    </message>
-    <message>
-        <source>Unsupported Formats Ignored for Unity Mode</source>
-        <translation>Formatos No Soportados Ignorados en Modo Unity</translation>
     </message>
     <message>
         <source>Operation completed with %1 error(s).
@@ -1023,10 +1681,6 @@ Arrastra y suelta archivos de animación aquí o usa el botón examinar.</transl
 </source>
         <translation>  ... y %1 más.
 </translation>
-    </message>
-    <message>
-        <source>Extraction Complete with Errors</source>
-        <translation>Extracción Completada con Errores</translation>
     </message>
     <message>
         <source>REZ %1/%2: %p%</source>
@@ -1098,375 +1752,315 @@ Arrastra y suelta archivos de animación aquí o usa el botón examinar.</transl
     </message>
 </context>
 <context>
-    <name>PakViewerWindow</name>
+    <name>MseViewerWidget</name>
     <message>
-        <source>PAK Viewer - Counter Strike Online</source>
-        <translation>Visor PAK - Counter Strike Online</translation>
+        <source>No MSE loaded - nothing to export.</source>
+        <translation>No hay MSE cargado: nada que exportar.</translation>
     </message>
     <message>
-        <source>PAK File</source>
-        <translation>Archivo PAK</translation>
+        <source>Invalid FPS/duration.</source>
+        <translation>FPS/duración no válidos.</translation>
     </message>
     <message>
-        <source>Open PAK...</source>
-        <translation>Abrir PAK...</translation>
+        <source>Cannot create output directory: %1</source>
+        <translation>No se puede crear la carpeta de salida: %1</translation>
     </message>
     <message>
-        <source>Open PAK File</source>
-        <translation>Abrir Archivo PAK</translation>
+        <source>Animation capped at %1 frames (%2s @ %3fps requested).</source>
+        <translation>Animación limitada a %1 fotogramas (se pidieron %2 s a %3 fps).</translation>
     </message>
     <message>
-        <source>Contents</source>
-        <translation>Contenido</translation>
+        <source>IFL texture animation flattened to its first frame (%1).</source>
+        <translation>La animación de textura IFL se redujo a su primer fotograma (%1).</translation>
     </message>
     <message>
-        <source>Select a PAK file to view...</source>
-        <translation>Selecciona un archivo PAK para ver...</translation>
+        <source>%1 MDE submesh(es) dropped - too large for one model (%2 bones).</source>
+        <translation>Se descartaron %1 submalla(s) MDE: demasiado grandes para un modelo (%2 huesos).</translation>
     </message>
     <message>
-        <source>Search:</source>
-        <translation>Buscar:</translation>
+        <source>Particle group %1: texture animation flattened to frame 0 (%2 frames).</source>
+        <translation>Grupo de partículas %1: la animación de textura se redujo al fotograma 0 (%2 fotogramas).</translation>
     </message>
     <message>
-        <source>Search files... (Ctrl+F)</source>
-        <translation>Buscar archivos... (Ctrl+F)</translation>
+        <source>%1 particle slot(s) dropped - model count cap (%2) reached.</source>
+        <translation>Se descartaron %1 ranura(s) de partículas: se alcanzó el límite de modelos (%2).</translation>
     </message>
     <message>
-        <source>Select All Matches</source>
-        <translation>Seleccionar Todas las Coincidencias</translation>
+        <source>Nothing visible to bake (no live particles or meshes within %1s).</source>
+        <translation>Nada visible que hornear (no hay partículas ni mallas activas en %1 s).</translation>
     </message>
     <message>
-        <source>Path</source>
-        <translation>Ruta</translation>
+        <source>Cannot write %1</source>
+        <translation>No se puede escribir %1</translation>
     </message>
     <message>
-        <source>Size</source>
-        <translation>Tamaño</translation>
+        <source>Texture not found, using white: %1</source>
+        <translation>Textura no encontrada, se usa blanco: %1</translation>
     </message>
     <message>
-        <source>Type</source>
-        <translation>Tipo</translation>
+        <source>Failed to write texture %1</source>
+        <translation>No se pudo escribir la textura %1</translation>
     </message>
     <message>
-        <source>Open in Viewer</source>
-        <translation>Abrir en Visor</translation>
+        <source>GoldSrc export finished: %1</source>
+        <translation>Exportación GoldSrc terminada: %1</translation>
     </message>
     <message>
-        <source>Open .mdl or .spr files in viewer</source>
-        <translation>Abrir archivos .mdl o .spr en el visor</translation>
+        <source>Models: %1 (%2)</source>
+        <translation>Modelos: %1 (%2)</translation>
     </message>
     <message>
-        <source>Extract Selected</source>
-        <translation>Extraer Seleccionados</translation>
+        <source>Files per model: &lt;name&gt;_ref.smd, &lt;name&gt;_anim.smd, &lt;name&gt;.qc | shared textures: %1</source>
+        <translation>Archivos por modelo: &lt;nombre&gt;_ref.smd, &lt;nombre&gt;_anim.smd, &lt;nombre&gt;.qc | texturas compartidas: %1</translation>
     </message>
     <message>
-        <source>Extract All</source>
-        <translation>Extraer Todo</translation>
+        <source>Bones: %1 total | Frames: %2 @ %3 fps | Scale: %4 | Brightness: %5</source>
+        <translation>Huesos: %1 en total | Fotogramas: %2 a %3 fps | Escala: %4 | Brillo: %5</translation>
     </message>
     <message>
-        <source>No PAK file loaded</source>
-        <translation>Ningún archivo PAK cargado</translation>
+        <source>Particle pools: %1 | MDE submeshes: %2</source>
+        <translation>Grupos de partículas: %1 | Submallas MDE: %2</translation>
     </message>
     <message>
-        <source>PAK files (*.pak);;All files (*.*)</source>
-        <translation>Archivos PAK (*.pak);;Todos los archivos (*.*)</translation>
+        <source>Billboards frozen from the current camera angle.</source>
+        <translation>Billboards congelados desde el ángulo de cámara actual.</translation>
     </message>
     <message>
-        <source>Error</source>
-        <translation>Error</translation>
+        <source>Compact mode: 2 bones per quad - one quad axis has a fixed size.</source>
+        <translation>Modo compacto: 2 huesos por quad; un eje del quad tiene tamaño fijo.</translation>
     </message>
     <message>
-        <source>Failed to open PAK file.</source>
-        <translation>Error al abrir el archivo PAK.</translation>
+        <source>IMPORTANT: the effect is split over %1 models - compile each QC and spawn ALL parts at the same origin together.</source>
+        <translation>IMPORTANTE: el efecto se divide en %1 modelos; compila cada QC y genera TODAS las partes juntas en el mismo origen.</translation>
     </message>
     <message>
-        <source>Invalid PAK file size.</source>
-        <translation>Tamaño de archivo PAK inválido.</translation>
+        <source>Fewer parts: enable compact mode (half the bones), bake only one loop of the effect (shorter duration), or lower the FPS.</source>
+        <translation>Menos partes: activa el modo compacto (la mitad de huesos), hornea solo un ciclo del efecto (menor duración) o baja los FPS.</translation>
     </message>
     <message>
-        <source>Failed to read PAK file data.</source>
-        <translation>Error al leer los datos del archivo PAK.</translation>
+        <source>Warnings:</source>
+        <translation>Advertencias:</translation>
     </message>
     <message>
-        <source>Invalid PAK header. File may be isnt Correct.</source>
-        <translation>Encabezado PAK inválido. El archivo puede no ser correcto.</translation>
+        <source>Compile each part with: studiomdl.exe &lt;name&gt;.qc</source>
+        <translation>Compila cada parte con: studiomdl.exe &lt;nombre&gt;.qc</translation>
     </message>
     <message>
-        <source>Failed to parse PAK entries.</source>
-        <translation>Error al analizar las entradas del PAK.</translation>
+        <source>Resolution must be between 16 and 1024 pixels.</source>
+        <translation>La resolución debe estar entre 16 y 1024 píxeles.</translation>
     </message>
     <message>
-        <source>%1 files</source>
-        <translation>%1 archivos</translation>
+        <source>OpenGL context not ready - open the effect in the viewer first.</source>
+        <translation>El contexto OpenGL no está listo: abre primero el efecto en el visor.</translation>
     </message>
     <message>
-        <source>Failed to extract file.</source>
-        <translation>Error al extraer el archivo.</translation>
+        <source>Failed to create the offscreen render target.</source>
+        <translation>No se pudo crear el destino de renderizado fuera de pantalla.</translation>
     </message>
     <message>
-        <source>Failed to create temp file.</source>
-        <translation>Error al crear el archivo temporal.</translation>
+        <source>Palette quantization failed.</source>
+        <translation>Falló la cuantización de la paleta.</translation>
     </message>
     <message>
-        <source>Viewer Not Configured</source>
-        <translation>Visor No Configurado</translation>
+        <source>Sprite export finished: %1</source>
+        <translation>Exportación de sprite terminada: %1</translation>
     </message>
     <message>
-        <source>Please configure the Model Viewer path in Settings -&gt; Configure...</source>
-        <translation>Por favor, configura la ruta del Visor de Modelos en Configuración -&gt; Configurar...</translation>
+        <source>Frames: %1 @ %2 fps | Resolution: %3x%3 | Scale: %4 | Brightness: %5</source>
+        <translation>Fotogramas: %1 a %2 fps | Resolución: %3x%3 | Escala: %4 | Brillo: %5</translation>
     </message>
     <message>
-        <source>Viewer Not Found</source>
-        <translation>Visor No Encontrado</translation>
+        <source>Single entity, single precache, no bone limit - baked from the CURRENT frozen camera angle.</source>
+        <translation>Una entidad, una precarga, sin límite de huesos; horneado desde el ángulo de cámara congelado ACTUAL.</translation>
     </message>
     <message>
-        <source>The configured viewer executable was not found:
-%1</source>
-        <translation>No se encontró el ejecutable del visor configurado:
-%1</translation>
+        <source>In-game: point an env_sprite (or precache_model + custom spawn) at &quot;sprites/%1.spr&quot;, set its framerate to %2; the additive blend is already baked into the file.</source>
+        <translation>En el juego: apunta un env_sprite (o precache_model + spawn propio) a &quot;sprites/%1.spr&quot; y pon su framerate en %2; la mezcla aditiva ya está horneada en el archivo.</translation>
     </message>
     <message>
-        <source>Failed to open file: %1</source>
-        <translation>Error al abrir el archivo: %1</translation>
-    </message>
-    <message>
-        <source>Select Output Directory</source>
-        <translation>Seleccionar Directorio de Salida</translation>
-    </message>
-    <message>
-        <source>Extraction complete.
-
-Successful: %1
-Failed: %2</source>
-        <translation>Extracción completada.
-
-Exitosos: %1
-Fallidos: %2</translation>
-    </message>
-    <message>
-        <source>Extraction Complete</source>
-        <translation>Extracción Completada</translation>
-    </message>
-    <message>
-        <source>Extracted %1/%2 files</source>
-        <translation>%1/%2 archivos extraídos</translation>
-    </message>
-    <message>
-        <source>Half-Life Model</source>
-        <translation>Modelo de Half-Life</translation>
-    </message>
-    <message>
-        <source>Half-Life Sprite</source>
-        <translation>Sprite de Half-Life</translation>
-    </message>
-    <message>
-        <source>Wave Audio</source>
-        <translation>Audio Wave</translation>
-    </message>
-    <message>
-        <source>Image</source>
-        <translation>Imagen</translation>
-    </message>
-    <message>
-        <source>Text File</source>
-        <translation>Archivo de Texto</translation>
-    </message>
-    <message>
-        <source>MP3 Audio</source>
-        <translation>Audio MP3</translation>
-    </message>
-    <message>
-        <source>Resource list file</source>
-        <translation>Archivo de lista de recursos</translation>
-    </message>
-    <message>
-        <source>WAD Texture Pack</source>
-        <translation>Paquete de Texturas WAD</translation>
-    </message>
-    <message>
-        <source>BSP Map</source>
-        <translation>Mapa BSP</translation>
-    </message>
-    <message>
-        <source>Navigation Mesh</source>
-        <translation>Malla de Navegación</translation>
-    </message>
-    <message>
-        <source>Voxel file</source>
-        <translation>Archivo de vóxeles</translation>
-    </message>
-    <message>
-        <source>%1 files (%2 visible)</source>
-        <translation>%1 archivos (%2 visibles)</translation>
+        <source>Note: non-additive (alpha-blended) parts of the effect may show faint dark edges - additive sprite playback cannot reproduce true translucency against an arbitrary in-game background.</source>
+        <translation>Nota: las partes no aditivas (con mezcla alfa) del efecto pueden mostrar bordes oscuros tenues; la reproducción aditiva de sprites no puede reproducir la translucidez real sobre cualquier fondo del juego.</translation>
     </message>
 </context>
 <context>
-    <name>RezViewerWindow</name>
+    <name>MseViewerWindow</name>
     <message>
-        <source>REZ Viewer - LithTech Engine</source>
-        <translation>Visor REZ - Motor LithTech</translation>
+        <source>Metin2 Script Effect Viewer</source>
+        <translation>Visor de efectos de script de Metin2</translation>
     </message>
     <message>
-        <source>REZ File</source>
-        <translation>Archivo REZ</translation>
+        <source>Open MSE</source>
+        <translation>Abrir MSE</translation>
     </message>
     <message>
-        <source>Select a REZ file to view...</source>
-        <translation>Selecciona un archivo REZ para ver...</translation>
+        <source>Open Folder</source>
+        <translation>Abrir carpeta</translation>
     </message>
     <message>
-        <source>Open REZ...</source>
-        <translation>Abrir REZ...</translation>
+        <source>0 files</source>
+        <translation>0 archivos</translation>
     </message>
     <message>
-        <source>Contents</source>
-        <translation>Contenido</translation>
+        <source>Previous</source>
+        <translation>Anterior</translation>
     </message>
     <message>
-        <source>Search:</source>
-        <translation>Buscar:</translation>
+        <source>Play</source>
+        <translation>Reproducir</translation>
     </message>
     <message>
-        <source>Search files... (Ctrl+F)</source>
-        <translation>Buscar archivos... (Ctrl+F)</translation>
+        <source>Pause</source>
+        <translation>Pausa</translation>
     </message>
     <message>
-        <source>Select All Matches</source>
-        <translation>Seleccionar Todas las Coincidencias</translation>
+        <source>Stop</source>
+        <translation>Detener</translation>
     </message>
     <message>
-        <source>Path</source>
-        <translation>Ruta</translation>
+        <source>Restart</source>
+        <translation>Reiniciar</translation>
     </message>
     <message>
-        <source>Size</source>
-        <translation>Tamaño</translation>
+        <source>Next</source>
+        <translation>Siguiente</translation>
     </message>
     <message>
-        <source>Type</source>
-        <translation>Tipo</translation>
+        <source>No file loaded</source>
+        <translation>Ningún archivo cargado</translation>
     </message>
     <message>
-        <source>View DTX</source>
-        <translation>Ver DTX</translation>
+        <source>Time: 0.00s</source>
+        <translation>Tiempo: 0.00 s</translation>
     </message>
     <message>
-        <source>View selected DTX file in DTX Viewer</source>
-        <translation>Ver el archivo DTX seleccionado en el Visor DTX</translation>
+        <source>Particles: 0</source>
+        <translation>Partículas: 0</translation>
     </message>
     <message>
-        <source>View SPR</source>
-        <translation>Ver SPR</translation>
+        <source>Effect Speed</source>
+        <translation>Velocidad del efecto</translation>
     </message>
     <message>
-        <source>View selected SPR file in Lithtech Sprite Viewer</source>
-        <translation>Ver el archivo SPR seleccionado en el Visor de Sprites Lithtech</translation>
+        <source>Texture Path</source>
+        <translation>Ruta de texturas</translation>
     </message>
     <message>
-        <source>Extract Selected</source>
-        <translation>Extraer Seleccionados</translation>
+        <source>Browse...</source>
+        <translation>Examinar...</translation>
     </message>
     <message>
-        <source>Extract All</source>
-        <translation>Extraer Todo</translation>
+        <source>Export</source>
+        <translation>Exportar</translation>
     </message>
     <message>
-        <source>No REZ file loaded</source>
-        <translation>Ningún archivo REZ cargado</translation>
+        <source>Export SMD/QC (GoldSrc)</source>
+        <translation>Exportar SMD/QC (GoldSrc)</translation>
     </message>
     <message>
-        <source>REZ files (*.rez);;All files (*.*)</source>
-        <translation>Archivos REZ (*.rez);;Todos los archivos (*.*)</translation>
+        <source>Bake the effect into SMD bone animation + QC for studiomdl (CS 1.6 / HL1).
+Billboards face the CURRENT camera angle - orient the view first.</source>
+        <translation>Hornea el efecto en animación de huesos SMD + QC para studiomdl (CS 1.6 / HL1).
+Los billboards miran al ángulo de cámara ACTUAL: orienta la vista primero.</translation>
     </message>
     <message>
-        <source>Loading REZ: %p%</source>
-        <translation>Cargando REZ: %p%</translation>
+        <source>Export Sprite (.spr, GoldSrc)</source>
+        <translation>Exportar sprite (.spr, GoldSrc)</translation>
     </message>
     <message>
-        <source>Loading REZ file...</source>
-        <translation>Cargando archivo REZ...</translation>
+        <source>Bake the effect into a native multi-frame Half-Life sprite: one
+entity, one precached file, no 128-bone limit. Flat baked billboard
+from the CURRENT camera angle, additive blend only - orient the
+view first. Best for effects too dense to fit a single .mdl.</source>
+        <translation>Hornea el efecto en un sprite nativo de Half-Life con varios fotogramas: una
+entidad, un archivo precargado, sin límite de 128 huesos. Billboard plano
+desde el ángulo de cámara ACTUAL, solo mezcla aditiva: orienta la
+vista primero. Ideal para efectos demasiado densos para un solo .mdl.</translation>
     </message>
     <message>
-        <source>Error</source>
-        <translation>Error</translation>
+        <source>Log</source>
+        <translation>Registro</translation>
     </message>
     <message>
-        <source>Failed to load REZ file.</source>
-        <translation>Error al cargar el archivo REZ.</translation>
+        <source>Hide Log</source>
+        <translation>Ocultar registro</translation>
     </message>
     <message>
-        <source>No files</source>
-        <translation>Sin archivos</translation>
+        <source>Show Log</source>
+        <translation>Mostrar registro</translation>
     </message>
     <message>
-        <source>%1 files</source>
-        <translation>%1 archivos</translation>
+        <source>Export SMD</source>
+        <translation>Exportar SMD</translation>
     </message>
     <message>
-        <source>Failed to read DTX data from REZ file.</source>
-        <translation>Error al leer los datos DTX del archivo REZ.</translation>
+        <source>Load an MSE effect first.</source>
+        <translation>Carga primero un efecto MSE.</translation>
     </message>
     <message>
-        <source>Failed to extract SPR file.</source>
-        <translation>Error al extraer el archivo SPR.</translation>
+        <source>Animation FPS:</source>
+        <translation>FPS de animación:</translation>
     </message>
     <message>
-        <source>Select Output Folder</source>
-        <translation>Seleccionar Carpeta de Salida</translation>
+        <source>Duration (s):</source>
+        <translation>Duración (s):</translation>
     </message>
     <message>
-        <source>Extraction complete.
-
-Successful: %1
-Failed: %2</source>
-        <translation>Extracción completada.
-
-Exitosos: %1
-Fallidos: %2</translation>
+        <source>Metin2 cm -&gt; GoldSrc units. 0.40 maps a 180cm character to 72 units.</source>
+        <translation>Metin2 cm -&gt; unidades GoldSrc. 0.40 convierte un personaje de 180 cm en 72 unidades.</translation>
     </message>
     <message>
-        <source>Extraction Complete</source>
-        <translation>Extracción Completada</translation>
+        <source>Scale:</source>
+        <translation>Escala:</translation>
     </message>
     <message>
-        <source>Extracted %1/%2 files</source>
-        <translation>%1/%2 archivos extraídos</translation>
+        <source>Extra RGB multiplier baked into the textures.
+Lower it if the effect renders too bright in-game.</source>
+        <translation>Multiplicador RGB extra horneado en las texturas.
+Bájalo si el efecto se ve demasiado brillante en el juego.</translation>
     </message>
     <message>
-        <source>LithTech Texture</source>
-        <translation>Textura LithTech</translation>
+        <source>Brightness:</source>
+        <translation>Brillo:</translation>
     </message>
     <message>
-        <source>LithTech Model</source>
-        <translation>Modelo LithTech</translation>
+        <source>Fit into a single MDL (compact)</source>
+        <translation>Ajustar a un solo MDL (compacto)</translation>
     </message>
     <message>
-        <source>LithTech Animation</source>
-        <translation>Animación LithTech</translation>
+        <source>Unchecked: lossless - effects over 128 bones are split into
+several .mdl parts, spawn them all at the same origin.
+Checked: 2 bones per particle (one quad axis keeps a fixed
+size) so the effect usually fits one .mdl.</source>
+        <translation>Desmarcado: sin pérdidas; los efectos de más de 128 huesos se dividen en
+varias partes .mdl, genéralas todas en el mismo origen.
+Marcado: 2 huesos por partícula (un eje del quad mantiene un tamaño
+fijo), así que el efecto suele caber en un .mdl.</translation>
     </message>
     <message>
-        <source>Wave Audio</source>
-        <translation>Audio Wave</translation>
+        <source>Billboards are baked from the CURRENT camera angle.</source>
+        <translation>Los billboards se hornean desde el ángulo de cámara ACTUAL.</translation>
     </message>
     <message>
-        <source>Image</source>
-        <translation>Imagen</translation>
+        <source>Select output directory</source>
+        <translation>Seleccionar carpeta de salida</translation>
     </message>
     <message>
-        <source>Text File</source>
-        <translation>Archivo de Texto</translation>
+        <source>Export Sprite</source>
+        <translation>Exportar sprite</translation>
     </message>
     <message>
-        <source>Lithtech Sprite</source>
-        <translation>Sprite Lithtech</translation>
+        <source>Square frame size in pixels. Higher = crisper but bigger file
+(numFrames * res * res bytes, plus a 768-byte shared palette).</source>
+        <translation>Tamaño del fotograma cuadrado en píxeles. Mayor = más nítido pero archivo más grande
+(numFotogramas * res * res bytes, más una paleta compartida de 768 bytes).</translation>
     </message>
     <message>
-        <source>Map Format</source>
-        <translation>Formato de Mapa</translation>
+        <source>Resolution:</source>
+        <translation>Resolución:</translation>
     </message>
     <message>
-        <source>%1 files (%2 visible)</source>
-        <translation>%1 archivos (%2 visibles)</translation>
+        <source>Renders off-screen from the CURRENT camera angle - orient the view before exporting. Additive blend only.</source>
+        <translation>Renderiza fuera de pantalla desde el ángulo de cámara ACTUAL: orienta la vista antes de exportar. Solo mezcla aditiva.</translation>
     </message>
 </context>
 <context>
@@ -1482,6 +2076,14 @@ Fallidos: %2</translation>
     <message>
         <source>Path your Half-Life Model Viewer...</source>
         <translation>Ruta de tu Visor de Modelos de Half-Life...</translation>
+    </message>
+    <message>
+        <source>Model Compiler:</source>
+        <translation>Compilador de modelos:</translation>
+    </message>
+    <message>
+        <source>Path your Model Compiler...</source>
+        <translation>Ruta de tu compilador de modelos...</translation>
     </message>
     <message>
         <source>Paths</source>
@@ -1522,6 +2124,10 @@ Fallidos: %2</translation>
     <message>
         <source>Executables (*.exe);;All files (*.*)</source>
         <translation>Ejecutables (*.exe);;Todos los archivos (*.*)</translation>
+    </message>
+    <message>
+        <source>Select studiomdl Executable</source>
+        <translation>Seleccionar el ejecutable de studiomdl</translation>
     </message>
     <message>
         <source>Select Default Extract Directory</source>
@@ -1697,10 +2303,6 @@ Fallidos: %2</translation>
         <translation>Visor de Sprites</translation>
     </message>
     <message>
-        <source>File</source>
-        <translation>Archivo</translation>
-    </message>
-    <message>
         <source>Create</source>
         <translation>Crear</translation>
     </message>
@@ -1737,10 +2339,6 @@ Fallidos: %2</translation>
         <translation>Ruta...</translation>
     </message>
     <message>
-        <source>Frame Preview (Scroll=Zoom, RightClick=Background, LeftDrag=Select)</source>
-        <translation>Vista Previa de Fotogramas (Rueda=Zoom, Clic Derecho=Fondo, Arrastrar Izq.=Seleccionar)</translation>
-    </message>
-    <message>
         <source>Zoom: 100%</source>
         <translation>Zoom: 100%</translation>
     </message>
@@ -1767,10 +2365,6 @@ Use for 640hud sprite coordinates.</source>
 Úsalo para coordenadas de sprites 640hud.</translation>
     </message>
     <message>
-        <source>Sprite File</source>
-        <translation>Archivo de Sprite</translation>
-    </message>
-    <message>
         <source>Open Sprite...</source>
         <translation>Abrir Sprite...</translation>
     </message>
@@ -1781,22 +2375,6 @@ Use for 640hud sprite coordinates.</source>
     <message>
         <source>Extract Frame...</source>
         <translation>Extraer Fotograma...</translation>
-    </message>
-    <message>
-        <source>Extract All Frames...</source>
-        <translation>Extraer Todos los Fotogramas...</translation>
-    </message>
-    <message>
-        <source>Save (Ctrl+S)</source>
-        <translation>Guardar (Ctrl+S)</translation>
-    </message>
-    <message>
-        <source>Save As...</source>
-        <translation>Guardar Como...</translation>
-    </message>
-    <message>
-        <source>Fix Sprite</source>
-        <translation>Reparar Sprite</translation>
     </message>
     <message>
         <source>Lithtech Texture Directory</source>
@@ -1821,10 +2399,6 @@ Use for 640hud sprite coordinates.</source>
     <message>
         <source>Export Frames as BMP</source>
         <translation>Exportar Fotogramas como BMP</translation>
-    </message>
-    <message>
-        <source>Frames</source>
-        <translation>Fotogramas</translation>
     </message>
     <message>
         <source>Color Palette</source>
@@ -1875,18 +2449,6 @@ Use for 640hud sprite coordinates.</source>
         <translation>B &lt;-&gt; G</translation>
     </message>
     <message>
-        <source>↩</source>
-        <translation>↩</translation>
-    </message>
-    <message>
-        <source>↪</source>
-        <translation>↪</translation>
-    </message>
-    <message>
-        <source>⟲</source>
-        <translation>⟲</translation>
-    </message>
-    <message>
         <source>Undo (Ctrl+Z)</source>
         <translation>Deshacer (Ctrl+Z)</translation>
     </message>
@@ -1905,10 +2467,6 @@ Use for 640hud sprite coordinates.</source>
     <message>
         <source>S: 0</source>
         <translation>S: 0</translation>
-    </message>
-    <message>
-        <source>Animation</source>
-        <translation>Animación</translation>
     </message>
     <message>
         <source>Play</source>
@@ -1983,6 +2541,94 @@ Use for 640hud sprite coordinates.</source>
         <translation>Examinar Fotogramas...</translation>
     </message>
     <message>
+        <source>Open sprite</source>
+        <translation>Abrir sprite</translation>
+    </message>
+    <message>
+        <source>Open a GoldSrc, CSO or LithTech sprite</source>
+        <translation>Abrir un sprite de GoldSrc, CSO o LithTech</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Guardar</translation>
+    </message>
+    <message>
+        <source>Save the palette and properties to the sprite (Ctrl+S)</source>
+        <translation>Guardar la paleta y las propiedades en el sprite (Ctrl+S)</translation>
+    </message>
+    <message>
+        <source>Save as</source>
+        <translation>Guardar como</translation>
+    </message>
+    <message>
+        <source>Save the sprite to a new file</source>
+        <translation>Guardar el sprite en un archivo nuevo</translation>
+    </message>
+    <message>
+        <source>Extract frame</source>
+        <translation>Extraer fotograma</translation>
+    </message>
+    <message>
+        <source>Save the frame shown as an image</source>
+        <translation>Guardar el fotograma mostrado como imagen</translation>
+    </message>
+    <message>
+        <source>Extract all</source>
+        <translation>Extraer todo</translation>
+    </message>
+    <message>
+        <source>Save every frame as an image</source>
+        <translation>Guardar cada fotograma como imagen</translation>
+    </message>
+    <message>
+        <source>Open the previous sprite in the folder (Up)</source>
+        <translation>Abrir el sprite anterior de la carpeta (Arriba)</translation>
+    </message>
+    <message>
+        <source>Open the next sprite in the folder (Down)</source>
+        <translation>Abrir el siguiente sprite de la carpeta (Abajo)</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Ver</translation>
+    </message>
+    <message>
+        <source>Look at a sprite and edit its palette</source>
+        <translation>Ver un sprite y editar su paleta</translation>
+    </message>
+    <message>
+        <source>Make a sprite from images</source>
+        <translation>Crear un sprite a partir de imágenes</translation>
+    </message>
+    <message>
+        <source>Turn CSO (V3) sprites into GoldSrc (V2) ones in a batch</source>
+        <translation>Convertir por lotes sprites de CSO (V3) en sprites de GoldSrc (V2)</translation>
+    </message>
+    <message>
+        <source>Wheel: zoom. Right click: background. Drag: select a region.</source>
+        <translation>Rueda: zoom. Clic derecho: fondo. Arrastrar: seleccionar una región.</translation>
+    </message>
+    <message>
+        <source>Open a sprite from the ribbon or the folder on the left.</source>
+        <translation>Abre un sprite desde la cinta o desde la carpeta de la izquierda.</translation>
+    </message>
+    <message>
+        <source>Fix Sprite (V3 to V2)</source>
+        <translation>Corregir sprite (V3 a V2)</translation>
+    </message>
+    <message>
+        <source>Turn this CSO sprite into a GoldSrc one</source>
+        <translation>Convertir este sprite de CSO en uno de GoldSrc</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>Restablecer</translation>
+    </message>
+    <message>
+        <source>Frames (Drag &amp; Drop supported)</source>
+        <translation>Fotogramas (admite arrastrar y soltar)</translation>
+    </message>
+    <message>
         <source>Parallel</source>
         <translation>Paralelo</translation>
     </message>
@@ -2031,6 +2677,18 @@ Comunes: Azul (0,0,255) o Negro (0,0,0)</translation>
     <message>
         <source>Contrast:</source>
         <translation>Contraste:</translation>
+    </message>
+    <message>
+        <source>Version:</source>
+        <translation>Versión:</translation>
+    </message>
+    <message>
+        <source>V2 - GoldSrc </source>
+        <translation>V2 - GoldSrc </translation>
+    </message>
+    <message>
+        <source>V3 - CSO (DXT5, keeps alpha)</source>
+        <translation>V3 - CSO (DXT5, conserva el alfa)</translation>
     </message>
     <message>
         <source>Sprite files (*.spr)</source>
@@ -2225,10 +2883,6 @@ Omitidos (V2): %3</translation>
         <translation>%1 de %2 fotogramas extraídos como %3.</translation>
     </message>
     <message>
-        <source>Image files (*.bmp *.png *.jpg *.jpeg *.gif *.tga *.tiff *.tif);;All files (*.*)</source>
-        <translation>Archivos de imagen (*.bmp *.png *.jpg *.jpeg *.gif *.tga *.tiff *.tif);;Todos los archivos (*.*)</translation>
-    </message>
-    <message>
         <source>No frames selected.</source>
         <translation>Ningún fotograma seleccionado.</translation>
     </message>
@@ -2315,6 +2969,18 @@ Omitidos (V2): %3</translation>
     <message>
         <source>Redo</source>
         <translation>Rehacer</translation>
+    </message>
+    <message>
+        <source>Image files (%1);;All files (*.*)</source>
+        <translation>Archivos de imagen (%1);;Todos los archivos (*.*)</translation>
+    </message>
+    <message>
+        <source>Failed to create the V3 sprite.</source>
+        <translation>No se pudo crear el sprite V3.</translation>
+    </message>
+    <message>
+        <source>V3 sprite created with %1 frame(s), one DXT5 texture each.</source>
+        <translation>Sprite V3 creado con %1 fotograma(s), una textura DXT5 cada uno.</translation>
     </message>
     <message>
         <source>Edit Color %1</source>
@@ -2409,10 +3075,6 @@ Omitidos (V2): %3</translation>
         <translation>Formato:</translation>
     </message>
     <message>
-        <source>Navigate Sprites</source>
-        <translation>Navegar Sprites</translation>
-    </message>
-    <message>
         <source>Sprites to Fix (Drag &amp; Drop supported)</source>
         <translation>Sprites to Fix (Drag &amp; Drop supported)</translation>
     </message>
@@ -2451,6 +3113,333 @@ Omitidos (V2): %3</translation>
     <message>
         <source>Output Directory</source>
         <translation>Directorio de Salida</translation>
+    </message>
+</context>
+<context>
+    <name>SteamWorkshopDownloaderDialog</name>
+    <message>
+        <source>Steam Workshop Downloader</source>
+        <translation>Descargador de Steam Workshop</translation>
+    </message>
+    <message>
+        <source>Enter Steam Workshop URL or ID</source>
+        <translation>Introduce la URL o el ID de Steam Workshop</translation>
+    </message>
+    <message>
+        <source>Show Item</source>
+        <translation>Mostrar elemento</translation>
+    </message>
+    <message>
+        <source>Look the item up without downloading it</source>
+        <translation>Consultar el elemento sin descargarlo</translation>
+    </message>
+    <message>
+        <source>Download Item</source>
+        <translation>Descargar elemento</translation>
+    </message>
+    <message>
+        <source>Folder:</source>
+        <translation>Carpeta:</translation>
+    </message>
+    <message>
+        <source>Browse...</source>
+        <translation>Examinar...</translation>
+    </message>
+    <message>
+        <source>Ready.</source>
+        <translation>Listo.</translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation>Abrir</translation>
+    </message>
+    <message>
+        <source>Open the downloaded file in the tab that fits it</source>
+        <translation>Abrir el archivo descargado en la pestaña que le corresponde</translation>
+    </message>
+    <message>
+        <source>Show in Folder</source>
+        <translation>Mostrar en la carpeta</translation>
+    </message>
+    <message>
+        <source>No item yet</source>
+        <translation>Aún no hay elemento</translation>
+    </message>
+    <message>
+        <source>Paste a Workshop link or item ID above, then show or download it.</source>
+        <translation>Pega arriba un enlace o ID de Workshop y luego muéstralo o descárgalo.</translation>
+    </message>
+    <message>
+        <source>updated %1</source>
+        <translation>actualizado %1</translation>
+    </message>
+    <message>
+        <source>No preview</source>
+        <translation>Sin vista previa</translation>
+    </message>
+    <message>
+        <source>Loading preview...</source>
+        <translation>Cargando vista previa...</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Error</translation>
+    </message>
+    <message>
+        <source>Please specify a valid destination folder.</source>
+        <translation>Indica una carpeta de destino válida.</translation>
+    </message>
+    <message>
+        <source>Downloading %1 (AppID: %2)...</source>
+        <translation>Descargando %1 (AppID: %2)...</translation>
+    </message>
+    <message>
+        <source>Invalid Input</source>
+        <translation>Entrada no válida</translation>
+    </message>
+    <message>
+        <source>Please enter a valid Steam Workshop URL or numeric Item ID.</source>
+        <translation>Introduce una URL de Steam Workshop válida o un ID numérico de elemento.</translation>
+    </message>
+    <message>
+        <source>Resolving Steam Item ID %1...</source>
+        <translation>Resolviendo el ID de elemento de Steam %1...</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation>Error: %1</translation>
+    </message>
+    <message>
+        <source>Fetch Failed</source>
+        <translation>No se pudo obtener</translation>
+    </message>
+    <message>
+        <source>Ready to download.</source>
+        <translation>Listo para descargar.</translation>
+    </message>
+    <message>
+        <source>Select Output Directory</source>
+        <translation>Seleccionar carpeta de salida</translation>
+    </message>
+    <message>
+        <source>Downloading: %1 MB / %2 MB (%3%)</source>
+        <translation>Descargando: %1 MB / %2 MB (%3%)</translation>
+    </message>
+    <message>
+        <source>Download completed: %1</source>
+        <translation>Descarga completada: %1</translation>
+    </message>
+    <message>
+        <source>Download failed: %1</source>
+        <translation>La descarga falló: %1</translation>
+    </message>
+    <message>
+        <source>Download Failed</source>
+        <translation>Descarga fallida</translation>
+    </message>
+    <message>
+        <source>Failed to download workshop item.
+Error: %1</source>
+        <translation>No se pudo descargar el elemento del Workshop.
+Error: %1</translation>
+    </message>
+</context>
+<context>
+    <name>TextureWorkspace</name>
+    <message>
+        <source>Search (name, or a pattern like *.vtf)</source>
+        <translation>Buscar (nombre o un patrón como *.vtf)</translation>
+    </message>
+    <message>
+        <source>Color and alpha</source>
+        <translation>Color y alfa</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation>Color</translation>
+    </message>
+    <message>
+        <source>Alpha</source>
+        <translation>Alfa</translation>
+    </message>
+    <message>
+        <source>Fit</source>
+        <translation>Ajustar</translation>
+    </message>
+    <message>
+        <source>1:1</source>
+        <translation>1:1</translation>
+    </message>
+    <message>
+        <source>Frame</source>
+        <translation>Fotograma</translation>
+    </message>
+    <message>
+        <source>Face</source>
+        <translation>Cara</translation>
+    </message>
+    <message>
+        <source>Mipmap</source>
+        <translation>Mipmap</translation>
+    </message>
+    <message>
+        <source>BMPs are 8-bit with a palette of 256 colors, at most 512 x 512.</source>
+        <translation>Los BMP son de 8 bits con una paleta de 256 colores, de 512 x 512 como máximo.</translation>
+    </message>
+    <message>
+        <source>Transparent pixels as mask (blue)</source>
+        <translation>Píxeles transparentes como máscara (azul)</translation>
+    </message>
+    <message>
+        <source>For $texrendermode masked: pixels with alpha below 128 get palette index 255. Not used for DTX, whose alpha is a gloss mask.</source>
+        <translation>Para $texrendermode masked: los píxeles con alfa inferior a 128 reciben el índice de paleta 255. No se usa en DTX, cuyo alfa es una máscara de brillo.</translation>
+    </message>
+    <message>
+        <source>Power of two sides</source>
+        <translation>Lados en potencia de dos</translation>
+    </message>
+    <message>
+        <source>Save as BMP...</source>
+        <translation>Guardar como BMP...</translation>
+    </message>
+    <message>
+        <source>Save as PNG...</source>
+        <translation>Guardar como PNG...</translation>
+    </message>
+    <message>
+        <source>Export selected to output</source>
+        <translation>Exportar lo seleccionado a la salida</translation>
+    </message>
+    <message>
+        <source>Write the selected textures as BMPs to the output folder</source>
+        <translation>Escribir las texturas seleccionadas como BMP en la carpeta de salida</translation>
+    </message>
+    <message>
+        <source>Send to WAD</source>
+        <translation>Enviar al WAD</translation>
+    </message>
+    <message>
+        <source>Add the selected textures to the WAD open in the WAD tab</source>
+        <translation>Añadir las texturas seleccionadas al WAD abierto en la pestaña WAD</translation>
+    </message>
+    <message>
+        <source>Save as BMP</source>
+        <translation>Guardar como BMP</translation>
+    </message>
+    <message>
+        <source>Bitmap images (*.bmp)</source>
+        <translation>Imágenes de mapa de bits (*.bmp)</translation>
+    </message>
+    <message>
+        <source>Save error</source>
+        <translation>Error al guardar</translation>
+    </message>
+    <message>
+        <source>Failed to save BMP file.</source>
+        <translation>No se pudo guardar el archivo BMP.</translation>
+    </message>
+    <message>
+        <source>Save as PNG</source>
+        <translation>Guardar como PNG</translation>
+    </message>
+    <message>
+        <source>PNG images (*.png)</source>
+        <translation>Imágenes PNG (*.png)</translation>
+    </message>
+    <message>
+        <source>Failed to save PNG file.</source>
+        <translation>No se pudo guardar el archivo PNG.</translation>
+    </message>
+    <message>
+        <source>unreadable</source>
+        <translation>ilegible</translation>
+    </message>
+    <message>
+        <source>No textures open.</source>
+        <translation>No hay texturas abiertas.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n texture(s)</source>
+        <translation>
+            <numerusform>%n textura</numerusform>
+            <numerusform>%n texturas</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 of %2 textures</source>
+        <translation>%1 de %2 texturas</translation>
+    </message>
+    <message>
+        <source>This texture could not be decoded.</source>
+        <translation>No se pudo decodificar esta textura.</translation>
+    </message>
+    <message>
+        <source>Open textures from the ribbon, or drop them here.</source>
+        <translation>Abre texturas desde la cinta o suéltalas aquí.</translation>
+    </message>
+    <message>
+        <source>No texture selected.</source>
+        <translation>Ninguna textura seleccionada.</translation>
+    </message>
+    <message>
+        <source>From an archive</source>
+        <translation>De un archivo comprimido</translation>
+    </message>
+    <message>
+        <source>Size: %1 x %2</source>
+        <translation>Tamaño: %1 x %2</translation>
+    </message>
+    <message>
+        <source>Format: %1</source>
+        <translation>Formato: %1</translation>
+    </message>
+    <message>
+        <source>Frames: %1, faces: %2, mipmaps: %3</source>
+        <translation>Fotogramas: %1, caras: %2, mipmaps: %3</translation>
+    </message>
+    <message>
+        <source>Alpha: gloss mask</source>
+        <translation>Alfa: máscara de brillo</translation>
+    </message>
+    <message>
+        <source>Alpha: has transparent pixels</source>
+        <translation>Alfa: tiene píxeles transparentes</translation>
+    </message>
+    <message>
+        <source>Alpha: opaque</source>
+        <translation>Alfa: opaca</translation>
+    </message>
+    <message>
+        <source>GoldSrc</source>
+        <translation>GoldSrc</translation>
+    </message>
+    <message>
+        <source>Larger than 512: scaled down to fit when saved.</source>
+        <translation>Mayor que 512: se reduce al guardar para que quepa.</translation>
+    </message>
+    <message>
+        <source>Fits the 512 x 512 limit.</source>
+        <translation>Cabe en el límite de 512 x 512.</translation>
+    </message>
+    <message>
+        <source>Sides are not powers of two.</source>
+        <translation>Los lados no son potencias de dos.</translation>
+    </message>
+    <message>
+        <source>Open Textures</source>
+        <translation>Abrir texturas</translation>
+    </message>
+    <message>
+        <source>Textures (*.dtx *.vtf *.dds *.tga *.bmp *.png *.jpg *.jpeg);;All files (*.*)</source>
+        <translation>Texturas (*.dtx *.vtf *.dds *.tga *.bmp *.png *.jpg *.jpeg);;Todos los archivos (*.*)</translation>
+    </message>
+    <message>
+        <source>Open a Folder of Textures</source>
+        <translation>Abrir una carpeta de texturas</translation>
+    </message>
+    <message>
+        <source>Saved %1 texture(s) to %2</source>
+        <translation>%1 textura(s) guardada(s) en %2</translation>
     </message>
 </context>
 <context>
@@ -2499,316 +3488,6 @@ Versión actual: %1
     </message>
 </context>
 <context>
-    <name>VpkViewerWindow</name>
-    <message>
-        <source>VPK / GMA Viewer - Source Engine</source>
-        <translation>Visor VPK / GMA - Motor Source</translation>
-    </message>
-    <message>
-        <source>Archive File (VPK / GMA)</source>
-        <translation>Archivo (VPK / GMA)</translation>
-    </message>
-    <message>
-        <source>Select a VPK or GMA file to view...</source>
-        <translation>Selecciona un archivo VPK o GMA para ver...</translation>
-    </message>
-    <message>
-        <source>Open VPK / GMA...</source>
-        <translation>Abrir VPK / GMA...</translation>
-    </message>
-    <message>
-        <source>Contents</source>
-        <translation>Contenido</translation>
-    </message>
-    <message>
-        <source>Search:</source>
-        <translation>Buscar:</translation>
-    </message>
-    <message>
-        <source>Search files... (Ctrl+F)</source>
-        <translation>Buscar archivos... (Ctrl+F)</translation>
-    </message>
-    <message>
-        <source>Select All Matches</source>
-        <translation>Seleccionar Todas las Coincidencias</translation>
-    </message>
-    <message>
-        <source>Path</source>
-        <translation>Ruta</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation>Tamaño</translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <translation>Tipo</translation>
-    </message>
-    <message>
-        <source>Extract Selected</source>
-        <translation>Extraer Seleccionados</translation>
-    </message>
-    <message>
-        <source>Extract All</source>
-        <translation>Extraer Todo</translation>
-    </message>
-    <message>
-        <source>No archive loaded</source>
-        <translation>Ningún archivo cargado</translation>
-    </message>
-    <message>
-        <source>Open VPK / GMA File</source>
-        <translation>Abrir Archivo VPK / GMA</translation>
-    </message>
-    <message>
-        <source>Source archives (*.vpk *.gma);;VPK files (*.vpk);;GMA files (*.gma);;All files (*.*)</source>
-        <translation>Archivos de Source (*.vpk *.gma);;Archivos VPK (*.vpk);;Archivos GMA (*.gma);;Todos los archivos (*.*)</translation>
-    </message>
-    <message>
-        <source>Cannot Open</source>
-        <translation>No se Puede Abrir</translation>
-    </message>
-    <message>
-        <source>This appears to be a data chunk file (*_NNN.vpk).
-Please open the corresponding _dir.vpk file instead.</source>
-        <translation>Esto parece ser un archivo de fragmento de datos (*_NNN.vpk).
-Por favor, abre en su lugar el archivo _dir.vpk correspondiente.</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Error</translation>
-    </message>
-    <message>
-        <source>Failed to load VPK file.
-
-The file may be corrupted or not a valid VPK archive.</source>
-        <translation>Error al cargar el archivo VPK.
-
-El archivo puede estar dañado o no ser un archivo VPK válido.</translation>
-    </message>
-    <message>
-        <source>Failed to load GMA file.
-
-The file may be corrupted or not a valid Garry's Mod addon.</source>
-        <translation>Error al cargar el archivo GMA.
-
-El archivo puede estar dañado o no ser un complemento de Garry's Mod válido.</translation>
-    </message>
-    <message>
-        <source>%1 files — %2 (by %3)</source>
-        <translation>%1 archivos — %2 (por %3)</translation>
-    </message>
-    <message>
-        <source>%1 files</source>
-        <translation>%1 archivos</translation>
-    </message>
-    <message>
-        <source>Select Output Directory</source>
-        <translation>Seleccionar Directorio de Salida</translation>
-    </message>
-    <message>
-        <source>Extraction complete.
-
-Successful: %1
-Failed: %2</source>
-        <translation>Extracción completada.
-
-Exitosos: %1
-Fallidos: %2</translation>
-    </message>
-    <message>
-        <source>Extraction Complete</source>
-        <translation>Extracción Completada</translation>
-    </message>
-    <message>
-        <source>Extracted %1/%2 files</source>
-        <translation>%1/%2 archivos extraídos</translation>
-    </message>
-    <message>
-        <source>Source Model</source>
-        <translation>Modelo de Source</translation>
-    </message>
-    <message>
-        <source>Source Model Data</source>
-        <translation>Datos de Modelo de Source</translation>
-    </message>
-    <message>
-        <source>Source Texture</source>
-        <translation>Textura de Source</translation>
-    </message>
-    <message>
-        <source>Source Material</source>
-        <translation>Material de Source</translation>
-    </message>
-    <message>
-        <source>Audio</source>
-        <translation>Audio</translation>
-    </message>
-    <message>
-        <source>Image</source>
-        <translation>Imagen</translation>
-    </message>
-    <message>
-        <source>Text File</source>
-        <translation>Archivo de Texto</translation>
-    </message>
-    <message>
-        <source>Source Map</source>
-        <translation>Mapa de Source</translation>
-    </message>
-    <message>
-        <source>Sprite</source>
-        <translation>Sprite</translation>
-    </message>
-    <message>
-        <source>Particle System</source>
-        <translation>Sistema de Partículas</translation>
-    </message>
-    <message>
-        <source>Physics Mesh</source>
-        <translation>Malla de Física</translation>
-    </message>
-    <message>
-        <source>Lua Script</source>
-        <translation>Script Lua</translation>
-    </message>
-    <message>
-        <source>Choreography Scene</source>
-        <translation>Escena de Coreografía</translation>
-    </message>
-    <message>
-        <source>JSON Data</source>
-        <translation>Datos JSON</translation>
-    </message>
-    <message>
-        <source>%1 files (%2 visible)</source>
-        <translation>%1 archivos (%2 visibles)</translation>
-    </message>
-</context>
-<context>
-    <name>VtfViewerDialog</name>
-    <message>
-        <source>VTF Viewer - Source Engine</source>
-        <translation>Visor VTF - Motor Source</translation>
-    </message>
-    <message>
-        <source>Open VTF...</source>
-        <translation>Abrir VTF...</translation>
-    </message>
-    <message>
-        <source>Save as 8-bit BMP...</source>
-        <translation>Guardar como BMP de 8 bits...</translation>
-    </message>
-    <message>
-        <source>No file loaded.</source>
-        <translation>Ningún archivo cargado.</translation>
-    </message>
-    <message>
-        <source>Frame:</source>
-        <translation>Fotograma:</translation>
-    </message>
-    <message>
-        <source>Face:</source>
-        <translation>Cara:</translation>
-    </message>
-    <message>
-        <source>Mipmap:</source>
-        <translation>Mipmap:</translation>
-    </message>
-    <message>
-        <source>Select VTF file</source>
-        <translation>Seleccionar archivo VTF</translation>
-    </message>
-    <message>
-        <source>VTF textures (*.vtf);;All files (*.*)</source>
-        <translation>Texturas VTF (*.vtf);;Todos los archivos (*.*)</translation>
-    </message>
-    <message>
-        <source>VTF error</source>
-        <translation>Error de VTF</translation>
-    </message>
-    <message>
-        <source>Cannot open file:
-%1</source>
-        <translation>No se puede abrir el archivo:
-%1</translation>
-    </message>
-    <message>
-        <source>Failed to load VTF file.
-
-%1</source>
-        <translation>Error al cargar el archivo VTF.
-
-%1</translation>
-    </message>
-    <message>
-        <source>No image data for the selected frame/face/mipmap.</source>
-        <translation>No hay datos de imagen para el fotograma/cara/mipmap seleccionado.</translation>
-    </message>
-    <message>
-        <source>Failed to decode image data.
-
-%1</source>
-        <translation>Error al decodificar los datos de imagen.
-
-%1</translation>
-    </message>
-    <message>
-        <source>Image error</source>
-        <translation>Error de imagen</translation>
-    </message>
-    <message>
-        <source>Failed to construct image from decoded data.</source>
-        <translation>Error al construir la imagen a partir de los datos decodificados.</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation>Desconocido</translation>
-    </message>
-    <message>
-        <source>%1  |  %2 x %3  |  %4  |  v%5.%6  |  %7 frame(s), %8 mipmap(s)</source>
-        <translation>%1  |  %2 x %3  |  %4  |  v%5.%6  |  %7 fotograma(s), %8 mipmap(s)</translation>
-    </message>
-    <message>
-        <source>Save as 8-bit BMP</source>
-        <translation>Guardar como BMP de 8 bits</translation>
-    </message>
-    <message>
-        <source>Bitmap images (*.bmp)</source>
-        <translation>Imágenes de mapa de bits (*.bmp)</translation>
-    </message>
-    <message>
-        <source>GoldSrc Size Limit</source>
-        <translation>Límite de Tamaño de GoldSrc</translation>
-    </message>
-    <message>
-        <source>The image size (%1 x %2) does not fit GoldSrc texture limits (max 512 x 512).
-
-Do you want to save it resized to 512 x 512?</source>
-        <translation>El tamaño de la imagen (%1 x %2) no cumple los límites de textura de GoldSrc (máx. 512 x 512).
-
-¿Deseas guardarla redimensionada a 512 x 512?</translation>
-    </message>
-    <message>
-        <source>Save error</source>
-        <translation>Error al guardar</translation>
-    </message>
-    <message>
-        <source>Failed to save BMP file.</source>
-        <translation>Error al guardar el archivo BMP.</translation>
-    </message>
-    <message>
-        <source>Saved</source>
-        <translation>Guardado</translation>
-    </message>
-    <message>
-        <source>Saved 8-bit BMP:
-%1</source>
-        <translation>BMP de 8 bits guardado:
-%1</translation>
-    </message>
-</context>
-<context>
     <name>WadMakerDialog</name>
     <message>
         <source>WAD Editor</source>
@@ -2823,12 +3502,12 @@ Do you want to save it resized to 512 x 512?</source>
         <translation>Crear nuevo WAD</translation>
     </message>
     <message>
-        <source>Open WAD...</source>
-        <translation>Abrir WAD...</translation>
-    </message>
-    <message>
         <source>Open existing WAD file</source>
         <translation>Abrir archivo WAD existente</translation>
+    </message>
+    <message>
+        <source>Open WAD</source>
+        <translation>Abrir WAD</translation>
     </message>
     <message>
         <source>Save</source>
@@ -2839,54 +3518,62 @@ Do you want to save it resized to 512 x 512?</source>
         <translation>Guardar archivo WAD</translation>
     </message>
     <message>
-        <source>Save As...</source>
-        <translation>Guardar Como...</translation>
-    </message>
-    <message>
         <source>Save WAD to new file</source>
         <translation>Guardar WAD en un archivo nuevo</translation>
     </message>
     <message>
-        <source>Textures: 0 / %1</source>
-        <translation>Texturas: 0 / %1</translation>
+        <source>Save As</source>
+        <translation>Guardar como</translation>
     </message>
     <message>
-        <source>Filter:</source>
-        <translation>Filtro:</translation>
+        <source>Add images</source>
+        <translation>Añadir imágenes</translation>
+    </message>
+    <message>
+        <source>Add images as textures; they are fitted into 512 x 512 and 256 colors</source>
+        <translation>Añadir imágenes como texturas; se ajustan a 512 x 512 y 256 colores</translation>
+    </message>
+    <message>
+        <source>Remove the selected textures</source>
+        <translation>Eliminar las texturas seleccionadas</translation>
+    </message>
+    <message>
+        <source>Extract</source>
+        <translation>Extraer</translation>
+    </message>
+    <message>
+        <source>Save the selected textures as images</source>
+        <translation>Guardar las texturas seleccionadas como imágenes</translation>
+    </message>
+    <message>
+        <source>Rename the selected texture (F2, or double-click)</source>
+        <translation>Renombrar la textura seleccionada (F2 o doble clic)</translation>
+    </message>
+    <message>
+        <source>Replace image</source>
+        <translation>Reemplazar imagen</translation>
+    </message>
+    <message>
+        <source>Give the selected texture the picture of another image; its name stays</source>
+        <translation>Da a la textura seleccionada la imagen de otro archivo; su nombre se mantiene</translation>
     </message>
     <message>
         <source>Type to filter textures...</source>
         <translation>Escribe para filtrar texturas...</translation>
     </message>
     <message>
-        <source>Add Images...</source>
-        <translation>Agregar Imágenes...</translation>
-    </message>
-    <message>
         <source>Remove</source>
         <translation>Eliminar</translation>
-    </message>
-    <message>
-        <source>Extract...</source>
-        <translation>Extraer...</translation>
     </message>
     <message>
         <source>Rename</source>
         <translation>Renombrar</translation>
     </message>
     <message>
-        <source>Preview</source>
-        <translation>Vista Previa</translation>
-    </message>
-    <message>
         <source>Select a texture
 to preview</source>
         <translation>Selecciona una textura
 para previsualizar</translation>
-    </message>
-    <message>
-        <source>WAD Editor - New</source>
-        <translation>Editor WAD - Nuevo</translation>
     </message>
     <message>
         <source>Open WAD File</source>
@@ -2899,6 +3586,162 @@ para previsualizar</translation>
     <message>
         <source>WAD Editor - %1</source>
         <translation>Editor WAD - %1</translation>
+    </message>
+    <message>
+        <source>Fit</source>
+        <translation>Ajustar</translation>
+    </message>
+    <message>
+        <source>1:1</source>
+        <translation>1:1</translation>
+    </message>
+    <message>
+        <source>Play animation</source>
+        <translation>Reproducir animación</translation>
+    </message>
+    <message>
+        <source>Play the frames of this animated texture (+0 ... +9) at the game&apos;s 10 frames a second</source>
+        <translation>Reproducir los fotogramas de esta textura animada (+0 ... +9) a los 10 fotogramas por segundo del juego</translation>
+    </message>
+    <message>
+        <source>Select a texture to see its properties.</source>
+        <translation>Selecciona una textura para ver sus propiedades.</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Nombre</translation>
+    </message>
+    <message>
+        <source>The name without its prefix; the type below adds the prefix. GoldSrc allows 15 characters in all.</source>
+        <translation>El nombre sin su prefijo; el tipo de abajo añade el prefijo. GoldSrc permite 15 caracteres en total.</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation>Normal</translation>
+    </message>
+    <message>
+        <source>Masked  {</source>
+        <translation>Con máscara  {</translation>
+    </message>
+    <message>
+        <source>Water  !</source>
+        <translation>Agua  !</translation>
+    </message>
+    <message>
+        <source>Animated  +0 ... +9</source>
+        <translation>Animada  +0 ... +9</translation>
+    </message>
+    <message>
+        <source>Toggled  +a ... +j</source>
+        <translation>Alternada  +a ... +j</translation>
+    </message>
+    <message>
+        <source>Light  ~</source>
+        <translation>Luz  ~</translation>
+    </message>
+    <message>
+        <source>Masked: palette colour 255 (blue) is see-through.
+Water: drawn as a wavy liquid surface.
+Animated: +0 to +9 of one name play in a loop.
+Toggled: +a to +j are the second look a button switches to.
+Light: emits light when the map is compiled with lights.rad.</source>
+        <translation>Con máscara: el color 255 de la paleta (azul) es transparente.
+Agua: se dibuja como una superficie líquida ondulada.
+Animada: +0 a +9 de un mismo nombre se reproducen en bucle.
+Alternada: +a a +j son el segundo aspecto al que cambia un botón.
+Luz: emite luz cuando el mapa se compila con lights.rad.</translation>
+    </message>
+    <message>
+        <source>Frame:</source>
+        <translation>Fotograma:</translation>
+    </message>
+    <message>
+        <source>Type:</source>
+        <translation>Tipo:</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Tamaño</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>Todas</translation>
+    </message>
+    <message>
+        <source>Every texture</source>
+        <translation>Todas las texturas</translation>
+    </message>
+    <message>
+        <source>Masked textures</source>
+        <translation>Texturas con máscara</translation>
+    </message>
+    <message>
+        <source>Water textures</source>
+        <translation>Texturas de agua</translation>
+    </message>
+    <message>
+        <source>Animated and toggled textures</source>
+        <translation>Texturas animadas y alternadas</translation>
+    </message>
+    <message>
+        <source>Light textures</source>
+        <translation>Texturas de luz</translation>
+    </message>
+    <message>
+        <source>Sort:</source>
+        <translation>Ordenar:</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tipo</translation>
+    </message>
+    <message>
+        <source>Thumbnail size</source>
+        <translation>Tamaño de miniatura</translation>
+    </message>
+    <message>
+        <source>List</source>
+        <translation>Lista</translation>
+    </message>
+    <message>
+        <source>Show the textures as a list with their sizes</source>
+        <translation>Mostrar las texturas como lista con sus tamaños</translation>
+    </message>
+    <message>
+        <source>Drop images here to add them, or a WAD to open it.</source>
+        <translation>Suelta aquí imágenes para añadirlas o un WAD para abrirlo.</translation>
+    </message>
+    <message>
+        <source>New images:</source>
+        <translation>Imágenes nuevas:</translation>
+    </message>
+    <message>
+        <source>Scale to multiples of 16</source>
+        <translation>Escalar a múltiplos de 16</translation>
+    </message>
+    <message>
+        <source>Keep size, see-through border</source>
+        <translation>Mantener tamaño, borde transparente</translation>
+    </message>
+    <message>
+        <source>GoldSrc needs sides that are multiples of 16. Scaling stretches the image a little; the border keeps it as it is and makes the texture masked ({).</source>
+        <translation>GoldSrc necesita lados múltiplos de 16. Escalar estira un poco la imagen; el borde la deja como está y convierte la textura en una con máscara ({).</translation>
+    </message>
+    <message>
+        <source>Color Palette</source>
+        <translation>Paleta de colores</translation>
+    </message>
+    <message>
+        <source>Click a color to see RGB values</source>
+        <translation>Haz clic en un color para ver sus valores RGB</translation>
+    </message>
+    <message>
+        <source>Mipmaps</source>
+        <translation>Mipmaps</translation>
+    </message>
+    <message>
+        <source>Index %1: R %2, G %3, B %4</source>
+        <translation>Índice %1: R %2, G %3, B %4</translation>
     </message>
     <message>
         <source>Error</source>
@@ -2935,14 +3778,6 @@ Textures: %1</source>
 Texturas: %1</translation>
     </message>
     <message>
-        <source>Limit Reached</source>
-        <translation>Límite Alcanzado</translation>
-    </message>
-    <message>
-        <source>Maximum texture count (%1) reached.</source>
-        <translation>Se alcanzó el número máximo de texturas (%1).</translation>
-    </message>
-    <message>
         <source>Add Images</source>
         <translation>Agregar Imágenes</translation>
     </message>
@@ -2951,22 +3786,8 @@ Texturas: %1</translation>
         <translation>Todas las Imágenes (*.bmp *.png *.jpg *.jpeg *.tga *.dds);;BMP (*.bmp);;PNG (*.png);;JPEG (*.jpg *.jpeg);;TGA (*.tga);;DDS (*.dds);;Todos los Archivos (*.*)</translation>
     </message>
     <message>
-        <source>Maximum texture count reached. Remaining files skipped.</source>
-        <translation>Número máximo de texturas alcanzado. Los archivos restantes fueron omitidos.</translation>
-    </message>
-    <message>
         <source>Images Added</source>
         <translation>Imágenes Agregadas</translation>
-    </message>
-    <message>
-        <source>Added: %1
-Failed: %2</source>
-        <translation>Agregadas: %1
-Fallidas: %2</translation>
-    </message>
-    <message>
-        <source>No images could be added. Check format compatibility.</source>
-        <translation>No se pudo agregar ninguna imagen. Verifica la compatibilidad de formato.</translation>
     </message>
     <message>
         <source>Remove Textures</source>
@@ -2991,24 +3812,106 @@ Fallidas: %2</translation>
 %2</translation>
     </message>
     <message>
-        <source>Rename Texture</source>
-        <translation>Renombrar Textura</translation>
+        <source>The name is empty.</source>
+        <translation>El nombre está vacío.</translation>
     </message>
     <message>
-        <source>New name (max %1 characters):</source>
-        <translation>Nuevo nombre (máx. %1 caracteres):</translation>
+        <source>%1 characters: GoldSrc allows %2 with the prefix.</source>
+        <translation>%1 caracteres: GoldSrc permite %2 con el prefijo.</translation>
     </message>
     <message>
-        <source>Failed to rename texture. Invalid name.</source>
-        <translation>Error al renombrar la textura. Nombre inválido.</translation>
+        <source>%1 is already in this WAD.</source>
+        <translation>%1 ya está en este WAD.</translation>
+    </message>
+    <message>
+        <source>%1: the name is longer than %2 characters</source>
+        <translation>%1: el nombre tiene más de %2 caracteres</translation>
+    </message>
+    <message>
+        <source>%1: the name is used twice</source>
+        <translation>%1: el nombre se usa dos veces</translation>
+    </message>
+    <message>
+        <source>%1: %2 x %3 is not a multiple of 16</source>
+        <translation>%1: %2 x %3 no es múltiplo de 16</translation>
+    </message>
+    <message>
+        <source>%1: larger than 512 x 512</source>
+        <translation>%1: mayor que 512 x 512</translation>
+    </message>
+    <message>
+        <source>%1: an animation with a single frame</source>
+        <translation>%1: una animación de un solo fotograma</translation>
+    </message>
+    <message>
+        <source>%1: frames of the animation are missing</source>
+        <translation>%1: faltan fotogramas de la animación</translation>
+    </message>
+    <message>
+        <source>No textures yet. Add images from the ribbon.</source>
+        <translation>Aún no hay texturas. Añade imágenes desde la cinta.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n texture(s)</source>
+        <translation>
+            <numerusform>%n textura</numerusform>
+            <numerusform>%n texturas</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n warning(s)</source>
+        <translation>
+            <numerusform>%n advertencia</numerusform>
+            <numerusform>%n advertencias</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Sides must be multiples of 16</source>
+        <translation>Los lados deben ser múltiplos de 16</translation>
+    </message>
+    <message>
+        <source>Larger than 512 x 512</source>
+        <translation>Mayor que 512 x 512</translation>
+    </message>
+    <message>
+        <source>In the WAD: %1</source>
+        <translation>En el WAD: %1</translation>
+    </message>
+    <message>
+        <source>Color 255 is see-through in this texture.</source>
+        <translation>En esta textura el color 255 es transparente.</translation>
     </message>
     <message>
         <source>%1 textures selected</source>
         <translation>%1 texturas seleccionadas</translation>
     </message>
     <message>
-        <source>Textures: %1 / %2</source>
-        <translation>Texturas: %1 / %2</translation>
+        <source>%1 (the WAD is full)</source>
+        <translation>%1 (el WAD está lleno)</translation>
+    </message>
+    <message>
+        <source>Added: %1</source>
+        <translation>Añadidas: %1</translation>
+    </message>
+    <message>
+        <source>Names shortened to the 15 characters GoldSrc allows:</source>
+        <translation>Nombres acortados a los 15 caracteres que permite GoldSrc:</translation>
+    </message>
+    <message>
+        <source>Not added:</source>
+        <translation>No añadidas:</translation>
+    </message>
+    <message>
+        <source>Replace Image</source>
+        <translation>Reemplazar imagen</translation>
+    </message>
+    <message>
+        <source>All Images (*.bmp *.png *.jpg *.jpeg *.tga *.dds);;All Files (*.*)</source>
+        <translation>Todas las imágenes (*.bmp *.png *.jpg *.jpeg *.tga *.dds);;Todos los archivos (*.*)</translation>
+    </message>
+    <message>
+        <source>The image could not be read.</source>
+        <translation>No se pudo leer la imagen.</translation>
     </message>
     <message>
         <source>Unsaved Changes</source>
@@ -3017,195 +3920,6 @@ Fallidas: %2</translation>
     <message>
         <source>Save changes before proceeding?</source>
         <translation>¿Guardar los cambios antes de continuar?</translation>
-    </message>
-</context>
-<context>
-    <name>XfsViewerWindow</name>
-    <message>
-        <source>XFS Viewer</source>
-        <translation>Visor XFS</translation>
-    </message>
-    <message>
-        <source>XFS Archive</source>
-        <translation>Archivo XFS</translation>
-    </message>
-    <message>
-        <source>Open XFS...</source>
-        <translation>Abrir XFS...</translation>
-    </message>
-    <message>
-        <source>Open XFS Archive</source>
-        <translation>Abrir Archivo XFS</translation>
-    </message>
-    <message>
-        <source>Contents</source>
-        <translation>Contenido</translation>
-    </message>
-    <message>
-        <source>Select an XFS file to view...</source>
-        <translation>Selecciona un archivo XFS para ver...</translation>
-    </message>
-    <message>
-        <source>Search:</source>
-        <translation>Buscar:</translation>
-    </message>
-    <message>
-        <source>Search files... (Ctrl+F)</source>
-        <translation>Buscar archivos... (Ctrl+F)</translation>
-    </message>
-    <message>
-        <source>Select All Matches</source>
-        <translation>Seleccionar Todas las Coincidencias</translation>
-    </message>
-    <message>
-        <source>Path</source>
-        <translation>Ruta</translation>
-    </message>
-    <message>
-        <source>Packed</source>
-        <translation>Comprimido</translation>
-    </message>
-    <message>
-        <source>Unpacked</source>
-        <translation>Descomprimido</translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <translation>Tipo</translation>
-    </message>
-    <message>
-        <source>View SPR</source>
-        <translation>Ver SPR</translation>
-    </message>
-    <message>
-        <source>View selected SPR file in Lithtech Sprite Viewer</source>
-        <translation>Ver el archivo SPR seleccionado en el Visor de Sprites Lithtech</translation>
-    </message>
-    <message>
-        <source>Extract Selected</source>
-        <translation>Extraer Seleccionados</translation>
-    </message>
-    <message>
-        <source>Extract All</source>
-        <translation>Extraer Todo</translation>
-    </message>
-    <message>
-        <source>No XFS file loaded</source>
-        <translation>Ningún archivo XFS cargado</translation>
-    </message>
-    <message>
-        <source>XFS files (*.xfs);;All files (*.*)</source>
-        <translation>Archivos XFS (*.xfs);;Todos los archivos (*.*)</translation>
-    </message>
-    <message>
-        <source>Loading XFS...</source>
-        <translation>Cargando XFS...</translation>
-    </message>
-    <message>
-        <source>Loading XFS archive...</source>
-        <translation>Cargando archivo XFS...</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Error</translation>
-    </message>
-    <message>
-        <source>Failed to load XFS file. The file may be corrupted or not a valid XFS archive.</source>
-        <translation>Error al cargar el archivo XFS. El archivo puede estar dañado o no ser un archivo XFS válido.</translation>
-    </message>
-    <message>
-        <source>Archive: %1 | Total packed: %2 | Total unpacked: %3</source>
-        <translation>Archivo: %1 | Total comprimido: %2 | Total descomprimido: %3</translation>
-    </message>
-    <message>
-        <source>No files found</source>
-        <translation>No se encontraron archivos</translation>
-    </message>
-    <message>
-        <source>%1 files</source>
-        <translation>%1 archivos</translation>
-    </message>
-    <message>
-        <source>Failed to extract SPR file.</source>
-        <translation>Error al extraer el archivo SPR.</translation>
-    </message>
-    <message>
-        <source>Select Output Directory</source>
-        <translation>Seleccionar Directorio de Salida</translation>
-    </message>
-    <message>
-        <source>Extracting: %p%</source>
-        <translation>Extrayendo: %p%</translation>
-    </message>
-    <message>
-        <source>Extracted %1 files</source>
-        <translation>%1 archivos extraídos</translation>
-    </message>
-    <message>
-        <source>Extraction Complete</source>
-        <translation>Extracción Completada</translation>
-    </message>
-    <message>
-        <source>Successfully extracted %1 files to:
-%2</source>
-        <translation>%1 archivos extraídos correctamente a:
-%2</translation>
-    </message>
-    <message>
-        <source>Extraction failed</source>
-        <translation>Extracción fallida</translation>
-    </message>
-    <message>
-        <source>Extraction Failed</source>
-        <translation>Extracción Fallida</translation>
-    </message>
-    <message>
-        <source>Failed to extract files. The archive may be corrupted.</source>
-        <translation>Error al extraer los archivos. El archivo puede estar dañado.</translation>
-    </message>
-    <message>
-        <source>%1 files (%2 visible)</source>
-        <translation>%1 archivos (%2 visibles)</translation>
-    </message>
-    <message>
-        <source>Sprite</source>
-        <translation>Sprite</translation>
-    </message>
-    <message>
-        <source>Image Data</source>
-        <translation>Datos de Imagen</translation>
-    </message>
-    <message>
-        <source>Data File</source>
-        <translation>Archivo de Datos</translation>
-    </message>
-    <message>
-        <source>Text Config</source>
-        <translation>Configuración de Texto</translation>
-    </message>
-    <message>
-        <source>Audio</source>
-        <translation>Audio</translation>
-    </message>
-    <message>
-        <source>Texture</source>
-        <translation>Textura</translation>
-    </message>
-    <message>
-        <source>Animation</source>
-        <translation>Animación</translation>
-    </message>
-    <message>
-        <source>Model</source>
-        <translation>Modelo</translation>
-    </message>
-    <message>
-        <source>Script</source>
-        <translation>Script</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation>Desconocido</translation>
     </message>
 </context>
 </TS>
