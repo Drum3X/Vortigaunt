@@ -515,6 +515,167 @@ Referans model olmadan etkisi yoktur.</translation>
     </message>
 </context>
 <context>
+    <name>HandsWorkspace</name>
+    <message>
+        <source>Open v_ model</source>
+        <translation>v_ modeli aç</translation>
+    </message>
+    <message>
+        <source>Open the view model whose hands are replaced</source>
+        <translation>Elleri değiştirilecek görünüm modelini aç</translation>
+    </message>
+    <message>
+        <source>New hands</source>
+        <translation>Yeni eller</translation>
+    </message>
+    <message>
+        <source>Build</source>
+        <translation>Derle</translation>
+    </message>
+    <message>
+        <source>Put the new hands in the model, compile it with studiomdl and show it</source>
+        <translation>Yeni elleri modele koy, studiomdl ile derle ve göster</translation>
+    </message>
+    <message>
+        <source>Save as</source>
+        <translation>Farklı kaydet</translation>
+    </message>
+    <message>
+        <source>Write the model with the new hands</source>
+        <translation>Modeli yeni elleriyle kaydet</translation>
+    </message>
+    <message>
+        <source>View model</source>
+        <translation>Görünüm modeli</translation>
+    </message>
+    <message>
+        <source>Open v_ model...</source>
+        <translation>v_ modeli aç...</translation>
+    </message>
+    <message>
+        <source>The parts whose hands are replaced; a part with no hands found is replaced whole</source>
+        <translation>Elleri değiştirilecek parçalar; el bulunamayan bir parça tümüyle değiştirilir</translation>
+    </message>
+    <message>
+        <source>Replace the hands in:</source>
+        <translation>Ellerin değiştirileceği yer:</translation>
+    </message>
+    <message>
+        <source>Build and show</source>
+        <translation>Derle ve göster</translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation>Göster</translation>
+    </message>
+    <message>
+        <source>Original</source>
+        <translation>Orijinal</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation>Oynat</translation>
+    </message>
+    <message>
+        <source>Animation:</source>
+        <translation>Animasyon:</translation>
+    </message>
+    <message>
+        <source>v_ model</source>
+        <translation>v_ modeli</translation>
+    </message>
+    <message>
+        <source>GoldSrc model (*.mdl)</source>
+        <translation>GoldSrc modeli (*.mdl)</translation>
+    </message>
+    <message>
+        <source>Choose the new hands, an SMD or a view model to take them from; they are remembered</source>
+        <translation>Yeni elleri seç: bir SMD ya da ellerinin alınacağı bir görünüm modeli; hatırlanır</translation>
+    </message>
+    <message>
+        <source>Choose new hands...</source>
+        <translation>Yeni elleri seç...</translation>
+    </message>
+    <message>
+        <source>A reference SMD with its textures next to it, or a v_ model whose hands are taken. Any GoldSrc rig works: the arms are matched by their shape and the hands fitted joint by joint.</source>
+        <translation>Dokuları yanında olan bir referans SMD ya da elleri alınacak bir v_ modeli. Her GoldSrc iskeleti olur: kollar şekillerine göre eşleştirilir, eller eklem eklem oturtulur.</translation>
+    </message>
+    <message>
+        <source>Open a v_ model from the ribbon, choose the new hands and build.</source>
+        <translation>Şeritten bir v_ modeli açın, yeni elleri seçin ve derleyin.</translation>
+    </message>
+    <message>
+        <source>Choose new hands</source>
+        <translation>Yeni elleri seç</translation>
+    </message>
+    <message>
+        <source>Hands (*.smd *.mdl);;SMD model (*.smd);;GoldSrc model (*.mdl)</source>
+        <translation>Eller (*.smd *.mdl);;SMD modeli (*.smd);;GoldSrc modeli (*.mdl)</translation>
+    </message>
+    <message>
+        <source>%1 (%2 of %3 triangles are hands)</source>
+        <translation>%1 (%3 üçgenin %2 tanesi el)</translation>
+    </message>
+    <message>
+        <source>%1 (%2 triangles, no hands)</source>
+        <translation>%1 (%2 üçgen, el yok)</translation>
+    </message>
+    <message>
+        <source>The model has to be compiled with studiomdl. Set the location of studiomdl in Settings.</source>
+        <translation>Modelin studiomdl ile derlenmesi gerekir. studiomdl&apos;nin yerini Ayarlar&apos;dan belirtin.</translation>
+    </message>
+    <message>
+        <source>Could not make a folder to build in.</source>
+        <translation>Derleme için klasör oluşturulamadı.</translation>
+    </message>
+    <message>
+        <source>studiomdl could not compile the model:
+
+%1</source>
+        <translation>studiomdl modeli derleyemedi:
+
+%1</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n triangle(s) of the old hands out</source>
+        <translation>
+            <numerusform>Eski ellerden %n üçgen çıkarıldı</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n triangle(s) of the new hands in</source>
+        <translation>
+            <numerusform>Yeni ellerden %n üçgen eklendi</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Fitted onto the model&apos;s arms by their shape: %1 bones.</source>
+        <translation>Modelin kollarına şekline göre oturtuldu: %1 kemik.</translation>
+    </message>
+    <message>
+        <source>The bone names did not match: each vertex took the bone of the old hands where it lies.</source>
+        <translation>Kemik adları eşleşmedi: her köşe, bulunduğu yerdeki eski elin kemiğini aldı.</translation>
+    </message>
+    <message>
+        <source>%1 of %2 bones matched by name.</source>
+        <translation>%2 kemiğin %1 tanesi adla eşleşti.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n warning(s) in the console</source>
+        <translation>
+            <numerusform>Konsolda %n uyarı</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Save v_ model</source>
+        <translation>v_ modeli kaydet</translation>
+    </message>
+    <message>
+        <source>Could not write %1.</source>
+        <translation>%1 yazılamadı.</translation>
+    </message>
+</context>
+<context>
     <name>LoLModelDownloadDialog</name>
     <message>
         <source>LoL Model Downloader</source>
@@ -1058,6 +1219,38 @@ image</source>
 değiştir</translation>
     </message>
     <message>
+        <source>Open
+p_ model</source>
+        <translation>p_ modeli
+aç</translation>
+    </message>
+    <message>
+        <source>Player
+model</source>
+        <translation>Oyuncu
+modeli</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>Sıfırla</translation>
+    </message>
+    <message>
+        <source>Open
+v_ model</source>
+        <translation>v_ modeli
+aç</translation>
+    </message>
+    <message>
+        <source>New
+hands</source>
+        <translation>Yeni
+eller</translation>
+    </message>
+    <message>
+        <source>Build</source>
+        <translation>Derle</translation>
+    </message>
+    <message>
         <source>Send to
 WAD</source>
         <translation>WAD&apos;a
@@ -1150,6 +1343,18 @@ görüntüleyici</translation>
         <translation>WAD</translation>
     </message>
     <message>
+        <source>P Model</source>
+        <translation>P Model</translation>
+    </message>
+    <message>
+        <source>Placement</source>
+        <translation>Yerleşim</translation>
+    </message>
+    <message>
+        <source>Hands</source>
+        <translation>Eller</translation>
+    </message>
+    <message>
         <source>Sound</source>
         <translation>Ses</translation>
     </message>
@@ -1180,6 +1385,18 @@ görüntüleyici</translation>
     <message>
         <source>GitHub Repository of Vortigaunt</source>
         <translation>Vortigaunt GitHub Deposu</translation>
+    </message>
+    <message>
+        <source>Show on player</source>
+        <translation>Oyuncu üstünde göster</translation>
+    </message>
+    <message>
+        <source>Open the p_ model this file was converted to in the hands of a player model</source>
+        <translation>Bu dosyadan dönüştürülen p_ modeli bir oyuncu modelinin elinde aç</translation>
+    </message>
+    <message>
+        <source>Convert the file first; its p_ model is then shown on a player</source>
+        <translation>Önce dosyayı dönüştürün; ardından p_ modeli bir oyuncu üstünde gösterilir</translation>
     </message>
     <message>
         <source>Skipped</source>
@@ -1680,6 +1897,26 @@ The operation is picked from the file type.</source>
 </source>
         <translation>  ... ve %1 dosya daha.
 </translation>
+    </message>
+    <message>
+        <source>The p_ model needs its QC to be compiled. Turn on Write QC and convert the file again.</source>
+        <translation>p_ modelin derlenmesi için QC dosyası gerekli. QC yaz&apos;ı açıp dosyayı yeniden dönüştürün.</translation>
+    </message>
+    <message>
+        <source>Convert this file first; its p_ model is shown afterwards.</source>
+        <translation>Önce bu dosyayı dönüştürün; p_ modeli ardından gösterilir.</translation>
+    </message>
+    <message>
+        <source>The p_ model has to be compiled to be shown. Set the location of studiomdl in Settings.</source>
+        <translation>p_ modelin gösterilmesi için derlenmesi gerekir. studiomdl&apos;nin yerini Ayarlar&apos;dan belirtin.</translation>
+    </message>
+    <message>
+        <source>studiomdl could not compile %1:
+
+%2</source>
+        <translation>studiomdl %1 dosyasını derleyemedi:
+
+%2</translation>
     </message>
     <message>
         <source>REZ %1/%2: %p%</source>
@@ -3916,6 +4153,153 @@ Dokular: %1</translation>
     <message>
         <source>Save changes before proceeding?</source>
         <translation>Devam etmeden önce değişiklikler kaydedilsin mi?</translation>
+    </message>
+</context>
+<context>
+    <name>WeaponFitWorkspace</name>
+    <message>
+        <source>Open p_ model</source>
+        <translation>p_ modeli aç</translation>
+    </message>
+    <message>
+        <source>Open the p_ model to place in the player&apos;s hands</source>
+        <translation>Oyuncunun eline yerleştirilecek p_ modeli aç</translation>
+    </message>
+    <message>
+        <source>Player model</source>
+        <translation>Oyuncu modeli</translation>
+    </message>
+    <message>
+        <source>Choose the player model the p_ model is shown on; it is remembered</source>
+        <translation>p_ modelin üstünde gösterileceği oyuncu modelini seç; hatırlanır</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Kaydet</translation>
+    </message>
+    <message>
+        <source>Write the p_ model with the weapon where it is shown</source>
+        <translation>p_ modeli, silah gösterildiği yerde olacak şekilde yaz</translation>
+    </message>
+    <message>
+        <source>Save as</source>
+        <translation>Farklı kaydet</translation>
+    </message>
+    <message>
+        <source>Write the placed p_ model to a new file</source>
+        <translation>Yerleştirilen p_ modeli yeni bir dosyaya yaz</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>Sıfırla</translation>
+    </message>
+    <message>
+        <source>Put the weapon back where the file has it</source>
+        <translation>Silahı dosyadaki yerine geri koy</translation>
+    </message>
+    <message>
+        <source>Player</source>
+        <translation>Oyuncu</translation>
+    </message>
+    <message>
+        <source>Choose player model...</source>
+        <translation>Oyuncu modeli seç...</translation>
+    </message>
+    <message>
+        <source>The player&apos;s animation; the ref_aim one of the weapon fits best</source>
+        <translation>Oyuncunun animasyonu; en iyisi silahın ref_aim animasyonudur</translation>
+    </message>
+    <message>
+        <source>Where the player looks: 0 straight ahead, -90 up, 90 down</source>
+        <translation>Oyuncunun baktığı yer: 0 düz ileri, -90 yukarı, 90 aşağı</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation>Oynat</translation>
+    </message>
+    <message>
+        <source>Animation:</source>
+        <translation>Animasyon:</translation>
+    </message>
+    <message>
+        <source>Looking:</source>
+        <translation>Bakış:</translation>
+    </message>
+    <message>
+        <source>Weapon</source>
+        <translation>Silah</translation>
+    </message>
+    <message>
+        <source>Open p_ model...</source>
+        <translation>p_ modeli aç...</translation>
+    </message>
+    <message>
+        <source>The bone whose vertices are moved; a p_ model hangs on the right hand, a dual one on both</source>
+        <translation>Vertex&apos;leri taşınan kemik; p_ model sağ ele, çift silah iki ele bağlıdır</translation>
+    </message>
+    <message>
+        <source>Bone:</source>
+        <translation>Kemik:</translation>
+    </message>
+    <message>
+        <source>Open a p_ model from the ribbon, and choose a player model to hold it.</source>
+        <translation>Şeritten bir p_ model açın ve onu tutacak bir oyuncu modeli seçin.</translation>
+    </message>
+    <message>
+        <source>Placement</source>
+        <translation>Yerleşim</translation>
+    </message>
+    <message>
+        <source>Move %1:</source>
+        <translation>Taşı %1:</translation>
+    </message>
+    <message>
+        <source>Turn %1:</source>
+        <translation>Döndür %1:</translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation>Boyut:</translation>
+    </message>
+    <message>
+        <source>Zoom to the weapon</source>
+        <translation>Silaha yakınlaş</translation>
+    </message>
+    <message>
+        <source>Put the camera close to the weapon; double-click the view to see all again</source>
+        <translation>Kamerayı silaha yaklaştır; hepsini yeniden görmek için görünüme çift tıklayın</translation>
+    </message>
+    <message>
+        <source>Save p_ model</source>
+        <translation>p_ modeli kaydet</translation>
+    </message>
+    <message>
+        <source>GoldSrc model (*.mdl)</source>
+        <translation>GoldSrc modeli (*.mdl)</translation>
+    </message>
+    <message>
+        <source>p_ model</source>
+        <translation>p_ model</translation>
+    </message>
+    <message>
+        <source>Choose player model</source>
+        <translation>Oyuncu modeli seç</translation>
+    </message>
+    <message>
+        <source>%1 (%2 vertices)</source>
+        <translation>%1 (%2 vertex)</translation>
+    </message>
+    <message>
+        <source>No player model yet: the weapon is shown on its own. Choose one from a game folder, for example cstrike/models/player/gign/gign.mdl.</source>
+        <translation>Henüz oyuncu modeli yok: silah tek başına gösteriliyor. Bir oyun klasöründen seçin, örneğin cstrike/models/player/gign/gign.mdl.</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>Yok</translation>
+    </message>
+    <message>
+        <source>Save error</source>
+        <translation>Kaydetme hatası</translation>
     </message>
 </context>
 </TS>

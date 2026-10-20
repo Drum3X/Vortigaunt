@@ -1945,6 +1945,49 @@ bool WeaponModelConverter::IsViewModelFile(const std::string& path)
     return String_ToLower(FileIO::fromPath(FileIO::toPath(path).stem())).rfind("v_", 0) == 0;
 }
 
+std::vector<std::vector<std::vector<bool>>> WeaponModelConverter::FindHandMeshes(const StudioModel& model)
+{
+    const HandBones bones = findHandBones(model);
+    auto textureName = [&model](const StudioMesh& mesh) {
+        return mesh.texture >= 0 && mesh.texture < static_cast<int>(model.textures.size()) ? model.textures[mesh.texture].name : std::string();
+    };
+    std::vector<std::vector<std::vector<bool>>> hands(model.bodyParts.size());
+    bool namedSkin = false;
+    for (size_t p = 0; p < model.bodyParts.size(); ++p)
+    {
+        const StudioBodyPart& part = model.bodyParts[p];
+        for (const StudioSubModel& sub : part.models)
+        {
+            std::vector<bool> meshes;
+            for (const StudioMesh& mesh : sub.meshes)
+            {
+                const bool hand = !mesh.triangles.empty() && meshIsHands(part, sub, mesh, textureName(mesh), bones.armBone);
+                namedSkin = namedSkin || (hand && getHandNames(textureName(mesh)));
+                meshes.push_back(hand);
+            }
+            hands[p].push_back(std::move(meshes));
+        }
+    }
+    // with textures named for the hands, a part of the gun held in the hand is not taken for them by its bones
+    if (namedSkin)
+    {
+        for (size_t p = 0; p < model.bodyParts.size(); ++p)
+        {
+            const StudioBodyPart& part = model.bodyParts[p];
+            for (size_t m = 0; m < part.models.size(); ++m)
+            {
+                const StudioSubModel& sub = part.models[m];
+                for (size_t i = 0; i < sub.meshes.size(); ++i)
+                {
+                    if (hands[p][m][i] && !getHandNames(textureName(sub.meshes[i])) && !getHandNames(part.name) && !getHandNames(sub.name))
+                        hands[p][m][i] = false;
+                }
+            }
+        }
+    }
+    return hands;
+}
+
 ConvertResult WeaponModelConverter::ConvertFile(const std::string& inputPath, const std::string& outputDir)
 {
     const WeaponModelResult report = Convert(inputPath, outputDir, m_options);

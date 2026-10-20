@@ -2,6 +2,7 @@
 #include "core/smd/SmdWriter.h"
 #include "core/VortigauntLog.h"
 
+#include <algorithm>
 #include <filesystem>
 #include <iostream>
 #include <sstream>
@@ -1609,6 +1610,39 @@ bool Gr2Converter::convertAnimationsFromGranny(granny_model* modelToSample)
             }
         }
 
+
+        aiMatrix4x4 placementMatrix;
+        {
+            float m[16];
+            GrannyBuildCompositeTransform4x4(&modelToSample->InitialPlacement, m);
+            placementMatrix = aiMatrix4x4(m[0], m[4], m[8], m[12], m[1], m[5], m[9], m[13], m[2], m[6], m[10], m[14], m[3], m[7], m[11], m[15]);
+        }
+        std::vector<bool> placedInTrack(skeleton->BoneCount, false);
+        {
+            GrannySetControlClock(control, 0.0f);
+            GrannySampleModelAnimations(modelInstance, 0, skeleton->BoneCount, localPose);
+            auto difference = [](const aiMatrix4x4& a, const aiMatrix4x4& b) {
+                aiVector3D sa, pa, sb, pb;
+                aiQuaternion ra, rb;
+                a.Decompose(sa, ra, pa);
+                b.Decompose(sb, rb, pb);
+                const float dot = std::min(1.0f, std::abs(ra.x * rb.x + ra.y * rb.y + ra.z * rb.z + ra.w * rb.w));
+                return 2.0f * std::acos(dot) + (pa - pb).Length() / (pa.Length() + pb.Length() + 1.0f);
+            };
+            for (int bIdx = 0; bIdx < skeleton->BoneCount; ++bIdx) {
+                if (skeleton->Bones[bIdx].ParentIndex != GrannyNoParentBone) continue;
+                float m[16];
+                GrannyBuildCompositeTransform4x4(GrannyGetLocalPoseTransform(localPose, bIdx), m);
+                const aiMatrix4x4 track(m[0], m[4], m[8], m[12], m[1], m[5], m[9], m[13], m[2], m[6], m[10], m[14], m[3], m[7], m[11], m[15]);
+                GrannyBuildCompositeTransform4x4(&skeleton->Bones[bIdx].LocalTransform, m);
+                const aiMatrix4x4 rest(m[0], m[4], m[8], m[12], m[1], m[5], m[9], m[13], m[2], m[6], m[10], m[14], m[3], m[7], m[11], m[15]);
+                placedInTrack[bIdx] = difference(track, placementMatrix * rest) < difference(track, rest);
+                if (placedInTrack[bIdx]) {
+                    Vortigaunt_Printf(std::string("The track of ") + skeleton->Bones[bIdx].Name + " already holds the model's placement");
+                }
+            }
+        }
+
         // Sampling pass
         for (int s = 0; s < totalSteps; ++s) {
             float currentTime = static_cast<float>(s) * samplingTimeStep;
@@ -1637,18 +1671,8 @@ bool Gr2Converter::convertAnimationsFromGranny(granny_model* modelToSample)
                 aiMatrix4x4 G_i;
                 int parentIdx = grannyBone->ParentIndex;
                 if (parentIdx == GrannyNoParentBone) {
-                    // Apply InitialPlacement to root bone
-                    granny_transform& initialPlacement = modelToSample->InitialPlacement;
-                    float initialPlacementMatrix[16];
-                    GrannyBuildCompositeTransform4x4(&initialPlacement, initialPlacementMatrix);
-                    
-                    aiMatrix4x4 initialTransform(
-                        initialPlacementMatrix[0], initialPlacementMatrix[4], initialPlacementMatrix[8], initialPlacementMatrix[12],
-                        initialPlacementMatrix[1], initialPlacementMatrix[5], initialPlacementMatrix[9], initialPlacementMatrix[13],
-                        initialPlacementMatrix[2], initialPlacementMatrix[6], initialPlacementMatrix[10], initialPlacementMatrix[14],
-                        initialPlacementMatrix[3], initialPlacementMatrix[7], initialPlacementMatrix[11], initialPlacementMatrix[15]
-                    );
-                    G_i = initialTransform * L_i;
+                    // Apply InitialPlacement to root bone, unless its track holds it already
+                    G_i = placedInTrack[bIdx] ? L_i : placementMatrix * L_i;
                 } else {
                     G_i = animGlobalTransforms[parentIdx] * L_i;
                 }

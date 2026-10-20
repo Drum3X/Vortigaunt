@@ -28,6 +28,8 @@ struct GoldSrcTextureInfo
 };
 
 bool writeIndexed8(const char* filename, int width, int height, const uint8_t* paletteData, const uint8_t* pixelData);
+// the same with a palette of 256 RGB entries, as GoldSrc keeps them
+bool writeIndexed8Rgb(const std::string& filename, int width, int height, const uint8_t* paletteRgb, const uint8_t* pixels);
 
 // paletteRgb gets 256 RGB entries; with masked, index 255 is blue and marks pixels with alpha below 128
 bool quantize(const uint32_t* argbPixels, int width, int height, bool masked, uint8_t* paletteRgb, std::vector<uint8_t>& indices);

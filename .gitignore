@@ -41,6 +41,10 @@ src/core/autorig/PoseTransfer.h
 src/core/autorig/PoseTransfer.cpp
 src/ui/dialogs/AutoRigDialog.h
 src/ui/dialogs/AutoRigDialog.cpp
+src/core/mdl/HandSwap.h
+src/core/mdl/HandSwap.cpp
+src/ui/workspaces/HandsWorkspace.h
+src/ui/workspaces/HandsWorkspace.cpp
 
 # just doin tests in local
 /tests

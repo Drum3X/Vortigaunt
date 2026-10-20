@@ -515,6 +515,170 @@ No tiene efecto sin un modelo de referencia.</translation>
     </message>
 </context>
 <context>
+    <name>HandsWorkspace</name>
+    <message>
+        <source>Open v_ model</source>
+        <translation>Abrir modelo v_</translation>
+    </message>
+    <message>
+        <source>Open the view model whose hands are replaced</source>
+        <translation>Abrir el modelo de vista cuyas manos se reemplazan</translation>
+    </message>
+    <message>
+        <source>New hands</source>
+        <translation>Manos nuevas</translation>
+    </message>
+    <message>
+        <source>Build</source>
+        <translation>Compilar</translation>
+    </message>
+    <message>
+        <source>Put the new hands in the model, compile it with studiomdl and show it</source>
+        <translation>Poner las manos nuevas en el modelo, compilarlo con studiomdl y mostrarlo</translation>
+    </message>
+    <message>
+        <source>Save as</source>
+        <translation>Guardar como</translation>
+    </message>
+    <message>
+        <source>Write the model with the new hands</source>
+        <translation>Guardar el modelo con las manos nuevas</translation>
+    </message>
+    <message>
+        <source>View model</source>
+        <translation>Modelo de vista</translation>
+    </message>
+    <message>
+        <source>Open v_ model...</source>
+        <translation>Abrir modelo v_...</translation>
+    </message>
+    <message>
+        <source>The parts whose hands are replaced; a part with no hands found is replaced whole</source>
+        <translation>Las partes cuyas manos se reemplazan; una parte sin manos encontradas se reemplaza entera</translation>
+    </message>
+    <message>
+        <source>Replace the hands in:</source>
+        <translation>Reemplazar las manos en:</translation>
+    </message>
+    <message>
+        <source>Build and show</source>
+        <translation>Compilar y mostrar</translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation>Mostrar</translation>
+    </message>
+    <message>
+        <source>Original</source>
+        <translation>Original</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation>Reproducir</translation>
+    </message>
+    <message>
+        <source>Animation:</source>
+        <translation>Animación:</translation>
+    </message>
+    <message>
+        <source>v_ model</source>
+        <translation>Modelo v_</translation>
+    </message>
+    <message>
+        <source>GoldSrc model (*.mdl)</source>
+        <translation>Modelo GoldSrc (*.mdl)</translation>
+    </message>
+    <message>
+        <source>Choose the new hands, an SMD or a view model to take them from; they are remembered</source>
+        <translation>Elige las manos nuevas, un SMD o un modelo de vista del que tomarlas; se recuerdan</translation>
+    </message>
+    <message>
+        <source>Choose new hands...</source>
+        <translation>Elegir manos nuevas...</translation>
+    </message>
+    <message>
+        <source>A reference SMD with its textures next to it, or a v_ model whose hands are taken. Any GoldSrc rig works: the arms are matched by their shape and the hands fitted joint by joint.</source>
+        <translation>Un SMD de referencia con sus texturas al lado, o un modelo v_ del que se toman las manos. Sirve cualquier esqueleto de GoldSrc: los brazos se emparejan por su forma y las manos se ajustan articulación por articulación.</translation>
+    </message>
+    <message>
+        <source>Open a v_ model from the ribbon, choose the new hands and build.</source>
+        <translation>Abre un modelo v_ desde la cinta, elige las manos nuevas y compila.</translation>
+    </message>
+    <message>
+        <source>Choose new hands</source>
+        <translation>Elegir manos nuevas</translation>
+    </message>
+    <message>
+        <source>Hands (*.smd *.mdl);;SMD model (*.smd);;GoldSrc model (*.mdl)</source>
+        <translation>Manos (*.smd *.mdl);;Modelo SMD (*.smd);;Modelo GoldSrc (*.mdl)</translation>
+    </message>
+    <message>
+        <source>%1 (%2 of %3 triangles are hands)</source>
+        <translation>%1 (%2 de %3 triángulos son manos)</translation>
+    </message>
+    <message>
+        <source>%1 (%2 triangles, no hands)</source>
+        <translation>%1 (%2 triángulos, sin manos)</translation>
+    </message>
+    <message>
+        <source>The model has to be compiled with studiomdl. Set the location of studiomdl in Settings.</source>
+        <translation>El modelo debe compilarse con studiomdl. Indica la ubicación de studiomdl en Configuración.</translation>
+    </message>
+    <message>
+        <source>Could not make a folder to build in.</source>
+        <translation>No se pudo crear una carpeta para compilar.</translation>
+    </message>
+    <message>
+        <source>studiomdl could not compile the model:
+
+%1</source>
+        <translation>studiomdl no pudo compilar el modelo:
+
+%1</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n triangle(s) of the old hands out</source>
+        <translation>
+            <numerusform>%n triángulo de las manos antiguas quitado</numerusform>
+            <numerusform>%n triángulos de las manos antiguas quitados</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n triangle(s) of the new hands in</source>
+        <translation>
+            <numerusform>%n triángulo de las manos nuevas añadido</numerusform>
+            <numerusform>%n triángulos de las manos nuevas añadidos</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Fitted onto the model&apos;s arms by their shape: %1 bones.</source>
+        <translation>Ajustadas a los brazos del modelo por su forma: %1 huesos.</translation>
+    </message>
+    <message>
+        <source>The bone names did not match: each vertex took the bone of the old hands where it lies.</source>
+        <translation>Los nombres de los huesos no coincidieron: cada vértice tomó el hueso de las manos antiguas donde se encuentra.</translation>
+    </message>
+    <message>
+        <source>%1 of %2 bones matched by name.</source>
+        <translation>%1 de %2 huesos coincidieron por nombre.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n warning(s) in the console</source>
+        <translation>
+            <numerusform>%n advertencia en la consola</numerusform>
+            <numerusform>%n advertencias en la consola</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Save v_ model</source>
+        <translation>Guardar modelo v_</translation>
+    </message>
+    <message>
+        <source>Could not write %1.</source>
+        <translation>No se pudo escribir %1.</translation>
+    </message>
+</context>
+<context>
     <name>LoLModelDownloadDialog</name>
     <message>
         <source>LoL Model Downloader</source>
@@ -1058,6 +1222,38 @@ image</source>
 imagen</translation>
     </message>
     <message>
+        <source>Open
+p_ model</source>
+        <translation>Abrir
+modelo p_</translation>
+    </message>
+    <message>
+        <source>Player
+model</source>
+        <translation>Modelo de
+jugador</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>Restablecer</translation>
+    </message>
+    <message>
+        <source>Open
+v_ model</source>
+        <translation>Abrir
+modelo v_</translation>
+    </message>
+    <message>
+        <source>New
+hands</source>
+        <translation>Manos
+nuevas</translation>
+    </message>
+    <message>
+        <source>Build</source>
+        <translation>Compilar</translation>
+    </message>
+    <message>
         <source>Send to
 WAD</source>
         <translation>Enviar
@@ -1150,6 +1346,18 @@ MSE</translation>
         <translation>WAD</translation>
     </message>
     <message>
+        <source>P Model</source>
+        <translation>Modelo P</translation>
+    </message>
+    <message>
+        <source>Placement</source>
+        <translation>Colocación</translation>
+    </message>
+    <message>
+        <source>Hands</source>
+        <translation>Manos</translation>
+    </message>
+    <message>
         <source>Sound</source>
         <translation>Sonido</translation>
     </message>
@@ -1180,6 +1388,18 @@ MSE</translation>
     <message>
         <source>GitHub Repository of Vortigaunt</source>
         <translation>Repositorio de GitHub de Vortigaunt</translation>
+    </message>
+    <message>
+        <source>Show on player</source>
+        <translation>Mostrar en el jugador</translation>
+    </message>
+    <message>
+        <source>Open the p_ model this file was converted to in the hands of a player model</source>
+        <translation>Abrir el modelo p_ convertido desde este archivo en las manos de un modelo de jugador</translation>
+    </message>
+    <message>
+        <source>Convert the file first; its p_ model is then shown on a player</source>
+        <translation>Convierte primero el archivo; después su modelo p_ se muestra en un jugador</translation>
     </message>
     <message>
         <source>Skipped</source>
@@ -1681,6 +1901,26 @@ La operación se elige según el tipo de archivo.</translation>
 </source>
         <translation>  ... y %1 más.
 </translation>
+    </message>
+    <message>
+        <source>The p_ model needs its QC to be compiled. Turn on Write QC and convert the file again.</source>
+        <translation>El modelo p_ necesita su QC para compilarse. Activa Generar QC y vuelve a convertir el archivo.</translation>
+    </message>
+    <message>
+        <source>Convert this file first; its p_ model is shown afterwards.</source>
+        <translation>Convierte primero este archivo; su modelo p_ se muestra después.</translation>
+    </message>
+    <message>
+        <source>The p_ model has to be compiled to be shown. Set the location of studiomdl in Settings.</source>
+        <translation>El modelo p_ debe compilarse para mostrarse. Indica la ubicación de studiomdl en Configuración.</translation>
+    </message>
+    <message>
+        <source>studiomdl could not compile %1:
+
+%2</source>
+        <translation>studiomdl no pudo compilar %1:
+
+%2</translation>
     </message>
     <message>
         <source>REZ %1/%2: %p%</source>
@@ -3920,6 +4160,153 @@ Texturas: %1</translation>
     <message>
         <source>Save changes before proceeding?</source>
         <translation>¿Guardar los cambios antes de continuar?</translation>
+    </message>
+</context>
+<context>
+    <name>WeaponFitWorkspace</name>
+    <message>
+        <source>Open p_ model</source>
+        <translation>Abrir modelo p_</translation>
+    </message>
+    <message>
+        <source>Open the p_ model to place in the player&apos;s hands</source>
+        <translation>Abrir el modelo p_ que se colocará en las manos del jugador</translation>
+    </message>
+    <message>
+        <source>Player model</source>
+        <translation>Modelo de jugador</translation>
+    </message>
+    <message>
+        <source>Choose the player model the p_ model is shown on; it is remembered</source>
+        <translation>Elegir el modelo de jugador sobre el que se muestra el modelo p_; se recuerda</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Guardar</translation>
+    </message>
+    <message>
+        <source>Write the p_ model with the weapon where it is shown</source>
+        <translation>Guardar el modelo p_ con el arma donde se muestra</translation>
+    </message>
+    <message>
+        <source>Save as</source>
+        <translation>Guardar como</translation>
+    </message>
+    <message>
+        <source>Write the placed p_ model to a new file</source>
+        <translation>Guardar el modelo p_ colocado en un archivo nuevo</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>Restablecer</translation>
+    </message>
+    <message>
+        <source>Put the weapon back where the file has it</source>
+        <translation>Devolver el arma a donde la tiene el archivo</translation>
+    </message>
+    <message>
+        <source>Player</source>
+        <translation>Jugador</translation>
+    </message>
+    <message>
+        <source>Choose player model...</source>
+        <translation>Elegir modelo de jugador...</translation>
+    </message>
+    <message>
+        <source>The player&apos;s animation; the ref_aim one of the weapon fits best</source>
+        <translation>La animación del jugador; la ref_aim del arma es la que mejor encaja</translation>
+    </message>
+    <message>
+        <source>Where the player looks: 0 straight ahead, -90 up, 90 down</source>
+        <translation>Hacia dónde mira el jugador: 0 al frente, -90 arriba, 90 abajo</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation>Reproducir</translation>
+    </message>
+    <message>
+        <source>Animation:</source>
+        <translation>Animación:</translation>
+    </message>
+    <message>
+        <source>Looking:</source>
+        <translation>Mirada:</translation>
+    </message>
+    <message>
+        <source>Weapon</source>
+        <translation>Arma</translation>
+    </message>
+    <message>
+        <source>Open p_ model...</source>
+        <translation>Abrir modelo p_...</translation>
+    </message>
+    <message>
+        <source>The bone whose vertices are moved; a p_ model hangs on the right hand, a dual one on both</source>
+        <translation>El hueso cuyos vértices se mueven; un modelo p_ cuelga de la mano derecha, uno doble de ambas</translation>
+    </message>
+    <message>
+        <source>Bone:</source>
+        <translation>Hueso:</translation>
+    </message>
+    <message>
+        <source>Open a p_ model from the ribbon, and choose a player model to hold it.</source>
+        <translation>Abre un modelo p_ desde la cinta y elige un modelo de jugador que lo sostenga.</translation>
+    </message>
+    <message>
+        <source>Placement</source>
+        <translation>Colocación</translation>
+    </message>
+    <message>
+        <source>Move %1:</source>
+        <translation>Mover %1:</translation>
+    </message>
+    <message>
+        <source>Turn %1:</source>
+        <translation>Girar %1:</translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation>Tamaño:</translation>
+    </message>
+    <message>
+        <source>Zoom to the weapon</source>
+        <translation>Acercar al arma</translation>
+    </message>
+    <message>
+        <source>Put the camera close to the weapon; double-click the view to see all again</source>
+        <translation>Acercar la cámara al arma; doble clic en la vista para volver a verlo todo</translation>
+    </message>
+    <message>
+        <source>Save p_ model</source>
+        <translation>Guardar modelo p_</translation>
+    </message>
+    <message>
+        <source>GoldSrc model (*.mdl)</source>
+        <translation>Modelo GoldSrc (*.mdl)</translation>
+    </message>
+    <message>
+        <source>p_ model</source>
+        <translation>Modelo p_</translation>
+    </message>
+    <message>
+        <source>Choose player model</source>
+        <translation>Elegir modelo de jugador</translation>
+    </message>
+    <message>
+        <source>%1 (%2 vertices)</source>
+        <translation>%1 (%2 vértices)</translation>
+    </message>
+    <message>
+        <source>No player model yet: the weapon is shown on its own. Choose one from a game folder, for example cstrike/models/player/gign/gign.mdl.</source>
+        <translation>Aún no hay modelo de jugador: el arma se muestra sola. Elige uno de una carpeta del juego, por ejemplo cstrike/models/player/gign/gign.mdl.</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>Ninguno</translation>
+    </message>
+    <message>
+        <source>Save error</source>
+        <translation>Error al guardar</translation>
     </message>
 </context>
 </TS>

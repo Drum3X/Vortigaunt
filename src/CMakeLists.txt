@@ -14,6 +14,7 @@ set(VORTIGAUNT_CORE_HEADERS
     core/converters/FbxGlbConverter.h
     core/converters/WeaponModelConverter.h
     core/mdl/StudioModel.h
+    core/mdl/StudioDecompiler.h
     core/WadMaker.h
     
     core/QCFile.h
@@ -64,6 +65,7 @@ set(VORTIGAUNT_GUI_HEADERS
     ui/workspaces/ArchiveSource.h
     ui/workspaces/ArchiveWorkspace.h
     ui/workspaces/TextureWorkspace.h
+    ui/workspaces/WeaponFitWorkspace.h
     ui/windows/SpriteViewerWindow.h
 
 
@@ -72,6 +74,7 @@ set(VORTIGAUNT_GUI_HEADERS
     ui/widgets/RibbonBar.h
     ui/widgets/TextureView.h
     ui/widgets/PaletteWidget.h
+    ui/widgets/StudioModelView.h
 
 
     ui/ThemeManager.h
@@ -90,6 +93,7 @@ set(VORTIGAUNT_CORE
     core/converters/FbxGlbConverter.cpp
     core/converters/WeaponModelConverter.cpp
     core/mdl/StudioModel.cpp
+    core/mdl/StudioDecompiler.cpp
     core/converters/AudioConvert.cpp
     core/SpriteLoader.cpp
     core/extractors/xfs/XfsExtractor.cpp
@@ -163,6 +167,7 @@ set(VORTIGAUNT_GUI
     ui/workspaces/ArchiveSource.cpp
     ui/workspaces/ArchiveWorkspace.cpp
     ui/workspaces/TextureWorkspace.cpp
+    ui/workspaces/WeaponFitWorkspace.cpp
     ui/windows/SpriteViewerWindow.cpp
 
 
@@ -170,6 +175,7 @@ set(VORTIGAUNT_GUI
     ui/widgets/GLBViewer.cpp
     ui/widgets/RibbonBar.cpp
     ui/widgets/PaletteWidget.cpp
+    ui/widgets/StudioModelView.cpp
 
 
     core/LanguageManager.cpp
@@ -216,6 +222,7 @@ if(VORTIGAUNT_AUTORIG)
         core/autorig/MeshBvh.h core/autorig/MeshBvh.cpp
         core/autorig/WeightTransfer.h core/autorig/WeightTransfer.cpp
         core/autorig/SkeletonMath.h core/autorig/SkeletonMath.cpp
+        core/mdl/HandSwap.h core/mdl/HandSwap.cpp
     )
     target_compile_definitions(VortigauntTool PRIVATE ENABLE_AUTORIG)
 endif()
@@ -284,6 +291,8 @@ if(BUILD_GUI)
         core/autorig/WeightTransfer.h core/autorig/WeightTransfer.cpp
         core/autorig/SkeletonMath.h core/autorig/SkeletonMath.cpp
         ui/dialogs/AutoRigDialog.h ui/dialogs/AutoRigDialog.cpp
+        core/mdl/HandSwap.h core/mdl/HandSwap.cpp
+        ui/workspaces/HandsWorkspace.h ui/workspaces/HandsWorkspace.cpp
         )
         target_compile_definitions(VortigauntTool_gui PRIVATE ENABLE_AUTORIG)
     endif()

@@ -5,6 +5,8 @@
 
 #include "core/converters/IConverter.h"
 
+class StudioModel;
+
 // This is a converter for GoldSrc weapon models. It can convert a model into a view model (p_) and a world model (w_).
 // It can also generate the QC files for compiling the models. The converter can be used in a command-line tool or as a library.
 
@@ -77,6 +79,8 @@ class WeaponModelConverter : public IConverter
 {
 public:
     static bool IsViewModelFile(const std::string& path);
+    // for each body part, model and mesh of a view model, whether it is the skin of the hands
+    static std::vector<std::vector<std::vector<bool>>> FindHandMeshes(const StudioModel& model);
 
     WeaponModelResult Convert(const std::string& inputPath, const std::string& outputDir, const WeaponModelOptions& options = WeaponModelOptions());
 

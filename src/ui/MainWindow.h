@@ -33,8 +33,13 @@ class ArchiveWorkspace;
 class GLBViewer;
 class RibbonBar;
 class TextureWorkspace;
+class StudioModelView;
 class SpriteViewerWindow;
 class WadMakerDialog;
+class WeaponFitWorkspace;
+#ifdef ENABLE_AUTORIG
+class HandsWorkspace;
+#endif
 class VortigauntUpdateCheck;
 
 class MainWindow : public QMainWindow
@@ -60,6 +65,9 @@ public:
 
     // shows the WAD tab with the WAD open in it
     void openWad(const QString& path);
+
+    // shows the P Model tab with the p_ model in the player's hands
+    void openWeaponFit(const QString& path);
 
     // each file where it belongs: archives, textures, sprites and WADs in their tabs, the rest in the Convert list
     void openPaths(const QStringList& paths);
@@ -202,7 +210,11 @@ private:
 
     bool convertFbxGlb(const QString& inputPath, const QString& outputDir, bool writeQC);
 
-    bool convertViewModel(const QString& inputPath, const QString& outputDir, const WeaponModelOptions& options);
+    // pQcs gets the QC files of the p_ models it wrote
+    bool convertViewModel(const QString& inputPath, const QString& outputDir, const WeaponModelOptions& options, QStringList* pQcs = nullptr);
+
+    // the p_ model converted from the selected row, compiled when it is not yet, in the hands of the player
+    void showSelectedOnPlayer();
 
     bool convertDtx(const QString& inputPath, const QString& outputDir);
 
@@ -232,6 +244,10 @@ private:
     TextureWorkspace* m_textureWorkspace = nullptr;
     SpriteViewerWindow* m_spriteWorkspace = nullptr;
     WadMakerDialog* m_wadWorkspace = nullptr;
+    WeaponFitWorkspace* m_weaponFitWorkspace = nullptr;
+#ifdef ENABLE_AUTORIG
+    HandsWorkspace* m_handsWorkspace = nullptr;
+#endif
     bool           m_convertDocksShown = true;
     bool           m_filesDockWasVisible = true;
     bool           m_propertiesDockWasVisible = true;
@@ -271,6 +287,7 @@ private:
     QLabel*        m_previewHint = nullptr;
     GLBViewer*     m_modelPreview = nullptr;
     QLabel*        m_imagePreview = nullptr;
+    StudioModelView* m_studioPreview = nullptr;  // GoldSrc .mdl
     QLabel*        m_previewInfo = nullptr;
     QPushButton*   m_previewOpenButton = nullptr;
     QString        m_previewPath;
@@ -289,6 +306,7 @@ private:
     QLineEdit*      m_weaponReferenceEdit = nullptr;
     QPushButton*    m_weaponReferenceBrowse = nullptr;
     QCheckBox*      m_weaponUpsideDownCheck = nullptr;
+    QPushButton*    m_showOnPlayerButton = nullptr;
     QCheckBox*     m_separateFoldersCheck;  // For multiple extraction
     QCheckBox*     m_unityBmpCheck;         // Unity mode: convert textures to 8-bit BMP (unchecked = 32-bit PNG)
     QPlainTextEdit* m_logEdit;

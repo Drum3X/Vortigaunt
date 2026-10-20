@@ -89,6 +89,12 @@
 #include "workspaces/ArchiveSource.h"
 #include "workspaces/ArchiveWorkspace.h"
 #include "workspaces/TextureWorkspace.h"
+#ifdef ENABLE_AUTORIG
+#include "workspaces/HandsWorkspace.h"
+#endif
+#include "workspaces/WeaponFitWorkspace.h"
+#include "widgets/StudioModelView.h"
+#include "core/mdl/StudioModel.h"
 #include "SpriteViewerWindow.h"
 #include "LoLModelDownloadDialog.h"
 #include "SteamWorkshopDownloaderDialog.h"
@@ -132,6 +138,8 @@ enum class StatusKind
 constexpr int kPathRole = Qt::UserRole;
 constexpr int kOpRole = Qt::UserRole + 1;
 constexpr int kSubfolderRole = Qt::UserRole + 2;
+constexpr int kPModelRole = Qt::UserRole + 3;  // the QC of the p_ model a v_ model was converted to
+constexpr int kConvertedRole = Qt::UserRole + 4;  // the row was converted, with or without a QC
 
 // bigger models freeze the window while they load
 constexpr qint64 kMaxPreviewBytes = 60ll * 1024 * 1024;
@@ -163,6 +171,11 @@ constexpr const char* kIconView = "M2 12l5-5h10l5 5-5 5H7z M10 10h4v4h-4z";
 constexpr const char* kIconCreate = "M3 5h7v14H3z M14 5h7v14h-7z M17.5 9v6 M14.5 12h6";
 constexpr const char* kIconFix = "M14 4l6 6-9 9H5v-6z M12 6l6 6";
 constexpr const char* kIconRename = "M4 20h4l11-11-4-4L4 16z M13 7l4 4";
+constexpr const char* kIconPlayer = "M10 3h4v4h-4z M12 7v7 M7 10h10 M12 14l-3 7 M12 14l3 7";
+#ifdef ENABLE_AUTORIG
+constexpr const char* kIconHands = "M6 21l-2-8 M6 21h9l3-8 M8 13V4 M11 12V3 M14 12V4 M17 13V7";
+#endif
+constexpr const char* kIconReset =  "M4 4v6h6 M4 10l4-4h8v12H8";
 constexpr const char* kIconSprite = "M3 5h7v14H3z M14 5h7v14h-7z";
 constexpr const char* kIconWad = "M4 4h16v16H4z M4 12h16 M12 4v16";
 constexpr const char* kIconAudio = "M4 10v4 M8 7v10 M12 4v16 M16 8v8 M20 11v2";
@@ -354,6 +367,17 @@ void MainWindow::setupRibbon()
     workspaceCommand(m_wadWorkspace->extractAction(), tr("Extract"), kIconExtract, m_wadWorkspace);
     workspaceCommand(m_wadWorkspace->renameAction(), tr("Rename"), kIconRename, m_wadWorkspace);
     workspaceCommand(m_wadWorkspace->replaceAction(), tr("Replace\nimage"), kIconFrame, m_wadWorkspace);
+    workspaceCommand(m_weaponFitWorkspace->openAction(), tr("Open\np_ model"), kIconOpen, m_weaponFitWorkspace);
+    workspaceCommand(m_weaponFitWorkspace->playerAction(), tr("Player\nmodel"), kIconPlayer, m_weaponFitWorkspace);
+    workspaceCommand(m_weaponFitWorkspace->resetAction(), tr("Reset"), kIconReset, m_weaponFitWorkspace);
+    workspaceCommand(m_weaponFitWorkspace->saveAction(), tr("Save"), kIconSave, m_weaponFitWorkspace);
+    workspaceCommand(m_weaponFitWorkspace->saveAsAction(), tr("Save\nas"), kIconSave, m_weaponFitWorkspace);
+#ifdef ENABLE_AUTORIG
+    workspaceCommand(m_handsWorkspace->openAction(), tr("Open\nv_ model"), kIconOpen, m_handsWorkspace);
+    workspaceCommand(m_handsWorkspace->handsAction(), tr("New\nhands"), kIconHands, m_handsWorkspace);
+    workspaceCommand(m_handsWorkspace->buildAction(), tr("Build"), kIconCompile, m_handsWorkspace);
+    workspaceCommand(m_handsWorkspace->saveAsAction(), tr("Save\nas"), kIconSave, m_handsWorkspace);
+#endif
     QAction* texturesToWadAction = command(tr("Send to\nWAD"), tr("Add the selected textures to the WAD open in the WAD tab"), kIconWad);
     connect(texturesToWadAction, &QAction::triggered, m_textureWorkspace, &TextureWorkspace::sendSelectedToWad);
     m_audioConvertAction = new QAction(tr("Convert WAV for Goldsrc..."), this);
@@ -445,6 +469,27 @@ void MainWindow::setupRibbon()
     m_ribbon->addButton(wadTextureGroup, m_wadWorkspace->extractAction());
     m_ribbon->addButton(wadTextureGroup, m_wadWorkspace->renameAction());
     m_ribbon->addButton(wadTextureGroup, m_wadWorkspace->replaceAction());
+
+    const int weaponTab = m_ribbon->addTab(tr("P Model"));
+    m_persistentWorkspaces.push_back({ m_weaponFitWorkspace, weaponTab, tr("P Model") });
+    QWidget* weaponFileGroup = m_ribbon->addGroup(weaponTab, tr("Model"));
+    m_ribbon->addButton(weaponFileGroup, m_weaponFitWorkspace->openAction());
+    m_ribbon->addButton(weaponFileGroup, m_weaponFitWorkspace->playerAction());
+    QWidget* weaponSaveGroup = m_ribbon->addGroup(weaponTab, tr("Placement"));
+    m_ribbon->addButton(weaponSaveGroup, m_weaponFitWorkspace->resetAction());
+    m_ribbon->addButton(weaponSaveGroup, m_weaponFitWorkspace->saveAction());
+    m_ribbon->addButton(weaponSaveGroup, m_weaponFitWorkspace->saveAsAction());
+
+#ifdef ENABLE_AUTORIG
+    const int handsTab = m_ribbon->addTab(tr("Hands"));
+    m_persistentWorkspaces.push_back({ m_handsWorkspace, handsTab, tr("Hands") });
+    QWidget* handsModelGroup = m_ribbon->addGroup(handsTab, tr("Model"));
+    m_ribbon->addButton(handsModelGroup, m_handsWorkspace->openAction());
+    m_ribbon->addButton(handsModelGroup, m_handsWorkspace->handsAction());
+    QWidget* handsBuildGroup = m_ribbon->addGroup(handsTab, tr("Build"));
+    m_ribbon->addButton(handsBuildGroup, m_handsWorkspace->buildAction());
+    m_ribbon->addButton(handsBuildGroup, m_handsWorkspace->saveAsAction());
+#endif
 
     const int toolsTab = m_ribbon->addTab(tr("Tools"));
     m_toolsRibbonTab = toolsTab;
@@ -688,6 +733,10 @@ void MainWindow::setupDocks()
     m_weaponUpsideDownCheck = new QCheckBox(tr("Upside down"), m_weaponGroup);
     m_weaponUpsideDownCheck->setToolTip(tr("Turns the weapon end for end in the hand. For a grenade or knife that came out the wrong way up."));
     weaponForm->addRow(m_weaponUpsideDownCheck);
+    m_showOnPlayerButton = new QPushButton(tr("Show on player"), m_weaponGroup);
+    m_showOnPlayerButton->setToolTip(tr("Open the p_ model this file was converted to in the hands of a player model"));
+    weaponForm->addRow(m_showOnPlayerButton);
+    connect(m_showOnPlayerButton, &QPushButton::clicked, this, &MainWindow::showSelectedOnPlayer);
     propertiesLayout->addWidget(m_weaponGroup);
 
     // GR2 animations
@@ -857,6 +906,7 @@ void MainWindow::setupPreview()
     m_preview->addWidget(m_imagePreview);
 
     auto* infoPage = new QWidget(m_preview);
+    m_studioPreview = new StudioModelView(m_preview);
     auto* infoLayout = new QVBoxLayout(infoPage);
     infoLayout->addStretch();
     m_previewInfo = new QLabel(infoPage);
@@ -867,6 +917,8 @@ void MainWindow::setupPreview()
     infoLayout->addWidget(m_previewOpenButton, 0, Qt::AlignCenter);
     infoLayout->addStretch();
     m_preview->addWidget(infoPage);
+    // after the info page, which is page 3
+    m_preview->addWidget(m_studioPreview);
 
     m_workspaces = new QTabWidget(this);
     m_workspaces->setDocumentMode(true);
@@ -904,12 +956,29 @@ void MainWindow::setupPreview()
     };
     connect(m_textureWorkspace, &TextureWorkspace::sendToWad, this, sendToWad);
     connect(m_archiveWorkspace, &ArchiveWorkspace::sendToWad, this, sendToWad);
-    // an unsaved WAD shows a * on its tab
-    connect(m_wadWorkspace, &WadMakerDialog::modifiedChanged, this, [this](bool modified) {
-        const int index = m_workspaces->indexOf(m_wadWorkspace);
-        if (index > 0)
-            m_workspaces->setTabText(index, tr("WAD") + (modified ? QStringLiteral("*") : QString()));
-    });
+    m_weaponFitWorkspace = new WeaponFitWorkspace(this);
+    m_weaponFitWorkspace->hide();
+#ifdef ENABLE_AUTORIG
+    m_handsWorkspace = new HandsWorkspace(this);
+    m_handsWorkspace->hide();
+#endif
+
+    // what is not saved yet shows a * on its tab
+    auto showModified = [this](QWidget* workspace, bool modified) {
+        // a property, as setWindowModified wants a [*] in a window title
+        workspace->setProperty("vortigauntUnsaved", modified);
+        const int index = m_workspaces->indexOf(workspace);
+        const Workspace* entry = workspaceOf(workspace);
+        if (index > 0 && entry)
+            m_workspaces->setTabText(index, entry->title + (modified ? QStringLiteral("*") : QString()));
+    };
+    connect(m_wadWorkspace, &WadMakerDialog::modifiedChanged, this, [this, showModified](bool modified) { showModified(m_wadWorkspace, modified); });
+    connect(m_weaponFitWorkspace, &WeaponFitWorkspace::modifiedChanged, this,
+            [this, showModified](bool modified) { showModified(m_weaponFitWorkspace, modified); });
+#ifdef ENABLE_AUTORIG
+    connect(m_handsWorkspace, &HandsWorkspace::modifiedChanged, this,
+            [this, showModified](bool modified) { showModified(m_handsWorkspace, modified); });
+#endif
 }
 
 void MainWindow::openToolTab(QWidget* tool, const QString& title)
@@ -978,7 +1047,7 @@ void MainWindow::showWorkspace(QWidget* widget)
 {
     if (const Workspace* workspace = workspaceOf(widget))
     {
-        const bool unsaved = widget == m_wadWorkspace && m_wadWorkspace->isModified();
+        const bool unsaved = widget->property("vortigauntUnsaved").toBool();
         openToolTab(widget, workspace->title + (unsaved ? QStringLiteral("*") : QString()));
     }
 }
@@ -1008,6 +1077,12 @@ void MainWindow::openWad(const QString& path)
     m_wadWorkspace->loadWad(path);
 }
 
+void MainWindow::openWeaponFit(const QString& path)
+{
+    showWorkspace(m_weaponFitWorkspace);
+    m_weaponFitWorkspace->openWeapon(path);
+}
+
 void MainWindow::openPaths(const QStringList& paths)
 {
     QStringList textures;
@@ -1023,6 +1098,8 @@ void MainWindow::openPaths(const QStringList& paths)
             openSprite(path);
         else if (ext == "wad")
             openWad(path);
+        else if (ext == "mdl" && QFileInfo(path).fileName().startsWith(QStringLiteral("p_"), Qt::CaseInsensitive))
+            openWeaponFit(path);
         else
             others << path;
     }
@@ -1204,6 +1281,11 @@ void MainWindow::updatePropertiesFor(FileOp op)
 {
     const bool model = op == FileOp::Ltb || op == FileOp::Gr2 || op == FileOp::Mesh || op == FileOp::Weapon;
     m_weaponGroup->setVisible(op == FileOp::Weapon);
+    QTreeWidgetItem* current = m_fileList->currentItem();
+    const bool converted = current && current->data(0, kConvertedRole).toBool();
+    m_showOnPlayerButton->setEnabled(converted && !m_isProcessing);
+    m_showOnPlayerButton->setToolTip(converted ? tr("Open the p_ model this file was converted to in the hands of a player model")
+                                               : tr("Convert the file first; its p_ model is then shown on a player"));
     m_gr2AnimGroup->setVisible(op == FileOp::Gr2);
     m_modelGroup->setVisible(model);
     m_ignoreMeshesCheck->setVisible(op == FileOp::Ltb || op == FileOp::Gr2);
@@ -1235,6 +1317,19 @@ void MainWindow::showPreview(const QString& path, FileOp op)
                                    .arg(info.fileName().toHtmlEscaped(), UiUtils::formatSize(info.size()), text));
         m_preview->setCurrentIndex(3);
     };
+
+    // GoldSrc models, the view models among them, with their first animation
+    if (ext == "mdl")
+    {
+        auto model = std::make_shared<StudioModel>();
+        if (info.size() <= kMaxPreviewBytes && model->Load(path.toStdString()))
+        {
+            m_studioPreview->clearModels();
+            m_studioPreview->setSequence(m_studioPreview->addModel(model), 0);
+            m_preview->setCurrentWidget(m_studioPreview);
+            return;
+        }
+    }
 
     if (op == FileOp::Mesh)
     {
@@ -1651,7 +1746,23 @@ void MainWindow::onRun()
                 case FileOp::Ltb: ok = convertLtb(job.path, job.outputDir, ltbSettings); break;
                 case FileOp::Gr2: ok = convertGr2(job.path, job.outputDir, gr2WithAnimations); break;
                 case FileOp::Mesh: ok = convertFbxGlb(job.path, job.outputDir, writeQC); break;
-                case FileOp::Weapon: ok = convertViewModel(job.path, job.outputDir, weaponOptions); break;
+                case FileOp::Weapon:
+                {
+                    // the row remembers its p_ model, for Show on player
+                    QStringList pQcs;
+                    ok = convertViewModel(job.path, job.outputDir, weaponOptions, &pQcs);
+                    if (ok)
+                    {
+                        QTreeWidgetItem* item = job.item;
+                        const QString qc = pQcs.isEmpty() ? QString() : pQcs.front();
+                        QMetaObject::invokeMethod(this, [this, item, qc]() {
+                            item->setData(0, kPModelRole, qc);
+                            item->setData(0, kConvertedRole, true);
+                            onFileSelectionChanged();
+                        }, Qt::QueuedConnection);
+                    }
+                    break;
+                }
                 case FileOp::Dtx: ok = convertDtx(job.path, job.outputDir); break;
                 case FileOp::Unity:
                 {
@@ -1809,12 +1920,61 @@ void MainWindow::updateWeaponModelControls()
     m_weaponReferenceEdit->parentWidget()->setVisible(needsReference);
 }
 
-bool MainWindow::convertViewModel(const QString& inputPath, const QString& outputDir, const WeaponModelOptions& options)
+bool MainWindow::convertViewModel(const QString& inputPath, const QString& outputDir, const WeaponModelOptions& options, QStringList* pQcs)
 {
     WeaponModelConverter converter;
     converter.SetOptions(options);
-    const ConvertAssets summary = runConverter(converter, inputPath, outputDir);
+    const ConvertAssets summary = runConverter(converter, inputPath, outputDir, [pQcs](const ConvertResult& result) {
+        for (const std::string& qc : result.qcFiles)
+        {
+            const QString path = QString::fromStdString(qc);
+            if (pQcs && QFileInfo(path).fileName().startsWith(QStringLiteral("p_"), Qt::CaseInsensitive))
+                pQcs->append(path);
+        }
+    });
     return summary.total > 0 && summary.failed.empty();
+}
+
+void MainWindow::showSelectedOnPlayer()
+{
+    QTreeWidgetItem* item = m_fileList->currentItem();
+    const QString qc = item ? item->data(0, kPModelRole).toString() : QString();
+    if (qc.isEmpty())
+    {
+        const bool converted = item && item->data(0, kConvertedRole).toBool();
+        QMessageBox::information(this, tr("Show on player"),
+                                 converted ? tr("The p_ model needs its QC to be compiled. Turn on Write QC and convert the file again.")
+                                           : tr("Convert this file first; its p_ model is shown afterwards."));
+        return;
+    }
+
+    // the QC puts the model next to itself; compiled now when it is missing or older than the QC
+    const QFileInfo qcInfo(qc);
+    QString model = qcInfo.dir().filePath(qcInfo.completeBaseName() + QStringLiteral(".mdl"));
+    const QFileInfo modelInfo(model);
+    if (!modelInfo.exists() || modelInfo.lastModified() < qcInfo.lastModified())
+    {
+        const QString studiomdl = SettingsDialog::getStudioMdlPath();
+        if (!QFileInfo(studiomdl).isFile())
+        {
+            QMessageBox::warning(this, tr("Show on player"),
+                                 tr("The p_ model has to be compiled to be shown. Set the location of studiomdl in Settings."));
+            return;
+        }
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+        const QCCompileResult result = QCFile::Compile(studiomdl.toStdString(), qc.toStdString());
+        QApplication::restoreOverrideCursor();
+        if (!result.Ok)
+        {
+            QMessageBox::warning(this, tr("Show on player"), tr("studiomdl could not compile %1:\n\n%2")
+                                 .arg(qcInfo.fileName(), QString::fromStdString(result.Error)));
+            return;
+        }
+        VortigauntLog::Vortigaunt_Printf(QStringLiteral("^2Compiled:^7 %1").arg(QString::fromStdString(result.ModelPath)));
+        if (!result.ModelPath.empty())
+            model = QString::fromStdString(result.ModelPath);
+    }
+    openWeaponFit(model);
 }
 
 bool MainWindow::convertLtb(const QString& inputPath, const QString& outputDir, const ltbConverterSetting& settings)
@@ -2792,6 +2952,9 @@ void MainWindow::setUiProcessing(bool processing)
     m_outputFolderAction->setEnabled(!processing);
     m_fileOpCombo->setEnabled(!processing && !m_fileList->selectedItems().isEmpty());
     if (m_settingsAction) m_settingsAction->setDisabled(processing);
+    // what the finished work brought, like a p_ model to show on the player
+    if (!processing)
+        onFileSelectionChanged();
 }
 
 void MainWindow::runInBackground(std::function<void()> task)

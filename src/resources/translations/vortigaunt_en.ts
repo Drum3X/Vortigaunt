@@ -515,6 +515,170 @@ Has no effect without a reference model.</translation>
     </message>
 </context>
 <context>
+    <name>HandsWorkspace</name>
+    <message>
+        <source>Open v_ model</source>
+        <translation>Open v_ model</translation>
+    </message>
+    <message>
+        <source>Open the view model whose hands are replaced</source>
+        <translation>Open the view model whose hands are replaced</translation>
+    </message>
+    <message>
+        <source>New hands</source>
+        <translation>New hands</translation>
+    </message>
+    <message>
+        <source>Build</source>
+        <translation>Build</translation>
+    </message>
+    <message>
+        <source>Put the new hands in the model, compile it with studiomdl and show it</source>
+        <translation>Put the new hands in the model, compile it with studiomdl and show it</translation>
+    </message>
+    <message>
+        <source>Save as</source>
+        <translation>Save as</translation>
+    </message>
+    <message>
+        <source>Write the model with the new hands</source>
+        <translation>Write the model with the new hands</translation>
+    </message>
+    <message>
+        <source>View model</source>
+        <translation>View model</translation>
+    </message>
+    <message>
+        <source>Open v_ model...</source>
+        <translation>Open v_ model...</translation>
+    </message>
+    <message>
+        <source>The parts whose hands are replaced; a part with no hands found is replaced whole</source>
+        <translation>The parts whose hands are replaced; a part with no hands found is replaced whole</translation>
+    </message>
+    <message>
+        <source>Replace the hands in:</source>
+        <translation>Replace the hands in:</translation>
+    </message>
+    <message>
+        <source>Build and show</source>
+        <translation>Build and show</translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation>Show</translation>
+    </message>
+    <message>
+        <source>Original</source>
+        <translation>Original</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation>Play</translation>
+    </message>
+    <message>
+        <source>Animation:</source>
+        <translation>Animation:</translation>
+    </message>
+    <message>
+        <source>v_ model</source>
+        <translation>v_ model</translation>
+    </message>
+    <message>
+        <source>GoldSrc model (*.mdl)</source>
+        <translation>GoldSrc model (*.mdl)</translation>
+    </message>
+    <message>
+        <source>Choose the new hands, an SMD or a view model to take them from; they are remembered</source>
+        <translation>Choose the new hands, an SMD or a view model to take them from; they are remembered</translation>
+    </message>
+    <message>
+        <source>Choose new hands...</source>
+        <translation>Choose new hands...</translation>
+    </message>
+    <message>
+        <source>A reference SMD with its textures next to it, or a v_ model whose hands are taken. Any GoldSrc rig works: the arms are matched by their shape and the hands fitted joint by joint.</source>
+        <translation>A reference SMD with its textures next to it, or a v_ model whose hands are taken. Any GoldSrc rig works: the arms are matched by their shape and the hands fitted joint by joint.</translation>
+    </message>
+    <message>
+        <source>Open a v_ model from the ribbon, choose the new hands and build.</source>
+        <translation>Open a v_ model from the ribbon, choose the new hands and build.</translation>
+    </message>
+    <message>
+        <source>Choose new hands</source>
+        <translation>Choose new hands</translation>
+    </message>
+    <message>
+        <source>Hands (*.smd *.mdl);;SMD model (*.smd);;GoldSrc model (*.mdl)</source>
+        <translation>Hands (*.smd *.mdl);;SMD model (*.smd);;GoldSrc model (*.mdl)</translation>
+    </message>
+    <message>
+        <source>%1 (%2 of %3 triangles are hands)</source>
+        <translation>%1 (%2 of %3 triangles are hands)</translation>
+    </message>
+    <message>
+        <source>%1 (%2 triangles, no hands)</source>
+        <translation>%1 (%2 triangles, no hands)</translation>
+    </message>
+    <message>
+        <source>The model has to be compiled with studiomdl. Set the location of studiomdl in Settings.</source>
+        <translation>The model has to be compiled with studiomdl. Set the location of studiomdl in Settings.</translation>
+    </message>
+    <message>
+        <source>Could not make a folder to build in.</source>
+        <translation>Could not make a folder to build in.</translation>
+    </message>
+    <message>
+        <source>studiomdl could not compile the model:
+
+%1</source>
+        <translation>studiomdl could not compile the model:
+
+%1</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n triangle(s) of the old hands out</source>
+        <translation>
+            <numerusform>%n triangle of the old hands out</numerusform>
+            <numerusform>%n triangles of the old hands out</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n triangle(s) of the new hands in</source>
+        <translation>
+            <numerusform>%n triangle of the new hands in</numerusform>
+            <numerusform>%n triangles of the new hands in</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Fitted onto the model&apos;s arms by their shape: %1 bones.</source>
+        <translation>Fitted onto the model&apos;s arms by their shape: %1 bones.</translation>
+    </message>
+    <message>
+        <source>The bone names did not match: each vertex took the bone of the old hands where it lies.</source>
+        <translation>The bone names did not match: each vertex took the bone of the old hands where it lies.</translation>
+    </message>
+    <message>
+        <source>%1 of %2 bones matched by name.</source>
+        <translation>%1 of %2 bones matched by name.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n warning(s) in the console</source>
+        <translation>
+            <numerusform>%n warning in the console</numerusform>
+            <numerusform>%n warnings in the console</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Save v_ model</source>
+        <translation>Save v_ model</translation>
+    </message>
+    <message>
+        <source>Could not write %1.</source>
+        <translation>Could not write %1.</translation>
+    </message>
+</context>
+<context>
     <name>LoLModelDownloadDialog</name>
     <message>
         <source>LoL Model Downloader</source>
@@ -1058,6 +1222,38 @@ image</source>
 image</translation>
     </message>
     <message>
+        <source>Open
+p_ model</source>
+        <translation>Open
+p_ model</translation>
+    </message>
+    <message>
+        <source>Player
+model</source>
+        <translation>Player
+model</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>Reset</translation>
+    </message>
+    <message>
+        <source>Open
+v_ model</source>
+        <translation>Open
+v_ model</translation>
+    </message>
+    <message>
+        <source>New
+hands</source>
+        <translation>New
+hands</translation>
+    </message>
+    <message>
+        <source>Build</source>
+        <translation>Build</translation>
+    </message>
+    <message>
         <source>Send to
 WAD</source>
         <translation>Send to
@@ -1150,6 +1346,18 @@ viewer</translation>
         <translation>WAD</translation>
     </message>
     <message>
+        <source>P Model</source>
+        <translation>P Model</translation>
+    </message>
+    <message>
+        <source>Placement</source>
+        <translation>Placement</translation>
+    </message>
+    <message>
+        <source>Hands</source>
+        <translation>Hands</translation>
+    </message>
+    <message>
         <source>Sound</source>
         <translation>Sound</translation>
     </message>
@@ -1180,6 +1388,18 @@ viewer</translation>
     <message>
         <source>GitHub Repository of Vortigaunt</source>
         <translation>GitHub Repository of Vortigaunt</translation>
+    </message>
+    <message>
+        <source>Show on player</source>
+        <translation>Show on player</translation>
+    </message>
+    <message>
+        <source>Open the p_ model this file was converted to in the hands of a player model</source>
+        <translation>Open the p_ model this file was converted to in the hands of a player model</translation>
+    </message>
+    <message>
+        <source>Convert the file first; its p_ model is then shown on a player</source>
+        <translation>Convert the file first; its p_ model is then shown on a player</translation>
     </message>
     <message>
         <source>Skipped</source>
@@ -1681,6 +1901,26 @@ The operation is picked from the file type.</translation>
 </source>
         <translation>  ... and %1 more.
 </translation>
+    </message>
+    <message>
+        <source>The p_ model needs its QC to be compiled. Turn on Write QC and convert the file again.</source>
+        <translation>The p_ model needs its QC to be compiled. Turn on Write QC and convert the file again.</translation>
+    </message>
+    <message>
+        <source>Convert this file first; its p_ model is shown afterwards.</source>
+        <translation>Convert this file first; its p_ model is shown afterwards.</translation>
+    </message>
+    <message>
+        <source>The p_ model has to be compiled to be shown. Set the location of studiomdl in Settings.</source>
+        <translation>The p_ model has to be compiled to be shown. Set the location of studiomdl in Settings.</translation>
+    </message>
+    <message>
+        <source>studiomdl could not compile %1:
+
+%2</source>
+        <translation>studiomdl could not compile %1:
+
+%2</translation>
     </message>
     <message>
         <source>REZ %1/%2: %p%</source>
@@ -3920,6 +4160,153 @@ Textures: %1</translation>
     <message>
         <source>Save changes before proceeding?</source>
         <translation>Save changes before proceeding?</translation>
+    </message>
+</context>
+<context>
+    <name>WeaponFitWorkspace</name>
+    <message>
+        <source>Open p_ model</source>
+        <translation>Open p_ model</translation>
+    </message>
+    <message>
+        <source>Open the p_ model to place in the player&apos;s hands</source>
+        <translation>Open the p_ model to place in the player&apos;s hands</translation>
+    </message>
+    <message>
+        <source>Player model</source>
+        <translation>Player model</translation>
+    </message>
+    <message>
+        <source>Choose the player model the p_ model is shown on; it is remembered</source>
+        <translation>Choose the player model the p_ model is shown on; it is remembered</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Save</translation>
+    </message>
+    <message>
+        <source>Write the p_ model with the weapon where it is shown</source>
+        <translation>Write the p_ model with the weapon where it is shown</translation>
+    </message>
+    <message>
+        <source>Save as</source>
+        <translation>Save as</translation>
+    </message>
+    <message>
+        <source>Write the placed p_ model to a new file</source>
+        <translation>Write the placed p_ model to a new file</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>Reset</translation>
+    </message>
+    <message>
+        <source>Put the weapon back where the file has it</source>
+        <translation>Put the weapon back where the file has it</translation>
+    </message>
+    <message>
+        <source>Player</source>
+        <translation>Player</translation>
+    </message>
+    <message>
+        <source>Choose player model...</source>
+        <translation>Choose player model...</translation>
+    </message>
+    <message>
+        <source>The player&apos;s animation; the ref_aim one of the weapon fits best</source>
+        <translation>The player&apos;s animation; the ref_aim one of the weapon fits best</translation>
+    </message>
+    <message>
+        <source>Where the player looks: 0 straight ahead, -90 up, 90 down</source>
+        <translation>Where the player looks: 0 straight ahead, -90 up, 90 down</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation>Play</translation>
+    </message>
+    <message>
+        <source>Animation:</source>
+        <translation>Animation:</translation>
+    </message>
+    <message>
+        <source>Looking:</source>
+        <translation>Looking:</translation>
+    </message>
+    <message>
+        <source>Weapon</source>
+        <translation>Weapon</translation>
+    </message>
+    <message>
+        <source>Open p_ model...</source>
+        <translation>Open p_ model...</translation>
+    </message>
+    <message>
+        <source>The bone whose vertices are moved; a p_ model hangs on the right hand, a dual one on both</source>
+        <translation>The bone whose vertices are moved; a p_ model hangs on the right hand, a dual one on both</translation>
+    </message>
+    <message>
+        <source>Bone:</source>
+        <translation>Bone:</translation>
+    </message>
+    <message>
+        <source>Open a p_ model from the ribbon, and choose a player model to hold it.</source>
+        <translation>Open a p_ model from the ribbon, and choose a player model to hold it.</translation>
+    </message>
+    <message>
+        <source>Placement</source>
+        <translation>Placement</translation>
+    </message>
+    <message>
+        <source>Move %1:</source>
+        <translation>Move %1:</translation>
+    </message>
+    <message>
+        <source>Turn %1:</source>
+        <translation>Turn %1:</translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation>Size:</translation>
+    </message>
+    <message>
+        <source>Zoom to the weapon</source>
+        <translation>Zoom to the weapon</translation>
+    </message>
+    <message>
+        <source>Put the camera close to the weapon; double-click the view to see all again</source>
+        <translation>Put the camera close to the weapon; double-click the view to see all again</translation>
+    </message>
+    <message>
+        <source>Save p_ model</source>
+        <translation>Save p_ model</translation>
+    </message>
+    <message>
+        <source>GoldSrc model (*.mdl)</source>
+        <translation>GoldSrc model (*.mdl)</translation>
+    </message>
+    <message>
+        <source>p_ model</source>
+        <translation>p_ model</translation>
+    </message>
+    <message>
+        <source>Choose player model</source>
+        <translation>Choose player model</translation>
+    </message>
+    <message>
+        <source>%1 (%2 vertices)</source>
+        <translation>%1 (%2 vertices)</translation>
+    </message>
+    <message>
+        <source>No player model yet: the weapon is shown on its own. Choose one from a game folder, for example cstrike/models/player/gign/gign.mdl.</source>
+        <translation>No player model yet: the weapon is shown on its own. Choose one from a game folder, for example cstrike/models/player/gign/gign.mdl.</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>None</translation>
+    </message>
+    <message>
+        <source>Save error</source>
+        <translation>Save error</translation>
     </message>
 </context>
 </TS>

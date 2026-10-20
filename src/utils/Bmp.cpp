@@ -71,13 +71,6 @@ void toBmpPalette(const uint8_t* paletteRgb, uint8_t* paletteBgra)
     }
 }
 
-bool writeIndexed8Rgb(const std::string& filename, int width, int height, const uint8_t* paletteRgb, const uint8_t* pixels)
-{
-    uint8_t palette[1024];
-    toBmpPalette(paletteRgb, palette);
-    return BMP::writeIndexed8(filename.c_str(), width, height, palette, pixels);
-}
-
 } // namespace
 
 namespace BMP
@@ -122,6 +115,13 @@ bool writeIndexed8(const char* filename, int width, int height, const uint8_t* p
 
     const bool ok = !ferror(f);
     return fclose(f) == 0 && ok;
+}
+
+bool writeIndexed8Rgb(const std::string& filename, int width, int height, const uint8_t* paletteRgb, const uint8_t* pixels)
+{
+    uint8_t palette[1024];
+    toBmpPalette(paletteRgb, palette);
+    return writeIndexed8(filename.c_str(), width, height, palette, pixels);
 }
 
 bool quantize(const uint32_t* argbPixels, int width, int height, bool masked, uint8_t* paletteRgb, std::vector<uint8_t>& indices)

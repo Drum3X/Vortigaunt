@@ -13,6 +13,7 @@
 #include "DtxConverter.h"
 #include "core/converters/FbxGlbConverter.h"
 #include "core/converters/WeaponModelConverter.h"
+#include "core/mdl/StudioDecompiler.h"
 #include "utils/FileIO.h"
 
 #include "core/extractors/xfs/XfsExtractor.h"
@@ -398,6 +399,26 @@ int main(int argc,char** argv)
 			return 1;
 		}
 		return ConvertModels(argc, argv);
+	}
+
+	// a GoldSrc model back to SMDs, BMPs and a QC
+	if (argc >= 2 && std::string(argv[1]) == "-decompile")
+	{
+		if (argc < 3)
+		{
+			printf("Usage: VortigauntTool -decompile <model.mdl> [output_dir]\n");
+			return 1;
+		}
+		const DecompileResult result = DecompileStudioModel(argv[2], argc >= 4 ? argv[3] : "VortigauntOutput");
+		for (const std::string& warning : result.warnings)
+			printf("Warning: %s\n", warning.c_str());
+		if (!result.ok)
+		{
+			printf("Decompile failed: %s\n", result.error.c_str());
+			return 1;
+		}
+		printf("Decompiled: %d SMD file(s), %d texture(s), QC %s\n", result.smdFiles, result.textures, result.qcPath.c_str());
+		return 0;
 	}
 
 	// Unity extraction command
